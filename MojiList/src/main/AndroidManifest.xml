@@ -8,9 +8,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name="com.example.sbaar.mojilist.App"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.sbaar.com.example.sbaar.mojilist.MainActivity"
+            android:name="com.example.sbaar.mojilist.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

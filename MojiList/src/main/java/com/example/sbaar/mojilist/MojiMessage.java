@@ -3,7 +3,7 @@ package com.example.sbaar.mojilist;
 import org.json.JSONObject;
 
 /**
- * Created by DouglasW on 12/3/2015.
+ * Created by Scott Baar on 12/3/2015.
  */
 public class MojiMessage {
     String from,to, fromImg, toImg, messageRaw, id;

@@ -10,26 +10,23 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.mojilib.Moji;
+
 import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
 
 import java.util.List;
 
 /**
- * Created by DouglasW on 12/3/2015.
+ * Created by Scott Baar on 12/3/2015.
  */
 public class MAdapter extends ArrayAdapter<MojiMessage> {
     Context context;
     List<MojiMessage> messages;
-    Parser parser = new Parser();
-    Handler handler = new Handler();
     public MAdapter (Context context, List<MojiMessage> messages){
         super(context,R.layout.message_item,messages);
         this.context = context;
         this.messages = messages;
-        try {
-            parser.setProperty(Parser.schemaProperty, new HTMLSchema());
-        }catch (Exception e){}
 
     }
     @Override
@@ -47,8 +44,7 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
         holder = (Holder) convertView.getTag();
         if (!message.id.equals(holder.id)){
             holder.id = message.id;
-            Spanned spanned = new SpanBuilder(message.messageRaw,null,null,parser,holder.messageTV).convert();
-            holder.messageTV.setText(spanned);
+            Moji.setText(message.messageRaw,holder.messageTV);
             MainActivity.picasso.load(message.fromImg).centerCrop().resize(holder.fromIV.getMaxWidth(),holder.fromIV.getMaxHeight())
             .into(holder.fromIV);
             MainActivity.picasso.load(message.toImg).centerCrop().resize(holder.toIV.getMaxWidth(),holder.toIV.getMaxHeight())

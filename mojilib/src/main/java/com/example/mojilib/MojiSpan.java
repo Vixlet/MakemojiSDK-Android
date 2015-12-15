@@ -1,4 +1,4 @@
-package com.example.sbaar.mojilist;
+package com.example.mojilib;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,16 +14,16 @@ import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.view.View;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.squareup.picasso252.Picasso;
+import com.squareup.picasso252.Target;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by DouglasW on 12/3/2015.
+ * Created by Scott Baar on 12/3/2015.
  */
-public class MojiSpan extends ReplacementSpan {
+class MojiSpan extends ReplacementSpan {
 
     private Drawable mDrawable;
     private Uri mContentUri;
@@ -31,11 +31,19 @@ public class MojiSpan extends ReplacementSpan {
     private Context mContext;
     private String mSource;
     private View mRefreshView;
+    private int mWidth;
+    private int mHeight;
 
+    private static float BASE_SIZE_MULT = 1.25f;// to make mojis stand out from text, always multiply the size by this
 
 
     public MojiSpan(Drawable d, String source,View refreshView) {
         this(d, source, ALIGN_BOTTOM,refreshView);
+    }
+    public MojiSpan(Drawable d, String source, int w, int h,View refreshView) {
+        this(d, source, ALIGN_BOTTOM,refreshView);
+        mWidth = (int) (w * Moji.density *BASE_SIZE_MULT);
+        mHeight = (int) (h * Moji.density * BASE_SIZE_MULT);
     }
 
     /**
@@ -45,8 +53,7 @@ public class MojiSpan extends ReplacementSpan {
     Target t = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            mDrawable = new BitmapDrawable(MainActivity.resources,bitmap);
-            mDrawable.setBounds(0,0,mDrawable.getIntrinsicWidth(),mDrawable.getIntrinsicHeight());
+            mDrawable = new BitmapDrawable(Moji.resources,bitmap);
             //mDrawable.setBounds(0,0,20,20);
             if (mDrawableRef!=null) mDrawableRef = new WeakReference<>(mDrawable);
             mRefreshView.postInvalidate();
@@ -68,7 +75,7 @@ public class MojiSpan extends ReplacementSpan {
         mSource = source;
 
         mRefreshView=refreshView;
-        MainActivity.picasso.load(mSource).into(t);
+        Moji.picasso.load(mSource).into(t);
     }
 
 
@@ -143,6 +150,8 @@ public class MojiSpan extends ReplacementSpan {
                        Paint.FontMetricsInt fm) {
         Drawable d = getCachedDrawable();
         Rect rect = d.getBounds();
+        rect.bottom = mHeight;
+        rect.right = mWidth;
         //rect.bottom=100;
 
         if (fm != null) {

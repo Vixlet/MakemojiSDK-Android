@@ -1,4 +1,4 @@
-package com.example.sbaar.mojilist;
+package com.example.mojilib;
 
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -33,11 +33,13 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Created by DouglasW on 12/3/2015.
+ * Created by Scott Baar on 12/3/2015.
  */
-public class SpanBuilder implements ContentHandler {
+class SpanBuilder implements ContentHandler {
 
         private static final float[] HEADER_SIZES = {
                 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
@@ -49,6 +51,7 @@ public class SpanBuilder implements ContentHandler {
         private Html.ImageGetter mImageGetter;
         private Html.TagHandler mTagHandler;
         private View refreshView;
+        private ParsedAttributes parsedAttributes;
 
         public SpanBuilder(
                 String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler,
@@ -59,6 +62,7 @@ public class SpanBuilder implements ContentHandler {
             mTagHandler = tagHandler;
             mReader = parser;
             this.refreshView=refreshView;
+            parsedAttributes = new ParsedAttributes();
         }
 
         public Spanned convert() {
@@ -103,9 +107,9 @@ public class SpanBuilder implements ContentHandler {
                 // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
                 // so we can safely emite the linebreaks when we handle the close tag.
             } else if (tag.equalsIgnoreCase("p")) {
-                handleP(mSpannableStringBuilder);
+                handleP(mSpannableStringBuilder,attributes,parsedAttributes);
             } else if (tag.equalsIgnoreCase("div")) {
-                handleP(mSpannableStringBuilder);
+                handleP(mSpannableStringBuilder,attributes,parsedAttributes);
             } else if (tag.equalsIgnoreCase("strong")) {
                 start(mSpannableStringBuilder, new Bold());
             } else if (tag.equalsIgnoreCase("b")) {
@@ -143,7 +147,7 @@ public class SpanBuilder implements ContentHandler {
                 handleP(mSpannableStringBuilder);
                 start(mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
             } else if (tag.equalsIgnoreCase("img")) {
-                startImg(mSpannableStringBuilder, attributes, mImageGetter,refreshView);
+                startImg(mSpannableStringBuilder, attributes,parsedAttributes, mImageGetter,refreshView);
             } else if (mTagHandler != null) {
                 mTagHandler.handleTag(true, tag, mSpannableStringBuilder, mReader);
             }
@@ -198,6 +202,30 @@ public class SpanBuilder implements ContentHandler {
             }
         }
 
+    static Pattern marginT = Pattern.compile("(?:margin-top:)(\\d+)(?:.*)");
+    static Pattern marginB = Pattern.compile("(?:margin-bottom:)(\\d+)(?:.*)");
+    static Pattern marginL = Pattern.compile("(?:margin-left:)(\\d+)(?:.*)");
+    static Pattern marginR = Pattern.compile("(?:margin-right:)(\\d+)(?:.*)");
+    static Pattern fontFamily = Pattern.compile("(?:font-family:')(.*)(?:';)");
+    static Pattern fontSize = Pattern.compile("(?:font-size:)(\\d+)(?:.*)");
+    private static void handleP(SpannableStringBuilder text, Attributes attributes, ParsedAttributes parsedAttributes){
+        String style = attributes.getValue("","style");
+        if (style!=null) {
+            Matcher m = marginT.matcher(style);
+            if (m.find()) parsedAttributes.marginTop = Integer.parseInt(m.group(1));
+            m = marginB.matcher(style);
+            if (m.find()) parsedAttributes.marginBottom = Integer.parseInt(m.group(1));
+            m = marginL.matcher(style);
+            if (m.find()) parsedAttributes.marginLeft = Integer.parseInt(m.group(1));
+            m = marginR.matcher(style);
+            if (m.find()) parsedAttributes.marginRight = Integer.parseInt(m.group(1));
+            m = fontFamily.matcher(style);
+            if (m.find()) parsedAttributes.fontFamily = m.group(1);
+            m = fontSize.matcher(style);
+            if (m.find()) parsedAttributes.fontSizePt = Integer.parseInt(m.group(1));
+        }
+            handleP(text);
+        }
         private static void handleP(SpannableStringBuilder text) {
             int len = text.length();
 
@@ -250,10 +278,20 @@ public class SpanBuilder implements ContentHandler {
                 text.setSpan(repl, where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-
+    static Pattern widthPattern = Pattern.compile("(?:width:)(\\d+)(?:.*)");
+    static Pattern heightPattern = Pattern.compile("(?:height:)(\\d+)(?:.*)");
         private static void startImg(SpannableStringBuilder text,
-                                     Attributes attributes, Html.ImageGetter img,View refreshView) {
+                                     Attributes attributes, ParsedAttributes parsedAttributes, Html.ImageGetter img,View refreshView) {
             String src = attributes.getValue("", "src");
+            String style = attributes.getValue("", "style");
+            int width = 20;
+            int height = 20;
+            if (style!=null){
+                Matcher m = widthPattern.matcher(style);
+                if (m.find()) width = Integer.parseInt(m.group(1));
+                m = heightPattern.matcher(style);
+                if (m.find()) height = Integer.parseInt(m.group(1));
+            }
             Drawable d = null;
 
             if (img != null) {
@@ -262,7 +300,7 @@ public class SpanBuilder implements ContentHandler {
 
             if (d == null) {
                 d = //Resources.getSystem().
-                        MainActivity.resources.
+                        Moji.resources.
                         getDrawable(R.drawable.unknown_image);
                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
             }
@@ -273,7 +311,7 @@ public class SpanBuilder implements ContentHandler {
           /*  text.setSpan(new ImageSpan(d, src), len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
 
-            text.setSpan(new MojiSpan(d, src,refreshView), len, text.length(),
+            text.setSpan(new MojiSpan(d, src, width,height,refreshView), len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
@@ -305,7 +343,7 @@ public class SpanBuilder implements ContentHandler {
                         String name = f.mColor.substring(1);
                         int colorRes = res.getIdentifier(name, "color", "android");
                         if (colorRes != 0) {
-                            ColorStateList colors = res.getColorStateList(colorRes, null);
+                            ColorStateList colors = res.getColorStateList(colorRes);
                             text.setSpan(new TextAppearanceSpan(null, 0, 0, colors, null),
                                     where, len,
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

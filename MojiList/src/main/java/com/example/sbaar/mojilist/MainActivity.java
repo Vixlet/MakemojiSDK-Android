@@ -12,10 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso252.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,14 +34,7 @@ public class MainActivity extends AppCompatActivity {
         resources = getResources();
         context =this;
         Picasso.Builder builder = new Picasso.Builder(MainActivity.context);
-        builder.listener(new Picasso.Listener() {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                exception.printStackTrace();
-            }
-        });
         picasso = builder.build();
-        picasso.setLoggingEnabled(false);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -53,6 +50,17 @@ try {
         adapter.add(new MojiMessage(ja.getJSONObject(i)));
     }
     ja = new JSONArray(Sample.sample3);
+    for (int i = 0; i < ja.length(); i++) {
+        adapter.add(new MojiMessage(ja.getJSONObject(i)));
+    }
+    InputStream is = getResources().openRawResource(R.raw.newsample);
+    BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    StringBuilder responseStrBuilder = new StringBuilder();
+
+    String inputStr;
+    while ((inputStr = streamReader.readLine()) != null)
+        responseStrBuilder.append(inputStr);
+    ja = new JSONArray(responseStrBuilder.toString());
     for (int i = 0; i < ja.length(); i++) {
         adapter.add(new MojiMessage(ja.getJSONObject(i)));
     }
