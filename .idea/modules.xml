@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MojiList.iml" filepath="$PROJECT_DIR$/MojiList.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" filepath="$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mojilib/mojilib.iml" filepath="$PROJECT_DIR$/mojilib/mojilib.iml" />
     </modules>
   </component>
 </project>
