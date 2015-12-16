@@ -3,7 +3,7 @@ package com.example.mojilib;
 import android.text.Spanned;
 
 /**
- * Spanned and attributes parsed from html.
+ * Spanned and attributes parsed from html message. Margins are in raw unscaled px. Font in unscaled pt.
  * Created by Scott Baar on 12/15/2015.
  */
 public class ParsedAttributes {
@@ -13,6 +13,6 @@ public class ParsedAttributes {
     public int marginLeft;
     public int marginRight;
     public String fontFamily;
-    public int fontSizePt;//unscaled font size in pt
-    public int color;//color parsed from hex
+    public int fontSizePt = -1;//unscaled font size in pt. -1 if not set.
+    public int color = -1;//color parsed from hex. -1 if not set.
 }

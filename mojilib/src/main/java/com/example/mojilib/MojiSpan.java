@@ -13,6 +13,7 @@ import android.text.style.DynamicDrawableSpan;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
@@ -30,20 +31,39 @@ class MojiSpan extends ReplacementSpan {
     private int mResourceId;
     private Context mContext;
     private String mSource;
-    private View mRefreshView;
+    private TextView mRefreshView;
     private int mWidth;
     private int mHeight;
+    private int mFontSize;
 
-    private static float BASE_SIZE_MULT = 1.25f;// to make mojis stand out from text, always multiply the size by this
+    // the baseline "normal" font size in sp.
+    static final int BASE_TEXT_PT = 14;
+    //the text size in pixels, determined by BASE_TEXT_PT and screen density
+    static float BASE_TEXT_PX_SCALED;
+    private float mFontRatio;
+
+    // to make mojis stand out from text, always multiply the size by this
+    private static float BASE_SIZE_MULT = 1.25f;
 
 
-    public MojiSpan(Drawable d, String source,View refreshView) {
-        this(d, source, ALIGN_BOTTOM,refreshView);
-    }
-    public MojiSpan(Drawable d, String source, int w, int h,View refreshView) {
-        this(d, source, ALIGN_BOTTOM,refreshView);
-        mWidth = (int) (w * Moji.density *BASE_SIZE_MULT);
-        mHeight = (int) (h * Moji.density * BASE_SIZE_MULT);
+    public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, TextView refreshView) {
+        //scale based on font size
+        if (simple){ //scale based on current text size
+            mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
+        }
+        else{//scale based on font size to be set
+            mFontRatio = (fontSize*Moji.density)/BASE_TEXT_PX_SCALED;
+        }
+        mWidth = (int) (w * Moji.density *BASE_SIZE_MULT * mFontRatio);
+        mHeight = (int) (h * Moji.density * BASE_SIZE_MULT * mFontRatio);
+
+        mDrawable = d;
+        mSource = source;
+
+        mRefreshView=refreshView;
+        Moji.picasso.load(mSource)
+                //.resize(mWidth,mHeight)
+                .into(t);
     }
 
     /**
@@ -54,8 +74,8 @@ class MojiSpan extends ReplacementSpan {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             mDrawable = new BitmapDrawable(Moji.resources,bitmap);
-            //mDrawable.setBounds(0,0,20,20);
-            if (mDrawableRef!=null) mDrawableRef = new WeakReference<>(mDrawable);
+            mDrawable.setBounds(0,0,mWidth,mHeight);
+            mDrawableRef = new WeakReference<>(mDrawable);
             mRefreshView.postInvalidate();
         }
 
@@ -70,13 +90,6 @@ class MojiSpan extends ReplacementSpan {
         }
     };
 
-    public MojiSpan(Drawable d, String source, int verticalAlignment, View refreshView) {
-        mDrawable = d;
-        mSource = source;
-
-        mRefreshView=refreshView;
-        Moji.picasso.load(mSource).into(t);
-    }
 
 
     public Drawable getDrawable() {
@@ -172,12 +185,12 @@ class MojiSpan extends ReplacementSpan {
                      int top, int y, int bottom, Paint paint) {
         Drawable b = getCachedDrawable();
         canvas.save();
-
         int transY = bottom - b.getBounds().bottom;
         if (mVerticalAlignment == ALIGN_BASELINE) {
             transY -= paint.getFontMetricsInt().descent;
         }
 
+        //b.setBounds(0,0,-mWidth,mHeight);
         canvas.translate(x, transY);
         b.draw(canvas);
         canvas.restore();

@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
     public static Resources resources;
     public static Context context;
     public static Picasso picasso;
-    public static Handler handler = new Handler();
+    MAdapter adapter;
+    public boolean simple=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        MAdapter adapter = new MAdapter(this,new ArrayList<MojiMessage>());
+        adapter = new MAdapter(this,new ArrayList<MojiMessage>(), simple);
         final ListView listView = (ListView)findViewById(R.id.list_view);
 try {
     JSONArray ja = new JSONArray(Sample.sample1);
@@ -94,8 +95,18 @@ catch (Exception e){
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+
+        if (id ==R.id.action_size_up){
+            adapter.changeTextSize(2f);
             return true;
+        }
+        else if (id ==R.id.action_size_down){
+            adapter.changeTextSize(-2f);
+            return true;
+        }
+        else if (id == R.id.action_toggle_simple){
+            simple=!simple;
+            adapter.setSimple(simple);
         }
 
         return super.onOptionsItemSelected(item);

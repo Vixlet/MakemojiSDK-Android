@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent">
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         tools:text="message"
+        android:gravity="right"
+        android:textSize="18sp"
         android:id="@+id/item_message_tv"
         android:layout_height="wrap_content" />
     <ImageView
@@ -13,6 +15,7 @@
         android:layout_height="20dp"
         android:maxWidth="20dp"
         android:maxHeight="20dp"
+        android:visibility="gone"
         tools:src="@drawable/unknown_image"
         android:src="@drawable/unknown_image"
         android:id="@+id/from_iv"/>
@@ -21,6 +24,7 @@
         android:layout_height="20dp"
         android:maxWidth="20dp"
         android:maxHeight="20dp"
+        android:visibility="gone"
         tools:src="@drawable/unknown_image"
         android:src="@drawable/unknown_image"
         android:id="@+id/to_iv"/>

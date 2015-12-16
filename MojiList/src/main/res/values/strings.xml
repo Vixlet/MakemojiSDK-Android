@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MojiList</string>
     <string name="action_settings">Settings</string>
+    <string name="action_text_up">Text Size +</string>
+    <string name="action_text_down">Text Size -</string>
+    <string name="action_toggle_simple">Simple/Chat</string>
 </resources>

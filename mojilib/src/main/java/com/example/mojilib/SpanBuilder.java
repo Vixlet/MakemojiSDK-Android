@@ -21,7 +21,9 @@ import android.text.style.TextAppearanceSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import org.ccil.cowan.tagsoup2.Parser;
 import org.xml.sax.Attributes;
@@ -50,12 +52,13 @@ class SpanBuilder implements ContentHandler {
         private SpannableStringBuilder mSpannableStringBuilder;
         private Html.ImageGetter mImageGetter;
         private Html.TagHandler mTagHandler;
-        private View refreshView;
+        private TextView refreshView;
         private ParsedAttributes parsedAttributes;
+        private boolean mSimple;
 
         public SpanBuilder(
                 String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler,
-                Parser parser,View refreshView) {
+                Parser parser, boolean simple,TextView refreshView) {
             mSource = source;
             mSpannableStringBuilder = new SpannableStringBuilder();
             mImageGetter = imageGetter;
@@ -63,9 +66,10 @@ class SpanBuilder implements ContentHandler {
             mReader = parser;
             this.refreshView=refreshView;
             parsedAttributes = new ParsedAttributes();
+            mSimple =simple;
         }
 
-        public Spanned convert() {
+        public ParsedAttributes convert() {
 
             mReader.setContentHandler(this);
             try {
@@ -98,8 +102,8 @@ class SpanBuilder implements ContentHandler {
                     mSpannableStringBuilder.setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
                 }
             }
-
-            return mSpannableStringBuilder;
+            parsedAttributes.spanned = mSpannableStringBuilder;
+            return parsedAttributes;
         }
 
         private void handleStartTag(String tag, Attributes attributes) {
@@ -147,8 +151,12 @@ class SpanBuilder implements ContentHandler {
                 handleP(mSpannableStringBuilder);
                 start(mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
             } else if (tag.equalsIgnoreCase("img")) {
-                startImg(mSpannableStringBuilder, attributes,parsedAttributes, mImageGetter,refreshView);
-            } else if (mTagHandler != null) {
+                startImg(mSpannableStringBuilder, attributes,parsedAttributes, mImageGetter,refreshView,mSimple);
+            }
+            else if (tag.equalsIgnoreCase("span")){
+                parseSpanTag(mSpannableStringBuilder,attributes,parsedAttributes);
+            }
+            else if (mTagHandler != null) {
                 mTagHandler.handleTag(true, tag, mSpannableStringBuilder, mReader);
             }
         }
@@ -208,6 +216,7 @@ class SpanBuilder implements ContentHandler {
     static Pattern marginR = Pattern.compile("(?:margin-right:)(\\d+)(?:.*)");
     static Pattern fontFamily = Pattern.compile("(?:font-family:')(.*)(?:';)");
     static Pattern fontSize = Pattern.compile("(?:font-size:)(\\d+)(?:.*)");
+    static Pattern colorPattern = Pattern.compile("(?:color:)(#\\d+)(?:.*)");
     private static void handleP(SpannableStringBuilder text, Attributes attributes, ParsedAttributes parsedAttributes){
         String style = attributes.getValue("","style");
         if (style!=null) {
@@ -226,6 +235,18 @@ class SpanBuilder implements ContentHandler {
         }
             handleP(text);
         }
+    private static void parseSpanTag(SpannableStringBuilder text, Attributes attributes, ParsedAttributes parsedAttributes){
+        String style = attributes.getValue("","style");
+        if (style!=null){
+            Matcher m = colorPattern.matcher(style);
+            try {
+                if (m.find()) parsedAttributes.color = Color.parseColor(m.group(1));
+            }
+            catch (IllegalArgumentException e){
+                Log.e("Moji SpanBuilder","Can't parse color found in html!" + e.getLocalizedMessage());
+            }
+        }
+    }
         private static void handleP(SpannableStringBuilder text) {
             int len = text.length();
 
@@ -281,7 +302,8 @@ class SpanBuilder implements ContentHandler {
     static Pattern widthPattern = Pattern.compile("(?:width:)(\\d+)(?:.*)");
     static Pattern heightPattern = Pattern.compile("(?:height:)(\\d+)(?:.*)");
         private static void startImg(SpannableStringBuilder text,
-                                     Attributes attributes, ParsedAttributes parsedAttributes, Html.ImageGetter img,View refreshView) {
+                                     Attributes attributes, ParsedAttributes parsedAttributes, Html.ImageGetter img,TextView refreshView,
+                                     boolean simple) {
             String src = attributes.getValue("", "src");
             String style = attributes.getValue("", "style");
             int width = 20;
@@ -311,7 +333,7 @@ class SpanBuilder implements ContentHandler {
           /*  text.setSpan(new ImageSpan(d, src), len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
 
-            text.setSpan(new MojiSpan(d, src, width,height,refreshView), len, text.length(),
+            text.setSpan(new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,refreshView), len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 

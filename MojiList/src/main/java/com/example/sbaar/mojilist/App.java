@@ -14,6 +14,6 @@ public class App extends Application {
     public void onCreate(){
         super.onCreate();
         context=this;
-        Moji.setContext(context);
+        Moji.initialize(context);
     }
 }
