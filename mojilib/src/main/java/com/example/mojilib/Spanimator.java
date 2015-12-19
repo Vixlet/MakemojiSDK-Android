@@ -67,7 +67,7 @@ public class Spanimator {
             public void onAnimationUpdate(ValueAnimator animation) {
                 Set<Spanimatable> set = subscribers.keySet();
                 Log.d("Spanimator","spanimator subscruber size "+ set.size());
-                float progress = animation.getAnimatedFraction();
+                float progress = (float) animation.getAnimatedValue();
                 for (Spanimatable spanimatable : set){
                     if (spanimatable!=null){
                         spanimatable.onAnimationUpdate(HYPER_PULSE,progress,HYPER_PULSE_MIN,HYPER_PULSE_MAX);

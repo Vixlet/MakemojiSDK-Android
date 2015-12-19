@@ -122,22 +122,16 @@ public class Moji {
     @UiThread
     public static ParsedAttributes setText(String html, @NonNull TextView tv, boolean simple){
         ParsedAttributes parsedAttributes =parseHtml(html,tv,simple);
-       // if (tv.getTag(R.id._makemoji_textwatcher_tag_id)==null)
-         //   setTextWatcher(tv);
+        //if (tv.getTag(R.id._makemoji_textwatcher_tag_id)==null)
+          //  setTextWatcher(tv);
         CharSequence cs = tv.getText();
-        if (cs instanceof Spanned){
-            Spanned spanned = (Spanned) cs;
-            MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
-            if (mojiSpans.length>0)Log.d("TextWatcher","Adding spans "+ mojiSpans.length);
-            for (MojiSpan mojiSpan : mojiSpans) {
-                if (mojiSpan.shouldAnimate())
-                    Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
-            }
-        }
+        if (cs instanceof Spanned)
+            unsubSpanimatable((Spanned)cs);
+
         tv.setText(parsedAttributes.spanned);
 
         MojiSpan[] mojiSpans = parsedAttributes.spanned.getSpans(0, parsedAttributes.spanned.length(), MojiSpan.class);
-        if (mojiSpans.length>0)Log.d("TextWatcher","Adding spans "+ mojiSpans.length);
+       // if (mojiSpans.length>0)Log.d("TextWatcher","Adding spans "+ mojiSpans.length);
         for (MojiSpan mojiSpan : mojiSpans) {
             if (mojiSpan.shouldAnimate())
                 Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
@@ -149,6 +143,16 @@ public class Moji {
             if (parsedAttributes.fontSizePt!=-1) tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,parsedAttributes.fontSizePt);
         }
         return parsedAttributes;
+    }
+    static void unsubSpanimatable(Spanned spanned){
+        Log.d("unsub","unsub called");
+        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
+        // if (mojiSpans.length>0)Log.d("TextWatcher","Removing spans "+ mojiSpans.length);
+        for (MojiSpan mojiSpan : mojiSpans) {
+            if (mojiSpan.shouldAnimate())
+                Spanimator.unsubscrube(Spanimator.HYPER_PULSE, mojiSpan);
+        }
+
     }
 
     /**
@@ -176,16 +180,18 @@ public class Moji {
     private static TextWatcher textWatcher = new TextWatcher(){
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            if (s instanceof Spanned) {
+           /* if (s instanceof Spanned) {
                 Spanned spanned = (Spanned) s;
                 MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
                 if (mojiSpans.length>0)Log.d("TextWatcher","Removing spans "+ mojiSpans.length);
                 for (MojiSpan mojiSpan : mojiSpans) {
                     if (mojiSpan.shouldAnimate()) {
-                       // Spanimator.unsubscrube(Spanimator.HYPER_PULSE, mojiSpan);
+                        Spanimator.unsubscrube(Spanimator.HYPER_PULSE, mojiSpan);
                     }
                 }
-            }
+            }*/
+           if (s instanceof Spanned)
+               unsubSpanimatable((Spanned)s);
         }
 
         @Override
@@ -195,12 +201,6 @@ public class Moji {
 
         @Override
         public void afterTextChanged(Editable spanned) {
-            MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
-            if (mojiSpans.length>0)Log.d("TextWatcher","Adding spans "+ mojiSpans.length);
-            for (MojiSpan mojiSpan : mojiSpans) {
-                if (mojiSpan.shouldAnimate())
-                    Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
-            }
 
         }};
     private static int calculateMemoryCacheSize(Context context) {

@@ -52,6 +52,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     private WeakReference<Drawable> mDrawableRef;
     private WeakReference<TextView> mViewRef;
+    boolean shouldAnimate;
 
 
     public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, TextView refreshView) {
@@ -72,6 +73,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         Moji.picasso.load(mSource)
                 //.resize(mWidth,mHeight)
                 .into(t);
+        shouldAnimate = Math.random()<.2;
     }
 
     /**
@@ -197,13 +199,14 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         //save bounds before applying animation scale.
         int oldRight = d.getBounds().right;
         int oldBottom = d.getBounds().bottom;
-        d.setBounds(d.getBounds().left,d.getBounds().top,(int)(oldRight*currentAnimationScale),(int)(oldBottom*currentAnimationScale));
+        int newWidth = (int)(oldRight*currentAnimationScale);
+        d.setBounds(d.getBounds().left,d.getBounds().top,newWidth,(int)(oldBottom*currentAnimationScale));
         int transY = bottom - d.getBounds().bottom;
         if (mVerticalAlignment == ALIGN_BASELINE) {
             transY -= paint.getFontMetricsInt().descent;
         }
 
-        canvas.translate(x, transY);
+        canvas.translate(x+((mWidth-newWidth))/2, transY);
         d.draw(canvas);
         d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
         canvas.restore();
@@ -224,9 +227,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         return d;
     }
 
-
     public boolean shouldAnimate(){
-        return true;
+        return shouldAnimate;
+
     }
     @Override
     public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
