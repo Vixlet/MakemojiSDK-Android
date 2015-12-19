@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="app_name" type="string">MakeMojiLib</item>
+    <integer name="_makemoji_pulse_duration">3000</integer>
 </resources>

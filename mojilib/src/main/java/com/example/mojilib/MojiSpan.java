@@ -18,20 +18,21 @@ import android.widget.TextView;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
+import org.w3c.dom.Text;
+
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 /**
  * Created by Scott Baar on 12/3/2015.
  */
-class MojiSpan extends ReplacementSpan {
+class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     private Drawable mDrawable;
     private Uri mContentUri;
     private int mResourceId;
     private Context mContext;
     private String mSource;
-    private TextView mRefreshView;
     private int mWidth;
     private int mHeight;
     private int mFontSize;
@@ -44,6 +45,13 @@ class MojiSpan extends ReplacementSpan {
 
     // to make mojis stand out from text, always multiply the size by this
     private static float BASE_SIZE_MULT = 1.25f;
+
+    //proportion to size the moji on next frame when being animated;
+    private float currentAnimationScale = 1f;
+
+
+    private WeakReference<Drawable> mDrawableRef;
+    private WeakReference<TextView> mViewRef;
 
 
     public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, TextView refreshView) {
@@ -60,7 +68,7 @@ class MojiSpan extends ReplacementSpan {
         mDrawable = d;
         mSource = source;
 
-        mRefreshView=refreshView;
+        mViewRef = new WeakReference<>(refreshView);
         Moji.picasso.load(mSource)
                 //.resize(mWidth,mHeight)
                 .into(t);
@@ -76,7 +84,8 @@ class MojiSpan extends ReplacementSpan {
             mDrawable = new BitmapDrawable(Moji.resources,bitmap);
             mDrawable.setBounds(0,0,mWidth,mHeight);
             mDrawableRef = new WeakReference<>(mDrawable);
-            mRefreshView.postInvalidate();
+            TextView tv = mViewRef.get();
+            if (tv!=null)tv.postInvalidate();
         }
 
         @Override
@@ -183,16 +192,20 @@ class MojiSpan extends ReplacementSpan {
     public void draw(Canvas canvas, CharSequence text,
                      int start, int end, float x,
                      int top, int y, int bottom, Paint paint) {
-        Drawable b = getCachedDrawable();
+        Drawable d = getCachedDrawable();
         canvas.save();
-        int transY = bottom - b.getBounds().bottom;
+        //save bounds before applying animation scale.
+        int oldRight = d.getBounds().right;
+        int oldBottom = d.getBounds().bottom;
+        d.setBounds(d.getBounds().left,d.getBounds().top,(int)(oldRight*currentAnimationScale),(int)(oldBottom*currentAnimationScale));
+        int transY = bottom - d.getBounds().bottom;
         if (mVerticalAlignment == ALIGN_BASELINE) {
             transY -= paint.getFontMetricsInt().descent;
         }
 
-        //b.setBounds(0,0,-mWidth,mHeight);
         canvas.translate(x, transY);
-        b.draw(canvas);
+        d.draw(canvas);
+        d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
         canvas.restore();
     }
 
@@ -211,5 +224,23 @@ class MojiSpan extends ReplacementSpan {
         return d;
     }
 
-    private WeakReference<Drawable> mDrawableRef;
+
+    public boolean shouldAnimate(){
+        return true;
+    }
+    @Override
+    public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
+        currentAnimationScale = progress;
+        TextView tv = mViewRef.get();
+        if (tv!=null)
+            tv.invalidate();//redraw
+        else
+            Spanimator.unsubscrube(Spanimator.HYPER_PULSE,this);//no longer attatched to view.
+
+    }
+
+    @Override
+    public void onAnimationPause() {
+
+    }
 }
