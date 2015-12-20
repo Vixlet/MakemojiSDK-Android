@@ -10,6 +10,8 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ParagraphStyle;
 import android.text.style.QuoteSpan;
@@ -306,6 +308,7 @@ class SpanBuilder implements ContentHandler {
                                      boolean simple) {
             String src = attributes.getValue("", "src");
             String style = attributes.getValue("", "style");
+            String link = attributes.getValue("", "link");
             int width = 20;
             int height = 20;
             if (style!=null){
@@ -331,11 +334,26 @@ class SpanBuilder implements ContentHandler {
             int len = text.length();
             text.append("\uFFFC");
 
-          /*  text.setSpan(new ImageSpan(d, src), len, text.length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
+            final MojiSpan mojiSpan =new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,link,refreshView);
 
-            text.setSpan(new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,refreshView), len, text.length(),
+            text.setSpan(mojiSpan, len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
+                refreshView.setHighlightColor(Color.TRANSPARENT);
+                ClickableSpan clickableSpan = new ClickableSpan() {
+                    @Override
+                    public void onClick(View widget) {
+                        HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);
+                        if (hyperMojiListener == null)
+                            hyperMojiListener = Moji.getDefaultHyperMojiClickBehavior();
+                        hyperMojiListener.onClick(mojiSpan.getLink());
+                    }
+                };
+                text.setSpan(clickableSpan, len, text.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                refreshView.setMovementMethod(LinkMovementMethod.getInstance());
+            }
         }
 
         private static void startFont(SpannableStringBuilder text,

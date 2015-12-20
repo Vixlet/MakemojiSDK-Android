@@ -16,6 +16,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 import android.app.Application;
+import android.widget.Toast;
 
 import com.squareup.picasso252.LruCache;
 import com.squareup.picasso252.Picasso;
@@ -45,7 +46,8 @@ public class Moji {
     //screen density
     static float density;
 
-    //the index to tag textviews with our custom text watcher
+    //randomly seed some mojispans with links when in demo mode
+    static boolean demo = true;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * @param c The application object. Needed for resources and to register activity callbacks.
@@ -166,6 +168,20 @@ public class Moji {
     }
     public static ParsedAttributes parseHtml(String html, @Nullable TextView tv, boolean simple){
         return new SpanBuilder(html,null,null,parser,simple,tv).convert();
+    }
+
+    private static  HyperMojiListener defaultHyperMojiListener = new HyperMojiListener() {
+        @Override
+        public void onClick(String url) {
+            Toast.makeText(context,"default hypermoji click "+ url,Toast.LENGTH_SHORT).show();
+        }
+    };
+    private static HyperMojiListener customDefaultHyperMojiListener;
+    public static HyperMojiListener getDefaultHyperMojiClickBehavior(){
+        return customDefaultHyperMojiListener==null?defaultHyperMojiListener:customDefaultHyperMojiListener;
+    }
+    public static void setDefaultHyperMojiListener(HyperMojiListener hyperMojiListener ){
+        customDefaultHyperMojiListener = hyperMojiListener;
     }
 
     /**

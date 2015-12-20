@@ -10,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.mojilib.HyperMojiListener;
 import com.example.mojilib.Moji;
 
 import org.ccil.cowan.tagsoup2.HTMLSchema;
@@ -43,6 +45,13 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
             holder.fromIV = (ImageView) convertView.findViewById(R.id.from_iv);
             holder.toIV = (ImageView) convertView.findViewById(R.id.to_iv);
             convertView.setTag(holder);
+
+            holder.messageTV.setTag(R.id._makemoji_hypermoji_listener_tag_id, new HyperMojiListener() {
+                @Override
+                public void onClick(String url) {
+                    Toast.makeText(getContext(),"hypermoji clicked from adapter url " + url,Toast.LENGTH_SHORT).show();
+                }
+            });
 
             if (mTextSize== -1) mTextSize = holder.messageTV.getTextSize()/getContext().getResources().getDisplayMetrics().density;
         }

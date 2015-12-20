@@ -28,7 +28,7 @@ public class Spanimator {
 
     public static final int HYPER_PULSE = 0;
     public static final float HYPER_PULSE_MAX = 1f;
-    public static final float HYPER_PULSE_MIN = .5f;
+    public static final float HYPER_PULSE_MIN = .25f;
 
 
     private static Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
@@ -78,16 +78,18 @@ public class Spanimator {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                hyperAnimation.start();
+            if (hyperAnimation!=null)    hyperAnimation.start();
             }
         });
 
 
     }
     static void onResume(){
+        Log.d("Spanimator","spanimator lifecycle resume");
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
     }
     static void onPause(){
+        Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
 
     }

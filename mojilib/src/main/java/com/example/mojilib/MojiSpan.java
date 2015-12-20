@@ -52,10 +52,11 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     private WeakReference<Drawable> mDrawableRef;
     private WeakReference<TextView> mViewRef;
+    private String mLink;
     boolean shouldAnimate;
 
 
-    public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, TextView refreshView) {
+    public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, String link,TextView refreshView) {
         //scale based on font size
         if (simple){ //scale based on current text size
             mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
@@ -68,18 +69,19 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
 
         mDrawable = d;
         mSource = source;
+        mLink = link;
+        shouldAnimate = (link!=null && !link.isEmpty());
 
         mViewRef = new WeakReference<>(refreshView);
         Moji.picasso.load(mSource)
                 //.resize(mWidth,mHeight)
                 .into(t);
-        shouldAnimate = Math.random()<.2;
+        if (Moji.demo &&  Math.random() <= .2) {
+                shouldAnimate =true;
+                mLink = source;
+        }
     }
 
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
     Target t = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -196,19 +198,20 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
                      int top, int y, int bottom, Paint paint) {
         Drawable d = getCachedDrawable();
         canvas.save();
-        //save bounds before applying animation scale.
-        int oldRight = d.getBounds().right;
-        int oldBottom = d.getBounds().bottom;
-        int newWidth = (int)(oldRight*currentAnimationScale);
-        d.setBounds(d.getBounds().left,d.getBounds().top,newWidth,(int)(oldBottom*currentAnimationScale));
+        //save bounds before applying animation scale. for a size pulse only
+        //int oldRight = d.getBounds().right;
+        //int oldBottom = d.getBounds().bottom;
+       // int newWidth = (int)(oldRight*currentAnimationScale);
+        //d.setBounds(d.getBounds().left,d.getBounds().top,newWidth,(int)(oldBottom*currentAnimationScale));
         int transY = bottom - d.getBounds().bottom;
         if (mVerticalAlignment == ALIGN_BASELINE) {
             transY -= paint.getFontMetricsInt().descent;
         }
 
-        canvas.translate(x+((mWidth-newWidth))/2, transY);
+        d.setAlpha((int)(255 * currentAnimationScale));
+        canvas.translate(x, transY);
         d.draw(canvas);
-        d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
+       // d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
         canvas.restore();
     }
 
@@ -230,6 +233,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     public boolean shouldAnimate(){
         return shouldAnimate;
 
+    }
+    public String getLink(){
+        return mLink;
     }
     @Override
     public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
