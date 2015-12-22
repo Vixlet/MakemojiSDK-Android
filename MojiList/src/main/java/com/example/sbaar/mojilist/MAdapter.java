@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.mojilib.HyperMojiListener;
 import com.example.mojilib.Moji;
+import com.example.mojilib.ParsedAttributes;
 
 import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
@@ -56,24 +57,23 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
             if (mTextSize== -1) mTextSize = holder.messageTV.getTextSize()/getContext().getResources().getDisplayMetrics().density;
         }
         holder = (Holder) convertView.getTag();
-        if (!message.id.equals(holder.id) || mSimple!=holder.simple){
+        if (holder.simple!=mSimple){//simple has changed, destroy cached spanned
+            message.parsedAttributes = null;
+        }
+        if (!message.id.equals(holder.id)){
             holder.id = message.id;
-            Moji.setText(message.messageRaw,holder.messageTV,mSimple);
-            MainActivity.picasso.load(message.fromImg).centerCrop().resize(holder.fromIV.getMaxWidth(),holder.fromIV.getMaxHeight())
-            .into(holder.fromIV);
-            MainActivity.picasso.load(message.toImg).centerCrop().resize(holder.toIV.getMaxWidth(),holder.toIV.getMaxHeight())
-            .into(holder.toIV);
+            ParsedAttributes parsedAttributes = message.parsedAttributes;
+            if (parsedAttributes==null) {
+                parsedAttributes = Moji.parseHtml(message.messageRaw, holder.messageTV, mSimple);
+                message.parsedAttributes =parsedAttributes;
+            }
+            Moji.setText(message.parsedAttributes.spanned,holder.messageTV);
             holder.simple = mSimple;
         }
-        else if (holder.messageTV.getTextSize()!= mTextSize){
+        if (holder.messageTV.getTextSize()!= mTextSize){
             holder.messageTV.setTextSize(mTextSize);
             Moji.setText(message.messageRaw,holder.messageTV,mSimple);
         }
-        if (!mSimple){
-            holder.messageTV.setGravity(position%2==0? Gravity.LEFT:Gravity.RIGHT);
-        }
-        else
-            holder.messageTV.setGravity(Gravity.LEFT);
 
         return convertView;
     }

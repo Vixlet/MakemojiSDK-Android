@@ -34,24 +34,38 @@ public class Spanimator {
     private static Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
     private static ValueAnimator hyperAnimation;
     private static Handler mainHandler = new Handler(Looper.getMainLooper());
+    private static boolean mPaused =false;
 
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({HYPER_PULSE})
     public @interface Spanimation {}
 
-    public static void subscribe(@Spanimation int spanimation, Spanimatable spanimatable){
+    /**
+     * Adds a spanimatable to the list of subscribers to be updated on each animation frame
+     * @param spanimation the animation to subscribe to
+     * @param spanimatable the subscriber to add.
+     */
+    public static synchronized void subscribe(@Spanimation int spanimation, Spanimatable spanimatable){
         subscribers.put(spanimatable,true);
+        spanimatable.onSubscribed();
         setupStartAnimation(spanimation);
     }
-    public static void unsubscrube(@Spanimation int spanimation, Spanimatable spanimatable ){
+
+    /**
+     * Removes a spanimatable from the list of subscribers to be updated on each animation frame
+     * @param spanimation
+     * @param spanimatable
+     */
+    public static synchronized void unsubscribe(@Spanimation int spanimation, Spanimatable spanimatable ){
         subscribers.remove(spanimatable);
+        spanimatable.onUnsubscribed();
         if (subscribers.isEmpty() && hyperAnimation!=null){
             hyperAnimation.end();
-            hyperAnimation = null;
         }
     }
-    private static void setupStartAnimation(@Spanimation int spanimation){
+    private static synchronized void setupStartAnimation(@Spanimation int spanimation){
+        if (mPaused)return;
         if (hyperAnimation!=null) {
             if (!hyperAnimation.isRunning())hyperAnimation.start();
             return;
@@ -78,17 +92,19 @@ public class Spanimator {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-            if (hyperAnimation!=null)    hyperAnimation.start();
+            if (hyperAnimation!=null && !mPaused)    hyperAnimation.start();
             }
         });
 
 
     }
     static void onResume(){
+        mPaused=false;
         Log.d("Spanimator","spanimator lifecycle resume");
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
     }
     static void onPause(){
+        mPaused=true;
         Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
 

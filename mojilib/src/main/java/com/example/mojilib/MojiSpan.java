@@ -9,16 +9,12 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.text.style.DynamicDrawableSpan;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
-
-import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -54,6 +50,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private WeakReference<TextView> mViewRef;
     private String mLink;
     boolean shouldAnimate;
+    Drawable mPlaceHolder;
 
 
     public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, String link,TextView refreshView) {
@@ -68,13 +65,14 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         mHeight = (int) (h * Moji.density * BASE_SIZE_MULT * mFontRatio);
 
         mDrawable = d;
+        mPlaceHolder = d;
         mSource = source;
         mLink = link;
         shouldAnimate = (link!=null && !link.isEmpty());
 
         mViewRef = new WeakReference<>(refreshView);
         Moji.picasso.load(mSource)
-                //.resize(mWidth,mHeight)
+                .resize(mWidth,mHeight)
                 .into(t);
         if (Moji.demo &&  Math.random() <= .2) {
                 shouldAnimate =true;
@@ -223,8 +221,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
             d = wr.get();
 
         if (d == null) {
-            d = getDrawable();
-            mDrawableRef = new WeakReference<Drawable>(d);
+            d = mPlaceHolder;
         }
 
         return d;
@@ -239,17 +236,31 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     }
     @Override
     public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
-        currentAnimationScale = progress;
-        TextView tv = mViewRef.get();
-        if (tv!=null)
-            tv.invalidate();//redraw
-        else
-            Spanimator.unsubscrube(Spanimator.HYPER_PULSE,this);//no longer attatched to view.
-
+        if (shouldAnimate) {
+            currentAnimationScale = progress;
+            TextView tv = mViewRef.get();
+            if (tv != null)
+                tv.invalidate();//redraw
+            else
+                Spanimator.unsubscribe(Spanimator.HYPER_PULSE, this);//no longer attatched to view.
+        }
     }
 
     @Override
     public void onAnimationPause() {
 
+    }
+    @Override
+    public void onUnsubscribed(){
+        mDrawable = null;//get rid of hard reference to bitmap
+    }
+    public void onSubscribed(){
+        if (mDrawable==null) //if bitmap was gced, get it again. don't bother refetching for a new size.
+            Moji.picasso.load(mSource)
+                    //.resize(mWidth,mHeight)
+                    .into(t);
+    }
+    public void setTextView(TextView tv){
+        mViewRef = new WeakReference<>(tv);
     }
 }

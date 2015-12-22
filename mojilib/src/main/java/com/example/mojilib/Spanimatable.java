@@ -16,4 +16,14 @@ public interface Spanimatable {
      */
     void onAnimationUpdate(@Spanimation int spanimation, float progress, float min, float max );
     void onAnimationPause();
+
+    /**
+     * When the animation is subscribed to
+     */
+    void onSubscribed();
+
+    /**
+     * When the animation is unsubscribed to
+     */
+    void onUnsubscribed();
 }

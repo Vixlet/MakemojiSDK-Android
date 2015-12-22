@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -23,6 +24,7 @@ import com.squareup.picasso252.Picasso;
 
 import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
+import org.w3c.dom.Text;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
@@ -50,16 +52,16 @@ public class Moji {
     static boolean demo = true;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
-     * @param c The application object. Needed for resources and to register activity callbacks.
+     * @param app The application object. Needed for resources and to register activity callbacks.
      * @param cacheSizeBytes the in-memory cache size in bytes
      */
-    public static void initialize(Application c, int cacheSizeBytes){
-        context = c.getApplicationContext();
-        resources = c.getResources();
+    public static void initialize(Application app, int cacheSizeBytes){
+        context = app.getApplicationContext();
+        resources = app.getResources();
         density = resources.getDisplayMetrics().density;
         MojiSpan.BASE_TEXT_PX_SCALED = MojiSpan.BASE_TEXT_PT*density;
 
-        c.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+        app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
@@ -108,8 +110,8 @@ public class Moji {
         }catch (Exception e){}
     }
     //calls initialize with the default cache size, 5%
-    public static void initialize(Application c){
-        initialize(c,calculateMemoryCacheSize(c));
+    public static void initialize(Application app){
+        initialize(app,calculateMemoryCacheSize(app));
     }
 
     /**
@@ -118,26 +120,13 @@ public class Moji {
      * Call this after a TextView's
      * @param html the html message to parse
      * @param tv the TextView to set the text on. Used for sizing the emoji spans.
-     * @param simple If true, will not apply any styling information beyond setting the parsed message.
+     * @param simple If true, will not apply any styling information beyond setting the parsed message with emojis.
      * @return Returns the parsed attributes from the html so you can cherry pick which styles to apply.
      */
     @UiThread
-    public static ParsedAttributes setText(String html, @NonNull TextView tv, boolean simple){
+    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple){
         ParsedAttributes parsedAttributes =parseHtml(html,tv,simple);
-        //if (tv.getTag(R.id._makemoji_textwatcher_tag_id)==null)
-          //  setTextWatcher(tv);
-        CharSequence cs = tv.getText();
-        if (cs instanceof Spanned)
-            unsubSpanimatable((Spanned)cs);
-
-        tv.setText(parsedAttributes.spanned);
-
-        MojiSpan[] mojiSpans = parsedAttributes.spanned.getSpans(0, parsedAttributes.spanned.length(), MojiSpan.class);
-       // if (mojiSpans.length>0)Log.d("TextWatcher","Adding spans "+ mojiSpans.length);
-        for (MojiSpan mojiSpan : mojiSpans) {
-            if (mojiSpan.shouldAnimate())
-                Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
-        }
+        setText(parsedAttributes.spanned,tv);
         if (!simple){
             tv.setPadding((int)(parsedAttributes.marginLeft *density),(int)(parsedAttributes.marginTop *density),
                     (int) (parsedAttributes.marginRight * density),(int)(parsedAttributes.marginBottom *density));
@@ -146,27 +135,54 @@ public class Moji {
         }
         return parsedAttributes;
     }
-    static void unsubSpanimatable(Spanned spanned){
-        Log.d("unsub","unsub called");
-        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
-        // if (mojiSpans.length>0)Log.d("TextWatcher","Removing spans "+ mojiSpans.length);
-        for (MojiSpan mojiSpan : mojiSpans) {
-            if (mojiSpan.shouldAnimate())
-                Spanimator.unsubscrube(Spanimator.HYPER_PULSE, mojiSpan);
-        }
 
+    /**
+     * Set the spanned into the textview, subscribing and unsubscribing from animation as appropriate. Use this if you cache the spanned
+     * after calling #parseHtml
+     * @param spanned The spanned produced from #parseHtml
+     * @param tv The textview to change.
+     */
+    public static void setText(Spanned spanned, TextView tv){
+        CharSequence cs = tv.getText();
+        if (cs instanceof Spanned)
+            unsubSpanimatable((Spanned)cs);
+        tv.setText(spanned);
+        subSpanimatable(spanned,tv);
+
+    }
+
+    /**
+     * Call this to unsubscribe the spanned created from #setText from animation. Only need to call this yourself if you
+     * are going to be calling TextView.setText manually.
+     * @param spanned All moji spans in spanned will be unsubscribed
+     */
+    public static void unsubSpanimatable(Spanned spanned){
+        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
+        for (MojiSpan mojiSpan : mojiSpans) {
+                Spanimator.unsubscribe(Spanimator.HYPER_PULSE, mojiSpan);
+        }
+    }
+    /**
+     * Call this to subscribe the spanned created from #setText to animate. Only need to call this yourself if you
+     * are going to be calling TextView.setText  manually.
+     * @param spanned All moji spans in spanned will be subscribed to @Spanimator
+     */
+    public static void subSpanimatable(Spanned spanned, TextView tv){
+        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
+        for (MojiSpan mojiSpan : mojiSpans) {
+                Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
+                mojiSpan.setTextView(tv);
+        }
     }
 
     /**
      * Parse the html message without side effect. Returns the spanned and attributes
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
-     * @return
+     * @return An @ParsedAttributes object containg the spanned and style attributes.
      */
-    public static ParsedAttributes parseHtml(String html, @Nullable TextView tv){
-        return parseHtml(html,tv,false);
-    }
-    public static ParsedAttributes parseHtml(String html, @Nullable TextView tv, boolean simple){
+    @CheckResult
+    public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
         return new SpanBuilder(html,null,null,parser,simple,tv).convert();
     }
 
@@ -177,48 +193,13 @@ public class Moji {
         }
     };
     private static HyperMojiListener customDefaultHyperMojiListener;
-    public static HyperMojiListener getDefaultHyperMojiClickBehavior(){
+    static HyperMojiListener getDefaultHyperMojiClickBehavior(){
         return customDefaultHyperMojiListener==null?defaultHyperMojiListener:customDefaultHyperMojiListener;
     }
     public static void setDefaultHyperMojiListener(HyperMojiListener hyperMojiListener ){
         customDefaultHyperMojiListener = hyperMojiListener;
     }
 
-    /**
-     * watches the textview changing so we can subscribe and unsubscribe
-     * @param tv
-     */
-    private static void setTextWatcher(TextView tv){
-        tv.addTextChangedListener(textWatcher);
-        tv.setTag(R.id._makemoji_textwatcher_tag_id,textWatcher);
-
-    }
-    private static TextWatcher textWatcher = new TextWatcher(){
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-           /* if (s instanceof Spanned) {
-                Spanned spanned = (Spanned) s;
-                MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
-                if (mojiSpans.length>0)Log.d("TextWatcher","Removing spans "+ mojiSpans.length);
-                for (MojiSpan mojiSpan : mojiSpans) {
-                    if (mojiSpan.shouldAnimate()) {
-                        Spanimator.unsubscrube(Spanimator.HYPER_PULSE, mojiSpan);
-                    }
-                }
-            }*/
-           if (s instanceof Spanned)
-               unsubSpanimatable((Spanned)s);
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable spanned) {
-
-        }};
     private static int calculateMemoryCacheSize(Context context) {
         ActivityManager am =(ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         boolean largeHeap = (context.getApplicationInfo().flags & FLAG_LARGE_HEAP) != 0;
