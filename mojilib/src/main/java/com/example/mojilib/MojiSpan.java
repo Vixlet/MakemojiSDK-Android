@@ -17,6 +17,7 @@ import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
@@ -46,7 +47,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private float currentAnimationScale = 1f;
 
 
-    private WeakReference<Drawable> mDrawableRef;
+    private SoftReference<Drawable> mDrawableRef;
     private WeakReference<TextView> mViewRef;
     private String mLink;
     boolean shouldAnimate;
@@ -85,7 +86,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             mDrawable = new BitmapDrawable(Moji.resources,bitmap);
             mDrawable.setBounds(0,0,mWidth,mHeight);
-            mDrawableRef = new WeakReference<>(mDrawable);
+            mDrawableRef = new SoftReference<>(mDrawable);
             TextView tv = mViewRef.get();
             if (tv!=null)tv.postInvalidate();
         }
@@ -214,7 +215,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     }
 
     private Drawable getCachedDrawable() {
-        WeakReference<Drawable> wr = mDrawableRef;
+        SoftReference<Drawable> wr = mDrawableRef;
         Drawable d = null;
 
         if (wr != null)
@@ -255,7 +256,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         mDrawable = null;//get rid of hard reference to bitmap
     }
     public void onSubscribed(){
-        if (mDrawable==null) //if bitmap was gced, get it again. don't bother refetching for a new size.
+        if (mDrawableRef!=null && mDrawableRef.get()==null) //if bitmap was gced, get it again. don't bother refetching for a new size.
             Moji.picasso.load(mSource)
                     //.resize(mWidth,mHeight)
                     .into(t);
