@@ -8,7 +8,7 @@ import com.example.mojilib.Spanimator.Spanimation;
  */
 public interface Spanimatable {
     /**
-     * New animation frame. Called on ui thread for performance reasons.
+     * New animation frame. Called on ui thread for performance.
      * @param spanimation the animation that was subscribed to
      * @param progress the current value of the animation
      * @param min the min value of the animation
@@ -18,12 +18,12 @@ public interface Spanimatable {
     void onAnimationPause();
 
     /**
-     * When the animation is subscribed to
+     * called when the spanimatable is subscribed to
      */
     void onSubscribed();
 
     /**
-     * When the animation is unsubscribed to
+     * called when the spanimatable is unsubscribed from
      */
     void onUnsubscribed();
 }

@@ -57,7 +57,7 @@ public class Moji {
      */
     public static void initialize(Application app, int cacheSizeBytes){
         context = app.getApplicationContext();
-        resources = app.getResources();
+        resources = context.getResources();
         density = resources.getDisplayMetrics().density;
         MojiSpan.BASE_TEXT_PX_SCALED = MojiSpan.BASE_TEXT_PT*density;
 
@@ -142,6 +142,7 @@ public class Moji {
      * @param spanned The spanned produced from #parseHtml
      * @param tv The textview to change.
      */
+    @UiThread
     public static void setText(Spanned spanned, TextView tv){
         CharSequence cs = tv.getText();
         if (cs instanceof Spanned)
@@ -176,12 +177,13 @@ public class Moji {
     }
 
     /**
-     * Parse the html message without side effect. Returns the spanned and attributes
+     * Parse the html message without side effect. Returns the spanned and attributes. Not thread safe.
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
      * @return An @ParsedAttributes object containg the spanned and style attributes.
      */
     @CheckResult
+    @UiThread
     public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
         return new SpanBuilder(html,null,null,parser,simple,tv).convert();
     }

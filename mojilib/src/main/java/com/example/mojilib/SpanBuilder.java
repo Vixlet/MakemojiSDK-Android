@@ -105,6 +105,7 @@ class SpanBuilder implements ContentHandler {
                 }
             }
             parsedAttributes.spanned = mSpannableStringBuilder;
+            refreshView=null;
             return parsedAttributes;
         }
 

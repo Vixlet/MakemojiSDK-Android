@@ -24,18 +24,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static Resources resources;
-    public static Context context;
-    public static Picasso picasso;
     MAdapter adapter;
     public boolean simple=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        resources = getResources();
-        context =this;
-        Picasso.Builder builder = new Picasso.Builder(MainActivity.context);
-        picasso = builder.build();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,6 +59,7 @@ try {
         adapter.add(new MojiMessage(ja.getJSONObject(i)));
     }
     listView.setAdapter(adapter);
+    is.close();
 }
 catch (Exception e){
     Log.e("Main","json error "+ e.getLocalizedMessage());
