@@ -49,9 +49,10 @@ public class Moji {
     static float density;
 
     //randomly seed some mojispans with links when in demo mode
-    static boolean demo = true;
+    static boolean demo = false;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
+     * and activity lifecycle callbacks.
      * @param app The application object. Needed for resources and to register activity callbacks.
      * @param cacheSizeBytes the in-memory cache size in bytes
      */
@@ -63,43 +64,25 @@ public class Moji {
 
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-            }
-
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
             @Override
-            public void onActivityStarted(Activity activity) {
-
-            }
-
+            public void onActivityStarted(Activity activity) {}
             @Override
             public void onActivityResumed(Activity activity) {
                 Spanimator.onResume();
             }
-
             @Override
             public void onActivityPaused(Activity activity) {
                 Spanimator.onPause();
             }
-
             @Override
-            public void onActivityStopped(Activity activity) {
-
-            }
-
+            public void onActivityStopped(Activity activity) {}
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-            }
-
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
             @Override
-            public void onActivityDestroyed(Activity activity) {
-
-            }
-        });
+            public void onActivityDestroyed(Activity activity) {}});
 
         Picasso.Builder builder = new Picasso.Builder(context);
-
 
         int cacheSieBytes = calculateMemoryCacheSize(context);
         builder.memoryCache(new LruCache(cacheSieBytes));
@@ -117,7 +100,6 @@ public class Moji {
     /**
      * Parses an html message and converts it into a spanned, using the TextView to size the emoji spans properly.
      * Optionally applies other style attributes from html such as color, margin, and text size.
-     * Call this after a TextView's
      * @param html the html message to parse
      * @param tv the TextView to set the text on. Used for sizing the emoji spans.
      * @param simple If true, will not apply any styling information beyond setting the parsed message with emojis.
@@ -180,7 +162,7 @@ public class Moji {
      * Parse the html message without side effect. Returns the spanned and attributes. Not thread safe.
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
-     * @return An @ParsedAttributes object containg the spanned and style attributes.
+     * @return An @ParsedAttributes object containing the spanned and style attributes.
      */
     @CheckResult
     @UiThread
@@ -198,6 +180,12 @@ public class Moji {
     static HyperMojiListener getDefaultHyperMojiClickBehavior(){
         return customDefaultHyperMojiListener==null?defaultHyperMojiListener:customDefaultHyperMojiListener;
     }
+
+    /**
+     * When a hypermoji is clicked but no OnClickListener has been set with
+     * setTag(R.id._makemoji_hypermoji_listener_tag_id,HyperMojiListener), the default HyperMojiListener will be called.
+     * @param hyperMojiListener
+     */
     public static void setDefaultHyperMojiListener(HyperMojiListener hyperMojiListener ){
         customDefaultHyperMojiListener = hyperMojiListener;
     }

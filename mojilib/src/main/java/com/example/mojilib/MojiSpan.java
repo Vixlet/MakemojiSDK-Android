@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
+ * Fork of ImageSpan for custom emojis.
  * Created by Scott Baar on 12/3/2015.
  */
 class MojiSpan extends ReplacementSpan implements Spanimatable {
@@ -54,7 +56,18 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     Drawable mPlaceHolder;
 
 
-    public MojiSpan(Drawable d, String source, int w, int h,int fontSize, boolean simple, String link,TextView refreshView) {
+    /**
+     *
+     * @param d The placeholder drawable.
+     * @param source URL of the actual emoji
+     * @param w width
+     * @param h height
+     * @param fontSize pt size of parsed attributes
+     * @param simple if true, scale based on fontSize, otherwise refreshView's size
+     * @param link URL to callback when clicked.
+     * @param refreshView view to size against and invalidate after image load.
+     */
+    public MojiSpan(@NonNull  Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
         //scale based on font size
         if (simple){ //scale based on current text size
             mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
