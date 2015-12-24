@@ -159,13 +159,12 @@ public class Moji {
     }
 
     /**
-     * Parse the html message without side effect. Returns the spanned and attributes. Not thread safe.
+     * Parse the html message without side effect. Returns the spanned and attributes.
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
      * @return An @ParsedAttributes object containing the spanned and style attributes.
      */
     @CheckResult
-    @UiThread
     public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
         return new SpanBuilder(html,null,null,parser,simple,tv).convert();
     }
