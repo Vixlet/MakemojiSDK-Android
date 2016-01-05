@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MojiInputLayout">
+        <attr name="_mm_sendButtonLayoutAttr" format="reference" />
+        <attr name="_mm_inputTextAppearance" format="reference"/>
+        <attr name="_mm_categoryTextAppearanceAttr" format="reference"/>
+        <attr name="_mm_cameraButtonDrawableAttr" format="reference"/>
+        <attr name="_mm_cameraButtonVisiblityAttr" format="boolean"/>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources >
+    <style name="CustomMojiInputLayoutStyle">
+        <item name="_mm_cameraButtonDrawableAttr">@drawable/mm_dotted_square</item>
+    </style>
+</resources>

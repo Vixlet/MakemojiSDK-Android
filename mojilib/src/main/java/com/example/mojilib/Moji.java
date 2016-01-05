@@ -26,6 +26,13 @@ import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
 import org.w3c.dom.Text;
 
+import java.lang.ref.SoftReference;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
 import static android.os.Build.VERSION.SDK_INT;
@@ -42,9 +49,8 @@ public class Moji {
     // and to not conflict with app-side picasso implementations
     static Picasso picasso;
 
-    //our own html parser to create custom spans.
-    private static Parser parser;
-
+    //our own html parser to create custom spans. keep one for each thread.
+    private static Map<Long,SoftReference<Parser>> parsers =new HashMap<>();
     //screen density
     static float density;
 
@@ -87,10 +93,6 @@ public class Moji {
         int cacheSieBytes = calculateMemoryCacheSize(context);
         builder.memoryCache(new LruCache(cacheSieBytes));
         picasso = builder.build();
-        parser = new Parser();
-        try {
-            parser.setProperty(Parser.schemaProperty, new HTMLSchema());
-        }catch (Exception e){}
     }
     //calls initialize with the default cache size, 5%
     public static void initialize(Application app){
@@ -166,9 +168,23 @@ public class Moji {
      */
     @CheckResult
     public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
-        return new SpanBuilder(html,null,null,parser,simple,tv).convert();
+        return new SpanBuilder(html,null,null,getParser(),simple,tv).convert();
     }
 
+    //gets the parser for the current thread.
+    private static Parser getParser(){
+       SoftReference<Parser> softReference = parsers.get(Thread.currentThread().getId());
+
+        Parser parser;
+        if (softReference!=null && softReference.get()!=null)return softReference.get();
+
+        parser= new Parser();
+        try {
+            parser.setProperty(Parser.schemaProperty, new HTMLSchema());
+        }catch (Exception e){}
+        parsers.put(Thread.currentThread().getId(),new SoftReference<>(parser));
+        return parser;
+    }
     private static  HyperMojiListener defaultHyperMojiListener = new HyperMojiListener() {
         @Override
         public void onClick(String url) {

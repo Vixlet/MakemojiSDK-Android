@@ -16,8 +16,8 @@
         android:maxWidth="20dp"
         android:maxHeight="20dp"
         android:visibility="gone"
-        tools:src="@drawable/unknown_image"
-        android:src="@drawable/unknown_image"
+        tools:src="@drawable/mm_unknown_image"
+        android:src="@drawable/mm_unknown_image"
         android:id="@+id/from_iv"/>
     <ImageView
         android:layout_width="20dp"
@@ -25,8 +25,8 @@
         android:maxWidth="20dp"
         android:maxHeight="20dp"
         android:visibility="gone"
-        tools:src="@drawable/unknown_image"
-        android:src="@drawable/unknown_image"
+        tools:src="@drawable/mm_unknown_image"
+        android:src="@drawable/mm_unknown_image"
         android:id="@+id/to_iv"/>
 
 
