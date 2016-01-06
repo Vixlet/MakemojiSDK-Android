@@ -2,15 +2,23 @@ package com.example.mojilib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Scott Baar on 1/4/2016.
@@ -19,10 +27,8 @@ public class MojiInputLayout extends LinearLayout {
     ImageButton cameraImageButton;
     EditText editText;
     View sendLayout;
-    ViewPager topViewPager;
-    TopPagerAdapter topAdaper;
-
-
+    RecyclerView rv;
+    HorizontalScrollView hsv;
 
     public MojiInputLayout(Context context) {
         super(context);
@@ -50,37 +56,25 @@ public class MojiInputLayout extends LinearLayout {
         sendLayout = inflate(getContext(),sendLayoutRes,ll);
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
+        hsv = (HorizontalScrollView) findViewById(R.id._mm_hsv);
         if (!cameraVisiblity) cameraImageButton.setVisibility(View.GONE);
         editText = (EditText)findViewById(R.id._mm_edit_text);
-        topViewPager = (ViewPager)findViewById(R.id._mm_top_viewpager);
-        topAdaper = new TopPagerAdapter();
-        topViewPager.setAdapter(topAdaper);
+        rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        rv.setLayoutManager(llm);
+        rv.setAdapter(new HorizRVAdapter());
+      /*  hsv.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
+        rv.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });*/
 
     }
-
-    @Override
-    public boolean isInEditMode(){
-        return true;
-    }
-    class TopPagerAdapter extends PagerAdapter {
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view==object;
-        }
-        @Override
-        public Object instantiateItem(ViewGroup container, int position){
-
-                View v = LayoutInflater.from(getContext()).inflate(R.layout.mm_top_left_page,container,false);
-                container.addView(v);
-                return v;
-        }
-    }
-
-
 }
