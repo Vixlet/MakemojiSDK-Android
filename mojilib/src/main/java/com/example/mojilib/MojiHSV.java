@@ -10,6 +10,7 @@ import android.widget.HorizontalScrollView;
  * Created by Scott Baar on 1/6/2016.
  */
 public class MojiHSV extends HorizontalScrollView{
+    IAllowTouchIntercept mAllowTouchInterceptCalculator;
     public MojiHSV(Context context) {
         super(context);
     }
@@ -22,9 +23,15 @@ public class MojiHSV extends HorizontalScrollView{
         super(context, attrs, defStyleAttr);
     }
 
+    public interface IAllowTouchIntercept{
+        boolean calculateAllow();
+    }
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return false;
-        //return super.onInterceptTouchEvent(ev);
+        if (mAllowTouchInterceptCalculator!=null && !mAllowTouchInterceptCalculator.calculateAllow()) return false;
+        return super.onInterceptTouchEvent(ev);
+    }
+    public void setAllowTouchInterceptCalculator(IAllowTouchIntercept interceptCalculator){
+        mAllowTouchInterceptCalculator=interceptCalculator;
     }
 }

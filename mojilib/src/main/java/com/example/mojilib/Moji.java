@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.CheckResult;
@@ -15,10 +16,12 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.Application;
 import android.widget.Toast;
 
+import com.example.mojilib.model.MojiModel;
 import com.squareup.picasso252.LruCache;
 import com.squareup.picasso252.Picasso;
 
@@ -26,12 +29,21 @@ import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
@@ -54,6 +66,7 @@ public class Moji {
     //screen density
     static float density;
 
+    static MojiApi mojiApi;
     //randomly seed some mojispans with links when in demo mode
     static boolean demo = false;
     /**
@@ -93,6 +106,35 @@ public class Moji {
         int cacheSieBytes = calculateMemoryCacheSize(context);
         builder.memoryCache(new LruCache(cacheSieBytes));
         picasso = builder.build();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+
+                Request original = chain.request();
+
+                // Customize the request
+                Request request = original.newBuilder()
+                        .header("makemoji-sdkkey", "940ced93abf2ca4175a4a865b38f1009d8848a58")
+                        .header("makemoji-deviceId", "uniqueidiandsnasdfad")
+                        .method(original.method(), original.body())
+                        .build();
+
+                Response response = chain.proceed(request);
+                return response;
+            }
+        }).build();
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(MojiApi.BASE_URL).client(okHttpClient).
+                addConverterFactory(GsonConverterFactory.create()).build();
+        mojiApi = retrofit.create(MojiApi.class);
+        mojiApi.getTrending().enqueue(new SmallCB<List<MojiModel>>() {
+            @Override
+            public void done(retrofit2.Response<List<MojiModel>> response, @Nullable Throwable t) {
+               if (t==null){
+                   List<MojiModel> mojiModels = response.body();
+               }
+            }
+        });
     }
     //calls initialize with the default cache size, 5%
     public static void initialize(Application app){
@@ -220,5 +262,20 @@ public class Moji {
         static int getLargeMemoryClass(ActivityManager activityManager) {
             return activityManager.getLargeMemoryClass();
         }
+    }
+    protected static void loadImage(ImageView iv, String url){
+        if (url==null || url.isEmpty())return;
+        if (url.equals(iv.getTag()))return;
+        Picasso.with(Moji.context).load(url).into(iv);
+        iv.setTag(url);
+    }
+     static Activity getActivity(Context context) {
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity)context;
+            }
+            context = ((ContextWrapper)context).getBaseContext();
+        }
+        return null;
     }
 }

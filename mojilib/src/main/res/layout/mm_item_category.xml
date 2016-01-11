@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:src="@drawable/mm_unknown_image"
+        tools:layout_width="100dp"
+        tools:layout_height="100dp"
+        android:id="@+id/_mm_item_category_iv"/>
+    <TextView
+        android:layout_width="wrap_content"
+        tools:text="Expressions"
+        style="@style/MakeMojiHeaderTextAppearance"
+        android:ellipsize="end"
+        android:padding="4dp"
+        android:id="@+id/_mm_item_category_tv"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
