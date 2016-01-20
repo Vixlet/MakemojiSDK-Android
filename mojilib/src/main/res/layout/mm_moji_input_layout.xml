@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:background="@color/_mm_light_grey"
     android:orientation="vertical"
+    android:padding="0dp"
     android:layout_height="wrap_content">
     <LinearLayout
         android:id="@+id/_mm_horizontal_ll"
@@ -33,13 +34,15 @@
         android:id="@+id/_mm_edit_text"/>
     </LinearLayout>
 
-        <LinearLayout
+        <com.example.mojilib.ResizeableLL
             android:layout_width="match_parent"
             android:id="@+id/_mm_horizontal_top_scroller"
             android:orientation="horizontal"
             android:layout_height="wrap_content">
             <include
                 layout="@layout/mm_top_left_page"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
                 />
             <ImageView
                 android:layout_width="wrap_content"
@@ -53,7 +56,7 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="45dp" />
-        </LinearLayout>
+        </com.example.mojilib.ResizeableLL>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

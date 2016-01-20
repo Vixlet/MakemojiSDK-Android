@@ -3,6 +3,7 @@ package com.example.mojilib.pages;
 import android.support.annotation.CallSuper;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.FrameLayout;
 
 /**
  * A page selected with one of the three control buttons on the left.
@@ -45,5 +46,14 @@ public class MakeMojiPage {
         return mIsVisible;
     }
 
+    public void setHeight (int height){
+        if (mView==null)return;
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mView.getLayoutParams();
+        if (params.height!=height) {
+            params.height = height;
+            mView.setLayoutParams(params);
+        }
+        mView.invalidate();
+    }
 
 }

@@ -58,4 +58,5 @@ public class CategoriesPage extends MakeMojiPage {
     public void hide(){
         super.hide();
     }
+
 }

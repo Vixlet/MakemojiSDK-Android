@@ -24,8 +24,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.example.mojilib.pages.CategoriesPage;
-import com.github.aakira.expandablelayout.ExpandableLayout;
-import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,21 +80,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
 
-       final  ExpandableRelativeLayout erl = (ExpandableRelativeLayout) findViewById(R.id.sample_page);
-        erl.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleCategoryPage();
-                //erl.toggle();
-            }
-        });
-        erl.setOrientation(ExpandableLayout.HORIZONTAL);
-        //erl.setClosePositionIndex(0);
 
     }
     void toggleCategoryPage(){
+        measureHeight=true;
         hideKeyboard();
-        //setHeight();
         if (categoriesPage.isVisible()) {
             categoriesPage.hide();
         }
@@ -115,20 +103,25 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     boolean kbVisible=false;
     int newHeight;
+    boolean measureHeight;
     @Override
     public void onGlobalLayout() {
-        int heightDifference = getRootView().getHeight()- getHeight();
-        Log.d("kb","kb h "+ heightDifference);
-        if (heightDifference>0 && pageContainer!=null) {
-             newHeight = heightDifference + topScroller.getHeight() + horizontalLayout.getHeight();
+
+        Rect r = new Rect();
+        getRootView().getWindowVisibleDisplayFrame(r);
+
+        int screenHeight = getRootView().getHeight();
+        int heightDifference = screenHeight - (r.bottom - r.top);
+        Log.d("kb","kb h "+ heightDifference + " " + getHeight());
+        if (getHeight()!=0 && heightDifference>screenHeight/3) {
+            measureHeight=false;
+            newHeight = heightDifference -topScroller.getHeight() - horizontalLayout.getHeight();
+            Log.d("newh","new h "+ newHeight);
+            setHeight();
         }
     }
     void setHeight(){
 
-        LayoutParams params = (LayoutParams) pageContainer.getLayoutParams();
-        if (params.height!=newHeight) {
-            params.height = newHeight;
-            pageContainer.setLayoutParams(params);
-        }
+        categoriesPage.setHeight(newHeight);
     }
 }
