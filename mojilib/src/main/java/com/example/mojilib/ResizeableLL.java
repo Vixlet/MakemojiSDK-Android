@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 
@@ -50,10 +51,15 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
         mLastPrimaryContentSize = leftView.getMeasuredHeight();
         minSize = (int)(50 *Moji.density);
-        maxSize = getMeasuredWidth();
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                maxSize = getWidth() -(int)(50 *Moji.density);
+            }
+        });
 
     }
 
@@ -73,54 +79,62 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     float mDownX = 0;
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
-    }
-
-    /*@Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
+
         // Always handle the case of the touch gesture being complete.
-        if (action == MotionEvent.ACTION_DOWN){
-            mDownX = ev.getRawX();
-            return false;
-        }
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             // Release the scroll.
             mDragging = false;
             return false; // Do not intercept touch event, let the child handle it
         }
-        if (action == MotionEvent.ACTION_MOVE) {
-            if (mDragging) {
-                // We're currently scrolling, so yes, intercept the
-                // touch event!
-                return true;
-            }
+        else if (action==MotionEvent.ACTION_DOWN){
+            mDragStartX = ev.getRawX();
+            mDragStartY = ev.getY();
+            mStartWidth = leftView.getMeasuredWidth();
+        }
+        else if (action==MotionEvent.ACTION_MOVE){
+            if (mDragging) return true;
+            final int xDiff = Math.abs((int)(mDragStartX - ev.getRawX()));
 
-            // If the user has dragged her finger horizontally more than
-            // the touch slop, start the scroll
-
-            final int xDiff = (int) Math.abs(ev.getRawX() - mDownX);
-
-            Rect rvBounds = new Rect(recyclerView.getLeft(),recyclerView.getTop(),recyclerView.getRight(),recyclerView.getBottom());
-            if ((xDiff > mTouchSlop)
-                    && rvBounds.contains(recyclerView.getLeft()+(int)ev.getX(),recyclerView.getTop() +(int) ev.getX())
-                    && recyclerView.canScrollHorizontally(1) ) {
-                Log.d("asf","disable");
-                return false;
-            }
-
-            if (xDiff > mTouchSlop) {
+            boolean rvhandled = rvHandlesMotion(ev);
+            if (xDiff > mTouchSlop && !rvhandled) {
                 // Start scrolling!
                 mDragging = true;
                 return true;
             }
         }
+        return false;
+
+    }
+    //if true, recycler view will handle the motion.
+    boolean canScrollLeft,canScrollRight;
+    float newX;
+    private boolean rvHandlesMotion(MotionEvent ev){
+        newX = ev.getRawX();
+        int[] l = new int[2];
+        recyclerView.getLocationOnScreen(l);
+        int x = l[0];
+        int w = recyclerView.getWidth();
+        if ((ev.getRawX()< x || ev.getRawX()> x + w ))
             return false;
-    }*/
+        canScrollLeft = ((SnappyLinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition()!=0;
+        //canScrollRight = recyclerView.canScrollHorizontally(1);
+
+        Log.d("asfd","canscroll "+canScrollLeft);
+        if (newX<mDragStartX)//drag right
+            return true;
+        if (newX>mDragStartX && canScrollLeft)
+            return true;
+       // return  ((recyclerView.canScrollHorizontally(1) && mDragStartX>=newX)
+
+        return false;
+
+    }
+
     int mStartWidth;
     @Override
     public boolean onTouch(View view, MotionEvent me) {
-        maxSize = getMeasuredWidth();
+        int nw = mStartWidth - (int)(mDragStartX - me.getRawX());
         if (me.getAction() == MotionEvent.ACTION_DOWN) {
             mDraggingStarted = SystemClock.elapsedRealtime();
             mDragStartX = me.getRawX();
@@ -130,33 +144,23 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
             mDragging=true;
             return true;
         }
-        else if (me.getAction() == MotionEvent.ACTION_UP && mDragging) {
+        else if ((me.getAction() == MotionEvent.ACTION_UP || me.getAction()==MotionEvent.ACTION_CANCEL) && mDragging) {
             mDragging = false;
-                snapOpenOrClose((int)(me.getRawX() - mPointerOffset));
+                snapOpenOrClose(nw);
                 return true;
 
         }
         else if (me.getAction() == MotionEvent.ACTION_MOVE && mDragging) {
-            int nw = mStartWidth - (int)(mDragStartX - me.getRawX());
             setPrimaryContentWidth(nw);
-               // setPrimaryContentWidth((int) (me.getRawX() - mPointerOffset));
             }
-        else if (me.getAction() == MotionEvent.ACTION_CANCEL){
-            mDragging=false;
-            snapOpenOrClose((int)(me.getRawX() - mPointerOffset));
-            return false;
-        }
 
 
         return false;
     }
 
-    public boolean isPrimaryContentMaximized(){
-        return false;
-    }
     private boolean setPrimaryContentWidth(int newWidth) {
         newWidth=  Math.max(minSize,newWidth);
-        newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢) --<
+        newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
         lp.width=newWidth;
         leftView.setLayoutParams(lp);
@@ -173,7 +177,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
     ValueAnimator animator;
     private void snapOpenOrClose(int currentWidth){
-        maxSize = getMeasuredWidth() - (int)( 50 * Moji.density);
         int goalWidth = maxSize;
         if ((lastStateOpened && maxSize-currentWidth>expandSizeThreshold)//closed enough to snap close
                 || (!lastStateOpened && minSize+expandSizeThreshold>currentWidth))//not open enough to snap open.
