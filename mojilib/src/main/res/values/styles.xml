@@ -11,4 +11,9 @@
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">12dp</item>
         </style>
+    <style name="MakeMojiLeftButtonStyle">
+        <item name="android:padding">4dp</item>
+        <item name="android:layout_width">23dp</item>
+        <item name="android:layout_height">23dp</item>
+    </style>
 </resources>

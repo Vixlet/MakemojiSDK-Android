@@ -19,6 +19,7 @@ public class MakeMojiPage {
     protected MakeMojiPage(ViewStub stub){
         mViewStub = stub;
     }
+    protected MakeMojiPage(View v){ mView = v;}
     @CallSuper
     public void show(){
         mIsVisible=true;

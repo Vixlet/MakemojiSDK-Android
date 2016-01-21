@@ -23,7 +23,7 @@
         android:layout_gravity="center"
         android:minHeight="35dp"
         android:minWidth="35dp"
-        tools:src="@drawable/mm_dotted_square"
+        tools:src="@drawable/mm_camera_icon"
         android:background="@android:color/transparent"
         />
     <EditText
