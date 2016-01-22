@@ -10,7 +10,6 @@
     android:background="@android:color/holo_blue_light"
     android:layout_height="wrap_content" android:gravity="right">
     <View
-        android:id="@+id/spacer"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,28 +17,27 @@
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:id="@+id/img1"
+        android:id="@+id/_mm_categories_button"
         android:src="@drawable/mm_grid_icon"/>
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:id="@+id/img2"
+        android:id="@+id/_mm_trending_button"
         android:src="@drawable/mm_trending_icon"/>
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:id="@+id/img3"
+        android:id="@+id/_mm_recent_button"
         android:src="@drawable/mm_recent_icon"/>
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:id="@+id/img4"
+        android:id="@+id/_mm_flashtag_button"
         android:src="@drawable/mm_flashtag_icon"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:id="@+id/spacer2"
         />
 
 </LinearLayout>

@@ -118,14 +118,12 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         if ((ev.getRawX()< x || ev.getRawX()> x + w ))
             return false;
         canScrollLeft = ((SnappyLinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition()!=0;
-        //canScrollRight = recyclerView.canScrollHorizontally(1);
 
         Log.d("asfd","canscroll "+canScrollLeft);
         if (newX<mDragStartX)//drag right
             return true;
         if (newX>mDragStartX && canScrollLeft)
             return true;
-       // return  ((recyclerView.canScrollHorizontally(1) && mDragStartX>=newX)
 
         return false;
 

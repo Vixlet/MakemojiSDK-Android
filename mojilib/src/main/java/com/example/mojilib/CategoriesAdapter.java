@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mojilib.model.Category;
+import com.squareup.picasso252.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.mm_item_category, parent, false);
+        //v.getLayoutParams().height = parent.getHeight()/2;
         return new Holder(v);
     }
 
@@ -37,7 +39,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
     public void onBindViewHolder(Holder holder, int position) {
         Category category = categories.get(position);
         if (holder.position!=position){
-            Moji.loadImage(holder.image,category.image_url);
+            //Moji.loadImage(holder.image,category.image_url);
+            int width = (int)(80 *Moji.density * .9);
+            Picasso.with(Moji.context).load(category.image_url).resize(width,width).into(holder.image);
             holder.title.setText(category.name);
         }
 

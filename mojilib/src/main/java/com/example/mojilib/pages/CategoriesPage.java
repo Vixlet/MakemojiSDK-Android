@@ -10,6 +10,7 @@ import android.view.ViewStub;
 
 import com.example.mojilib.CategoriesAdapter;
 import com.example.mojilib.MojiApi;
+import com.example.mojilib.MojiInputLayout;
 import com.example.mojilib.R;
 import com.example.mojilib.SmallCB;
 import com.example.mojilib.model.Category;
@@ -26,8 +27,8 @@ public class CategoriesPage extends MakeMojiPage {
     GridLayoutManager glm;
     MojiApi api;
     CategoriesAdapter adapter;
-    public CategoriesPage(ViewStub stub, MojiApi mojiApi){
-        super(stub);
+    public CategoriesPage(ViewStub stub, MojiApi mojiApi, MojiInputLayout mojiInputLayout){
+        super(stub,mojiInputLayout);
         api=mojiApi;
         adapter = new CategoriesAdapter();
         api.getCategories().enqueue(new SmallCB<List<Category>>() {

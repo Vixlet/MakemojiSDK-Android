@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
 
+import com.example.mojilib.MojiInputLayout;
+
 /**
  * A page selected with one of the three control buttons on the left.
  * Created by Scott Baar on 1/10/2016.
@@ -15,11 +17,14 @@ public class MakeMojiPage {
     boolean mIsSetup;
     View mView;
     ViewStub mViewStub;
+    private MojiInputLayout mMojiInput;
 
-    protected MakeMojiPage(ViewStub stub){
+    protected MakeMojiPage(ViewStub stub, MojiInputLayout mojiInputLayout){
         mViewStub = stub;
+        mMojiInput = mojiInputLayout;
     }
-    protected MakeMojiPage(View v){ mView = v;}
+    protected MakeMojiPage(View v,MojiInputLayout mojiInputLayout){ mView = v;
+        mMojiInput = mojiInputLayout;}
     @CallSuper
     public void show(){
         mIsVisible=true;

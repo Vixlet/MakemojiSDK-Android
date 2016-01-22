@@ -105,6 +105,7 @@ public class Moji {
 
         int cacheSieBytes = calculateMemoryCacheSize(context);
         builder.memoryCache(new LruCache(cacheSieBytes));
+        builder.loggingEnabled(true);
         picasso = builder.build();
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override

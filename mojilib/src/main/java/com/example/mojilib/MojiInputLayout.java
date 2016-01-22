@@ -43,6 +43,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     View topScroller;
     LinearLayout horizontalLayout;
 
+    View trendingButton,flashtagButton,categoriesButton,recentButton;
+
     public MojiInputLayout(Context context) {
         super(context);
         init(null,0);
@@ -77,8 +79,20 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         rv.setLayoutManager(sllm);
         rv.setAdapter(new HorizRVAdapter());
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
-        categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi);
+        categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
+
+        categoriesButton = findViewById(R.id._mm_categories_button);
+        flashtagButton = findViewById(R.id._mm_flashtag_button);
+        recentButton = findViewById(R.id._mm_recent_button);
+        trendingButton = findViewById(R.id._mm_trending_button);
+        categoriesButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleCategoryPage();
+            }
+        });
+
 
 
     }
@@ -93,7 +107,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
 
     }
-    void hideKeyboard(){
+    public void hideKeyboard(){
         View view = editText;
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
