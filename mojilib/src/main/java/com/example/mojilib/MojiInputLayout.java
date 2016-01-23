@@ -154,7 +154,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
     }
     void setHeight(){
-
-        categoriesPage.setHeight(newHeight);
+        if (!pages.empty())pages.peek().setHeight(newHeight);
+        //categoriesPage.setHeight(newHeight);
     }
+    /*@Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (newHeight!=0)heightMeasureSpec = MeasureSpec.makeMeasureSpec(exactHeight,MeasureSpec.EXACTLY);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }*/
 }

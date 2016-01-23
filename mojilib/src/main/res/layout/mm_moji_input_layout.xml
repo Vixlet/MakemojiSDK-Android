@@ -10,6 +10,7 @@
     <LinearLayout
         android:id="@+id/_mm_horizontal_ll"
         android:orientation="horizontal"
+        android:tag="horizontall"
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
     <ImageButton
@@ -58,7 +59,8 @@
         </com.example.mojilib.ResizeableLL>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/_mm_page_container">
         <ViewStub
             android:id="@+id/_mm_stub_cat_page"

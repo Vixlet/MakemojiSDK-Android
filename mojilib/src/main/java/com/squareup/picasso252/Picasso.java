@@ -43,6 +43,7 @@ import static com.squareup.picasso252.Utils.log;
  * <p>
  * Use {@link #with(android.content.Context)} for the global singleton instance or construct your
  * own instance with {@link Builder}.
+ * TODO Unused methods should be deleted. Not an issue with proguard, but for the sake of the dex limit they should go.
  */
 public class Picasso {
 

@@ -1,20 +1,16 @@
 package com.example.mojilib;
 
-import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mojilib.model.MojiModel;
-import com.squareup.picasso252.Callback;
 import com.squareup.picasso252.Picasso;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -77,10 +73,12 @@ public class ViewPagerPage extends MakeMojiPage{
         public Object instantiateItem(ViewGroup container, int position) {
             View view = LayoutInflater.from(mMojiInput.getContext()).inflate(R.layout.mm_vp_page_content,container,false);
             container.addView(view);
-            GridView gv = (GridView) view.findViewById(R.id._mm_vp_page_gv);
-            MojiGridAdapter gridAdapter = new MojiGridAdapter(mMojiInput.getContext(),R.layout.mm_gv_moji_item,new ArrayList<MojiModel>());
+            RecyclerView rv = (RecyclerView) view;
+            MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>());
             gridAdapter.setMojiModels(mPopulator.populatePage(mojisPerPage,position*mojisPerPage));
-            gv.setAdapter(gridAdapter);
+            GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),4,GridLayoutManager.HORIZONTAL,false);
+            rv.setLayoutManager(glm);
+            rv.setAdapter(gridAdapter);
             return view;
         }
         @Override
@@ -89,12 +87,12 @@ public class ViewPagerPage extends MakeMojiPage{
         }
 
     }
-    class MojiGridAdapter extends ArrayAdapter<MojiModel>
+    public class MojiGridAdapter extends RecyclerView.Adapter<Holder>
     {
         List<MojiModel> mojiModels = new ArrayList<>();
 
-        public MojiGridAdapter(Context context, int resource, List<MojiModel> models) {
-            super(context, resource, models);
+        public MojiGridAdapter (List<MojiModel> models) {
+            mojiModels = models;
         }
 
         public void setMojiModels(List<MojiModel> models){
@@ -103,31 +101,35 @@ public class ViewPagerPage extends MakeMojiPage{
 
         }
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return mojiModels.size();
         }
 
-        @Override
-        public MojiModel getItem(int position) {
-            return mojiModels.get(position);
-        }
-
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            MojiModel model = getItem(position);
-            if (convertView == null) {
-                // if it's not recycled, initialize some attributes
-                convertView = LayoutInflater.from(mMojiInput.getContext()).inflate(R.layout.mm_gv_moji_item,parent,false);
-            }
-                imageView = (ImageView) convertView;
-
-            int width = (int)(80 *Moji.density * .9);
-            Picasso.with(Moji.context).load(model.image_url).resize(width,width).into(imageView);
-
-            return imageView;
+        public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.mm_rv_moji_item, parent, false);
+            //v.getLayoutParams().height = parent.getHeight()/2;
+            return new Holder(v);
         }
+
+        @Override
+        public void onBindViewHolder(Holder holder, int position) {
+            MojiModel model = mojiModels.get(position);
+            Picasso.with(Moji.context).load(model.image_url).fit().centerInside().into(holder.imageView);
+
+        }
+    }
+
+
+    }
+   class Holder extends RecyclerView.ViewHolder {
+    ImageView imageView;
+    public Holder(View v){
+        super(v);
+        imageView = (ImageView) v;
+
     }
 
 }
