@@ -3,15 +3,10 @@ package com.example.mojilib;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -19,14 +14,10 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-import com.example.mojilib.pages.CategoriesPage;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by Scott Baar on 1/4/2016.
@@ -43,7 +34,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     View topScroller;
     LinearLayout horizontalLayout;
 
-    View trendingButton,flashtagButton,categoriesButton,recentButton;
+    View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
+    Stack<MakeMojiPage> pages = new Stack<>();
 
     public MojiInputLayout(Context context) {
         super(context);
@@ -92,6 +84,13 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 toggleCategoryPage();
             }
         });
+        backButton = findViewById(R.id._mm_back_button);
+        backButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popPage();
+            }
+        });
 
 
 
@@ -103,10 +102,30 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             categoriesPage.hide();
         }
         else{
-            categoriesPage.show();
+            addPage(categoriesPage);
         }
 
     }
+    void addPage(MakeMojiPage page){
+        if (!pages.isEmpty() && pages.peek()!=null)pages.peek().hide();
+        pages.push(page);
+        page.show();
+        setHeight();
+        backButton.setVisibility(pages.size()>1?View.VISIBLE:View.GONE);
+
+    }
+    void popPage(){
+        if (pages.size()==0)return;
+        MakeMojiPage page = pages.pop();
+        MakeMojiPage oldPage = pages.size()>0 ?pages.peek():null;
+        page.hide();
+        if (oldPage!=null) oldPage.show();
+        backButton.setVisibility(pages.size()>1?View.VISIBLE:View.GONE);
+    }
+    protected ViewGroup getPageFrame(){
+        return pageContainer;
+    }
+
     public void hideKeyboard(){
         View view = editText;
         if (view != null) {

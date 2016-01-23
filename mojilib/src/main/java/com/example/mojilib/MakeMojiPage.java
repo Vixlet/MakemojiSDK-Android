@@ -1,6 +1,8 @@
-package com.example.mojilib.pages;
+package com.example.mojilib;
 
 import android.support.annotation.CallSuper;
+import android.support.annotation.LayoutRes;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
@@ -17,8 +19,12 @@ public class MakeMojiPage {
     boolean mIsSetup;
     View mView;
     ViewStub mViewStub;
-    private MojiInputLayout mMojiInput;
+    protected MojiInputLayout mMojiInput;
 
+    protected MakeMojiPage(@LayoutRes int layoutRes, MojiInputLayout mojiInputLayout){
+        this.mMojiInput = mojiInputLayout;
+        mView = LayoutInflater.from(mMojiInput.getContext()).inflate(layoutRes,mMojiInput.getPageFrame(),false);
+    }
     protected MakeMojiPage(ViewStub stub, MojiInputLayout mojiInputLayout){
         mViewStub = stub;
         mMojiInput = mojiInputLayout;
@@ -31,6 +37,7 @@ public class MakeMojiPage {
         if (mView==null) mView = mViewStub.inflate();
         if (!mIsSetup)
             setup();
+        if (mView.getParent()==null)mMojiInput.getPageFrame().addView(mView);
         mView.setVisibility(View.VISIBLE);
     }
     @CallSuper

@@ -1,18 +1,11 @@
-package com.example.mojilib.pages;
+package com.example.mojilib;
 
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
 import android.view.ViewStub;
 
-import com.example.mojilib.CategoriesAdapter;
-import com.example.mojilib.MojiApi;
-import com.example.mojilib.MojiInputLayout;
-import com.example.mojilib.R;
-import com.example.mojilib.SmallCB;
 import com.example.mojilib.model.Category;
 
 import java.util.List;
@@ -22,7 +15,7 @@ import retrofit2.Response;
 /**
  * Created by Scott Baar on 1/10/2016.
  */
-public class CategoriesPage extends MakeMojiPage {
+public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.ICatListener{
     RecyclerView rv;
     GridLayoutManager glm;
     MojiApi api;
@@ -30,7 +23,7 @@ public class CategoriesPage extends MakeMojiPage {
     public CategoriesPage(ViewStub stub, MojiApi mojiApi, MojiInputLayout mojiInputLayout){
         super(stub,mojiInputLayout);
         api=mojiApi;
-        adapter = new CategoriesAdapter();
+        adapter = new CategoriesAdapter(this);
         api.getCategories().enqueue(new SmallCB<List<Category>>() {
             @Override
             public void done(Response<List<Category>> response, @Nullable Throwable t) {
@@ -60,4 +53,9 @@ public class CategoriesPage extends MakeMojiPage {
         super.hide();
     }
 
+    @Override
+    public void onClick(Category category) {
+        ViewPagerPage vpp = new ViewPagerPage(category.name,mMojiInput,new CategoryPopulator(category));
+        mMojiInput.addPage(vpp);
+    }
 }

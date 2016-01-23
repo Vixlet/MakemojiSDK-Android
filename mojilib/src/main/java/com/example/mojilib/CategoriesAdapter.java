@@ -18,8 +18,13 @@ import java.util.List;
  */
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Holder>{
     List<Category> categories = new ArrayList<>();
+    ICatListener iCatListener;
+    public interface ICatListener{
+        void onClick(Category category);
+    }
 
-    public CategoriesAdapter(){
+    public CategoriesAdapter(ICatListener iCatListener){
+        this.iCatListener = iCatListener;
 
     }
     public void setCategories(List<Category> newCategories){
@@ -43,10 +48,17 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
             int width = (int)(80 *Moji.density * .9);
             Picasso.with(Moji.context).load(category.image_url).resize(width,width).into(holder.image);
             holder.title.setText(category.name);
+            holder.view.setTag(category);
         }
 
     }
 
+    View.OnClickListener catClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (iCatListener!=null) iCatListener.onClick((Category)v.getTag());
+        }
+    };
     @Override
     public int getItemCount() {
         return categories.size();
@@ -55,9 +67,12 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
     public class Holder extends RecyclerView.ViewHolder{
         public ImageView image;
         public TextView title;
+        public View view;
         public int position =-1;
         public Holder(View itemView) {
             super(itemView);
+            view = itemView;
+            view.setOnClickListener(catClick);
             image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
         }

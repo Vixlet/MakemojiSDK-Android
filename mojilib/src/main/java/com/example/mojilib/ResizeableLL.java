@@ -99,6 +99,8 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
             boolean rvhandled = rvHandlesMotion(ev);
             if (xDiff > mTouchSlop && !rvhandled) {
                 // Start scrolling!
+                if (mDragStartX>ev.getRawX()) mDragStartX-=mTouchSlop;//adjust for slop to remove jank on scroll start
+                else if (mDragStartX<ev.getRawX()) mDragStartX+=mTouchSlop;
                 mDragging = true;
                 return true;
             }
