@@ -53,7 +53,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private float mFontRatio;
 
     // to make mojis stand out from text, always multiply the size by this
-    private static float BASE_SIZE_MULT = 1.25f;
+    private static float BASE_SIZE_MULT = 1.35f;
 
     //proportion to size the moji on next frame when being animated;
     private float currentAnimationScale = 1f;
@@ -67,6 +67,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private static final String TAG = "MojiSpan";
     private static boolean LOG = true;
     String name;
+    int id = -1;
 
 
     /**
@@ -116,6 +117,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
         MojiSpan span = new MojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
         span.name = model.name;
+        span.id = model.id;
         return span;
     }
 
@@ -127,13 +129,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
             mDrawable.setBounds(0,0,mWidth,mHeight);
             mDrawableRef = new SoftReference<>(mDrawable);
             TextView tv = mViewRef.get();
-            if (tv!=null){
-                tv.postInvalidate();
-                if (tv instanceof EditText){
-                    EditText et = (EditText) tv;
-                    et.setText(et.getText());
-                }
-            }
+            Moji.invalidateTextView(tv);
         }
 
         @Override
@@ -286,8 +282,10 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         if (shouldAnimate) {
             currentAnimationScale = progress;
             TextView tv = mViewRef.get();
-            if (tv != null)
-                tv.invalidate();//redraw
+            if (tv != null) {
+                Moji.invalidateTextView(tv);
+            }
+
             else
                 Spanimator.unsubscribe(Spanimator.HYPER_PULSE, this);//no longer attatched to view.
         }
@@ -309,5 +307,12 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     }
     public void setTextView(TextView tv){
         mViewRef = new WeakReference<>(tv);
+    }
+
+    public String toHtml() {
+        return "<img style=\\\"vertical-align:text-bottom;width:20px;height:20px;\""
+                + "src=\"" + mSource + "\"" +
+                (id == -1 ? "" : "id=\"" + id + "\"")//insert id if this came from a model
+                + ">";
     }
 }

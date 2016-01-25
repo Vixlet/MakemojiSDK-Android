@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -43,14 +44,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     CategoriesPage categoriesPage;
 
     //just used for measurement
-    View topScroller;
+    ResizeableLL topScroller;
     LinearLayout horizontalLayout;
 
     View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
     PagerPopulator trendingPopulator;
     HorizRVAdapter adapter;
-
+    ResizeableLL resizeableLL;
     public MojiInputLayout(Context context) {
         super(context);
         init(null,0);
@@ -67,14 +68,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     public void init(AttributeSet attributeSet, int defStyle){
         TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,defStyle);
-        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawableAttr,R.drawable.mm_unknown_image);
+        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawableAttr,R.drawable.mm_camera_icon);
         int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayoutAttr,R.layout.mm_default_send_layout);
         boolean cameraVisiblity = a.getBoolean(R.styleable.MojiInputLayout__mm_sendButtonLayoutAttr,true);
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
-        topScroller = findViewById(R.id._mm_horizontal_top_scroller);
+        topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
         sendLayout = inflate(getContext(),sendLayoutRes,horizontalLayout);
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
@@ -232,9 +233,25 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             if (editText!=null)editText.setMovementMethod(LinkMovementMethod.getInstance());
         }
         editText.setText(ssb);
+        String html = Moji.toHtml(ssb);
+        Moji.subSpanimatable(ssb,editText);
         editText.setSelection(editText.length());
     }
     public int getDefaultSpanDimension(){
         return MojiSpan.getDefaultSpanDimension(editText.getTextSize());
+    }
+    public void setCameraButtonClickListener(View.OnClickListener onClickListener){
+        cameraImageButton.setOnClickListener(onClickListener);
+    }
+    public void setSendLayoutClickListener(final View.OnClickListener onClickListener){
+     sendLayout.setOnClickListener(new OnClickListener() {
+         @Override
+         public void onClick(View v) {
+             if (onClickListener!=null) onClickListener.onClick(v);
+         }
+     });
+    }
+    public String getInputAsHtml(){
+       return Moji.toHtml(new SpannableStringBuilder(editText.getText()));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.mojilib;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
@@ -116,21 +117,33 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         }
 
         @Override
-        public void onBindViewHolder(Holder holder, int position) {
-            MojiModel model = mojiModels.get(position);
-            Picasso.with(Moji.context).load(model.image_url).fit().centerInside().into(holder.imageView);
+        public void onBindViewHolder(final Holder holder, int position) {
+            final MojiModel model = mojiModels.get(position);
+            holder.imageView.forceDimen(holder.dimen);
+            holder.imageView.setModel(model);
+            holder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BitmapDrawable bm=null;
+                    if (holder.imageView.getDrawable()!=null && holder.imageView.getDrawable() instanceof BitmapDrawable)
+                        bm = (BitmapDrawable) holder.imageView.getDrawable();
+                    mMojiInput.addMojiModel(model,bm);
+                }
+            });
 
         }
     }
 
 
-    }
-   class Holder extends RecyclerView.ViewHolder {
-    ImageView imageView;
-    public Holder(View v){
-        super(v);
-        imageView = (ImageView) v;
 
-    }
+    class Holder extends RecyclerView.ViewHolder {
+        MojiImageView imageView;
+        int dimen;
+        public Holder(View v) {
+            super(v);
+            dimen =mMojiInput.getDefaultSpanDimension();
+            imageView = (MojiImageView) v;
 
+        }
+    }
 }

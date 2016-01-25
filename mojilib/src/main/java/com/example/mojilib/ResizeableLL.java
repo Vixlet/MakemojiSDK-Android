@@ -13,7 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.lang.annotation.Retention;
@@ -41,6 +45,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     boolean lastStateOpened = false; //affinity for snap behavior open or close
 
     int mTouchSlop;
+    ImageView flashButton;
     @Override
     public void onFinishInflate(){
         super.onFinishInflate();
@@ -54,13 +59,27 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();
+        flashButton = (ImageView) findViewById(R.id._mm_flashtag_button);
         post(new Runnable() {
             @Override
             public void run() {
-                maxSize = getWidth() -(int)(50 *Moji.density);
+                maxSize = getWidth() - flashButton.getWidth();//-(int)(50 *Moji.density);
+                jiggle();
             }
         });
 
+    }
+    public void jiggle(){
+        ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(50 * Moji.density),minSize);
+        animator.setInterpolator(new OvershootInterpolator());
+        animator.setDuration(1000);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                setPrimaryContentWidth((int)animation.getAnimatedValue());
+            }
+        });
+        animator.start();
     }
 
     private boolean mDragging;
@@ -159,7 +178,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
 
     private boolean setPrimaryContentWidth(int newWidth) {
-        newWidth=  Math.max(minSize,newWidth);
+        newWidth=  Math.max((int)(minSize *.9),newWidth);
         newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
         lp.width=newWidth;
@@ -170,7 +189,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
             lastStateOpened = true;
         if (minSize == newWidth)
             lastStateOpened = false;
-
 
         return true;
     }

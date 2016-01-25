@@ -28,10 +28,10 @@ public class Spanimator {
 
     public static final int HYPER_PULSE = 0;
     public static final float HYPER_PULSE_MAX = 1f;
-    public static final float HYPER_PULSE_MIN = .25f;
+    public static final float HYPER_PULSE_MIN = .15f;
 
 
-    private static Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
+    private static Map<Spanimatable,Boolean> subscribers = new WeakHashMap<>();
     private static ValueAnimator hyperAnimation;
     private static Handler mainHandler = new Handler(Looper.getMainLooper());
     private static boolean mPaused =false;
@@ -79,9 +79,16 @@ public class Spanimator {
         hyperAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+                float progress = (float) animation.getAnimatedValue();
                 Set<Spanimatable> set = subscribers.keySet();
                 Log.d("Spanimator","spanimator subscruber size "+ set.size());
-                float progress = (float) animation.getAnimatedValue();
+                if (set.size()==0 && animation.getAnimatedFraction()!=0f)
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            hyperAnimation.end();
+                        }
+                    });
                 for (Spanimatable spanimatable : set){
                     if (spanimatable!=null){
                         spanimatable.onAnimationUpdate(HYPER_PULSE,progress,HYPER_PULSE_MIN,HYPER_PULSE_MAX);
@@ -107,6 +114,7 @@ public class Spanimator {
         mPaused=true;
         Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
+        System.gc();
 
     }
 }

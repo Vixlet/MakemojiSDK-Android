@@ -50,7 +50,8 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         holder.name.setText(m.name);
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
         //Moji.loadImage(holder.image,m.image_url);
-        Picasso.with(mil.getContext()).load(m.image_url).resize(holder.dimen,holder.dimen).into(holder.image);
+        holder.image.forceDimen(holder.dimen);
+        holder.image.setModel(m);
         holder.pos = position;
     }
 
@@ -73,7 +74,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     public class RVHolder extends ViewHolder
     {
         TextView name;
-        ImageView image;
+        MojiImageView image;
         View v;
         int dimen;
         int pos;
@@ -82,14 +83,10 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             this.v = v;
             v.setTag(this);
             name = (TextView) v.findViewById(R.id.tv);
-            image = (ImageView)v.findViewById(R.id.pic);
+            image = (MojiImageView) v.findViewById(R.id.pic);
             int h = mil.getDefaultSpanDimension();//use same dimension as span to consolidate img fetches
            // (int)(parent.getHeight() *.8);
             dimen =h;
-          //  image.setMinimumWidth(h);
-        //    image.setMaxWidth(h);
-        //    image.setMinimumHeight(h);
-       //     image.setMaxHeight(h);
 
         }
     }
