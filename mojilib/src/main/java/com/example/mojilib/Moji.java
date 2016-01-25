@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -69,6 +71,7 @@ public class Moji {
     static MojiApi mojiApi;
     //randomly seed some mojispans with links when in demo mode
     static boolean demo = false;
+    static Handler handler = new Handler(Looper.getMainLooper());
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.

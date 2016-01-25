@@ -21,22 +21,21 @@ import java.util.List;
  * contains a viewpager that displays emojis. Populating the page is done by the populator
  * Created by Scott Baar on 1/19/2016.
  */
-public class ViewPagerPage extends MakeMojiPage{
-    public interface PagerPopulater {
-        void setup(ViewPagerPage page);//once done, call the next two
-        List<MojiModel> populatePage(int count, int offset);
-        int getTotalCount();
-    }
-    PagerPopulater mPopulator;
+public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.PopulatorObserver{
+
+    PagerPopulator mPopulator;
     ViewPager vp;
     TextView heading;
     int count;
     VPAdapter vpAdapter;
     int mojisPerPage = 10;
     CirclePageIndicator circlePageIndicator;
+    private static int MOJI_ITEM_HEIGHT = 50;
+    private static final int ROWS = 4;
 
-    public ViewPagerPage (String title,MojiInputLayout mojiInputLayout,PagerPopulater p){
+    public ViewPagerPage (String title,MojiInputLayout mojiInputLayout,PagerPopulator p){
         super(R.layout.mm_vp_page,mojiInputLayout);
+        MOJI_ITEM_HEIGHT *=Moji.density;
         mPopulator = p;
         vp = (ViewPager) mView.findViewById(R.id._mm_moji_pager);
         circlePageIndicator = (CirclePageIndicator) mView.findViewById(R.id._mm_vp_indicator);
@@ -48,7 +47,9 @@ public class ViewPagerPage extends MakeMojiPage{
 
     }
     //called by the populater once a query is complete.
+    @Override
     public void onNewDataAvailable(){
+        mojisPerPage =Math.max(10,vp.getWidth()/MOJI_ITEM_HEIGHT * ROWS);
         count = mPopulator.getTotalCount();
         vpAdapter = new VPAdapter();
         vp.setAdapter(vpAdapter);
@@ -76,7 +77,7 @@ public class ViewPagerPage extends MakeMojiPage{
             RecyclerView rv = (RecyclerView) view;
             MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>());
             gridAdapter.setMojiModels(mPopulator.populatePage(mojisPerPage,position*mojisPerPage));
-            GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),4,GridLayoutManager.HORIZONTAL,false);
+            GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),ROWS,GridLayoutManager.HORIZONTAL,false);
             rv.setLayoutManager(glm);
             rv.setAdapter(gridAdapter);
             return view;

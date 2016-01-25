@@ -10,10 +10,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.mojilib.model.MojiModel;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
@@ -38,6 +41,13 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     // the baseline "normal" font size in sp.
     static final int BASE_TEXT_PT = 14;
+
+    //most incoming messages will be at this size. Use it to calculate default span dimension
+    public static int DEFAULT_INCOMING_FONT_PT = 16;
+
+    //most incoming images will be at this size in px. Use it to calculate default span dimension
+    public static int DEFAULT_INCOMING_IMG_WH = 20;
+
     //the text size in pixels, determined by BASE_TEXT_PT and screen density
     static float BASE_TEXT_PX_SCALED;
     private float mFontRatio;
@@ -54,6 +64,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private String mLink;
     boolean shouldAnimate;
     Drawable mPlaceHolder;
+    private static final String TAG = "MojiSpan";
+    private static boolean LOG = true;
+    String name;
 
 
     /**
@@ -67,7 +80,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
      * @param link URL to callback when clicked.
      * @param refreshView view to size against and invalidate after image load.
      */
-    public MojiSpan(@NonNull  Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
+    public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
         //scale based on font size
         if (simple){ //scale based on current text size
             mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
@@ -94,14 +107,33 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         }
     }
 
+    public static int getDefaultSpanDimension(float textSize){
+        float ratio = (textSize)/BASE_TEXT_PX_SCALED;
+        return (int) (DEFAULT_INCOMING_IMG_WH * Moji.density * BASE_SIZE_MULT * ratio);
+    }
+    public static MojiSpan fromModel(MojiModel model, TextView tv, @Nullable BitmapDrawable bitmapDrawable){
+        Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_dotted_square);
+        d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+        MojiSpan span = new MojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
+        span.name = model.name;
+        return span;
+    }
+
     Target t = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            if (LOG)Log.d(TAG,"loaded "+name);
             mDrawable = new BitmapDrawable(Moji.resources,bitmap);
             mDrawable.setBounds(0,0,mWidth,mHeight);
             mDrawableRef = new SoftReference<>(mDrawable);
             TextView tv = mViewRef.get();
-            if (tv!=null)tv.postInvalidate();
+            if (tv!=null){
+                tv.postInvalidate();
+                if (tv instanceof EditText){
+                    EditText et = (EditText) tv;
+                    et.setText(et.getText());
+                }
+            }
         }
 
         @Override
@@ -208,6 +240,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     public void draw(Canvas canvas, CharSequence text,
                      int start, int end, float x,
                      int top, int y, int bottom, Paint paint) {
+        if (LOG)Log.d(TAG,"draw "+name);
         Drawable d = getCachedDrawable();
         canvas.save();
         //save bounds before applying animation scale. for a size pulse only

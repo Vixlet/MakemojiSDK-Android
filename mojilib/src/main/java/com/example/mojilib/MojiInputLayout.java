@@ -2,9 +2,19 @@ package com.example.mojilib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.Nullable;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +26,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
+import com.example.mojilib.model.MojiModel;
 
 import java.util.Stack;
 
@@ -36,6 +48,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
+    PagerPopulator trendingPopulator;
+    HorizRVAdapter adapter;
 
     public MojiInputLayout(Context context) {
         super(context);
@@ -69,7 +83,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         SnappyLinearLayoutManager sllm = new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
-        rv.setAdapter(new HorizRVAdapter());
+        adapter = new HorizRVAdapter(this);
+        rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
@@ -92,19 +107,37 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             }
         });
 
-
-
+        editText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearStack();
+            }});
+        trendingPopulator = new TrendingPopulator();
+        trendingPopulator.setup(trendingObserver);
     }
+
+    PagerPopulator.PopulatorObserver trendingObserver = new PagerPopulator.PopulatorObserver() {
+        @Override
+        public void onNewDataAvailable() {
+            adapter.setMojiModels(trendingPopulator.populatePage(50,0));
+        }
+    };
+
     void toggleCategoryPage(){
         measureHeight=true;
         hideKeyboard();
-        if (categoriesPage.isVisible()) {
-            categoriesPage.hide();
-        }
-        else{
-            addPage(categoriesPage);
-        }
+        layoutRunnable = new Runnable() {
+            @Override
+            public void run() {
 
+                if (categoriesPage.isVisible()) {
+                    categoriesPage.hide();
+                }
+                else{
+                    addPage(categoriesPage);
+                }
+            }
+        };
     }
     void addPage(MakeMojiPage page){
         if (!pages.isEmpty() && pages.peek()!=null)pages.peek().hide();
@@ -112,6 +145,13 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         page.show();
         setHeight();
         backButton.setVisibility(pages.size()>1?View.VISIBLE:View.GONE);
+
+    }
+    void clearStack(){
+        if (pages.size()==0)return;
+        MakeMojiPage page = pages.pop();
+        page.hide();
+        pages.clear();
 
     }
     void popPage(){
@@ -137,6 +177,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     boolean kbVisible=false;
     int newHeight;
     boolean measureHeight;
+    Runnable layoutRunnable;
     @Override
     public void onGlobalLayout() {
 
@@ -152,6 +193,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             Log.d("newh","new h "+ newHeight);
             setHeight();
         }
+        if (layoutRunnable!=null)
+        {
+            layoutRunnable.run();
+            layoutRunnable=null;
+        }
     }
     void setHeight(){
         if (!pages.empty())pages.peek().setHeight(newHeight);
@@ -162,4 +208,33 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (newHeight!=0)heightMeasureSpec = MeasureSpec.makeMeasureSpec(exactHeight,MeasureSpec.EXACTLY);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }*/
+    void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
+        final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
+        SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        int len = ssb.length();
+        ssb.append("\uFFFC");
+        ssb.setSpan(mojiSpan, len, ssb.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
+            if (editText!=null)editText.setHighlightColor(Color.TRANSPARENT);
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);
+                    if (hyperMojiListener == null)
+                        hyperMojiListener = Moji.getDefaultHyperMojiClickBehavior();
+                    hyperMojiListener.onClick(mojiSpan.getLink());
+                }
+            };
+            ssb.setSpan(clickableSpan, len, editText.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (editText!=null)editText.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+        editText.setText(ssb);
+        editText.setSelection(editText.length());
+    }
+    public int getDefaultSpanDimension(){
+        return MojiSpan.getDefaultSpanDimension(editText.getTextSize());
+    }
 }

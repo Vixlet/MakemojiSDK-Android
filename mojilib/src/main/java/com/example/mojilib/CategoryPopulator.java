@@ -15,11 +15,10 @@ import retrofit2.Response;
  * populates a page based on a given category
  * Created by Scott Baar on 1/22/2016.
  */
-public class CategoryPopulator implements ViewPagerPage.PagerPopulater {
+public class CategoryPopulator extends PagerPopulator<MojiModel>  {
     Category category;
-    ViewPagerPage page;
+    PopulatorObserver obs;
     MojiApi mojiApi;
-    List<MojiModel> mojiModels = new ArrayList<>();
     public CategoryPopulator(Category category){
         this.category = category;
         mojiApi = Moji.mojiApi;
@@ -27,8 +26,8 @@ public class CategoryPopulator implements ViewPagerPage.PagerPopulater {
 
 
     @Override
-    public void setup(ViewPagerPage vpp) {
-        this.page = vpp;
+    public void setup(PopulatorObserver o) {
+        this.obs = o;
         mojiApi.getByCategory(category.name).enqueue(new SmallCB<List<MojiModel>>() {
             @Override
             public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
@@ -37,7 +36,7 @@ public class CategoryPopulator implements ViewPagerPage.PagerPopulater {
                     return;
                 }
                 mojiModels = response.body();
-                page.onNewDataAvailable();
+                obs.onNewDataAvailable();
             }
         });
     }
@@ -45,12 +44,8 @@ public class CategoryPopulator implements ViewPagerPage.PagerPopulater {
     @Override
     public List<MojiModel> populatePage(int count, int offset) {
         if (mojiModels.size()<offset)return new ArrayList<>();//return empty
-        if (offset+count>mojiModels.size())return new ArrayList<>();
+        if (offset+count>mojiModels.size())count = mojiModels.size()-offset;
         return mojiModels.subList(offset,offset+count);
     }
 
-    @Override
-    public int getTotalCount() {
-        return mojiModels.size();
-    }
 }
