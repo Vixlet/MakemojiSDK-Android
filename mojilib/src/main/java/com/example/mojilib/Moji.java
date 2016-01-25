@@ -339,14 +339,18 @@ public class Moji {
             }
         }
     }
-    static void  invalidateTextView(TextView tv){
+    static void invalidateTextView(TextView tv){
         if (tv ==null)return;
-        int selection = tv.getSelectionEnd();
+
+        long lastInvalidated = tv.getTag(R.id._makemoji_last_invalidated_id)==null?0:
+                (long)tv.getTag(R.id._makemoji_last_invalidated_id);
+        Long now = System.currentTimeMillis();
+        if (lastInvalidated+15>now) return;
+
         tv.invalidate();
-        if (tv instanceof EditText) {
-            tv.setText(tv.getText());
-            ((EditText) tv).setSelection(selection);
-        }
+        if (tv instanceof EditText)tv.requestLayout();
+        tv.setTag(R.id._makemoji_last_invalidated_id,now);
+
     }
 
 }

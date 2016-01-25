@@ -283,7 +283,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
             currentAnimationScale = progress;
             TextView tv = mViewRef.get();
             if (tv != null) {
-                Moji.invalidateTextView(tv);
+                Moji.invalidateTextView(tv;
             }
 
             else

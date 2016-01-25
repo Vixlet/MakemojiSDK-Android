@@ -49,7 +49,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
-    PagerPopulator trendingPopulator;
+    TrendingPopulator trendingPopulator;
     HorizRVAdapter adapter;
     ResizeableLL resizeableLL;
     public MojiInputLayout(Context context) {
@@ -120,7 +120,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     PagerPopulator.PopulatorObserver trendingObserver = new PagerPopulator.PopulatorObserver() {
         @Override
         public void onNewDataAvailable() {
-            adapter.setMojiModels(trendingPopulator.populatePage(50,0));
+            adapter.setMojiModels(trendingPopulator.populatePage(200,0));
         }
     };
 

@@ -1,6 +1,7 @@
 package com.example.mojilib;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -33,10 +34,11 @@ public class MojiImageView extends ImageView  implements Spanimatable{
 
     public void setModel(MojiModel m){
         model = m;
+        Drawable d = getResources().getDrawable(R.drawable.mm_dotted_square);
         if (forceDimen!=-1)
-            Picasso.with(getContext()).load(m.image_url).resize(forceDimen,forceDimen).into(this);
+            Picasso.with(getContext()).load(m.image_url).resize(forceDimen,forceDimen).placeholder(d).into(this);
         else
-            Picasso.with(Moji.context).load(model.image_url).fit().centerInside().into(this);
+            Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
 
         if (m.link_url==null || m.link_url.isEmpty()){
             Spanimator.unsubscribe(Spanimator.HYPER_PULSE,this);
