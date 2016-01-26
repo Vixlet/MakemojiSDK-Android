@@ -15,7 +15,7 @@ import java.util.List;
 import retrofit2.Response;
 
 /**
- * populates a page based on a given category
+ * populates a page based cached trending emojis. Serve network response if no cache.
  * Created by Scott Baar on 1/22/2016.
  */
 public class TrendingPopulator extends PagerPopulator<MojiModel> {
@@ -28,7 +28,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
     }
 
 
-    boolean networkResponseServed;
+    boolean cachedResponseServed;
     @Override
     public void setup(PopulatorObserver o) {
         this.obs = o;
@@ -37,17 +37,17 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
             @Override
             public void run() {
                 try {
-
                     final List<MojiModel> cached = MojiModel.fromJSONArray(new JSONArray(sp.getString("trending", "[]")));
-                    Moji.handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!networkResponseServed) {
+                    if (!cached.isEmpty()) {
+                        cachedResponseServed = true;
+                        Moji.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
                                 mojiModels = cached;
                                 obs.onNewDataAvailable();
                             }
-                        }
-                    });
+                        });
+                    }
                 }
                 catch (JSONException je){
                     je.printStackTrace();
@@ -64,10 +64,13 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
                     Log.e("trending populator",t.getLocalizedMessage());
                     return;
                 }
-                mojiModels = response.body();
-                saveInBackground(mojiModels);
-                networkResponseServed = true;
-                obs.onNewDataAvailable();
+                List<MojiModel>networkModels = response.body();
+                saveInBackground(networkModels);
+                if (!cachedResponseServed) {
+                    mojiModels = networkModels;
+                    obs.onNewDataAvailable();
+                }
+
             }
         });
     }

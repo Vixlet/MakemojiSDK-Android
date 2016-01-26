@@ -9,11 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
@@ -31,6 +33,8 @@ import android.widget.LinearLayout;
 import com.example.mojilib.model.MojiModel;
 
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Scott Baar on 1/4/2016.
@@ -50,6 +54,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
     TrendingPopulator trendingPopulator;
+    SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
     ResizeableLL resizeableLL;
     public MojiInputLayout(Context context) {
@@ -84,7 +89,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         SnappyLinearLayoutManager sllm = new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
-        adapter = new HorizRVAdapter(this);
+        adapter = new HorizRVAdapter(this,editText.getTextSize());
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
@@ -115,12 +120,78 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             }});
         trendingPopulator = new TrendingPopulator();
         trendingPopulator.setup(trendingObserver);
+        searchPopulator = new SearchPopulator();
+        searchPopulator.setup(searchObserver);
+        editText.addTextChangedListener(editTextWatcher);
+        flashtagButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editText.setText(TextUtils.concat(editText.getText(),"!"));
+                editText.setSelection(editText.length());
+            }
+        });
     }
 
+    Pattern flashtagPattern = Pattern.compile("(?:.*)!([^\\s])*");
+    private TextWatcher editTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String text = s.toString();
+            int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
+            if (selectionEnd==-1){
+                useTrendingAdapter(true);
+                return;
+            }
+            text = text.substring(0,selectionEnd);//only look at what's before selection
+            int lastBang = text.lastIndexOf('!');
+            int lastSpace = text.lastIndexOf(' ');
+            if (lastSpace==-1) lastSpace = text.lastIndexOf('\n');
+            if (lastSpace==-1) lastSpace = text.lastIndexOf('\t');
+            if (lastBang==-1 || (lastSpace>0 && lastSpace>lastBang)) {
+                useTrendingAdapter(true);//no bang or there's whitespace afterward.
+                return;
+            }
+            String query = text.substring(lastBang+1,selectionEnd);
+            if (!query.isEmpty()) {
+                useTrendingAdapter(false);
+                searchPopulator.search(query);
+            }
+
+        }
+    };
+
+    boolean usingTrendingAdapter = true;
+    void useTrendingAdapter(boolean trending){
+        usingTrendingAdapter =trending;
+        if (usingTrendingAdapter) {
+            adapter.showNames(false);
+            adapter.setMojiModels(trendingPopulator.populatePage(200, 0));
+        }
+
+    }
     PagerPopulator.PopulatorObserver trendingObserver = new PagerPopulator.PopulatorObserver() {
         @Override
         public void onNewDataAvailable() {
-            adapter.setMojiModels(trendingPopulator.populatePage(200,0));
+            if (usingTrendingAdapter)adapter.setMojiModels(trendingPopulator.populatePage(200,0));
+        }
+    };
+    PagerPopulator.PopulatorObserver searchObserver = new PagerPopulator.PopulatorObserver() {
+        @Override
+        public void onNewDataAvailable() {
+            if (!usingTrendingAdapter){
+                adapter.showNames(true);
+                adapter.setMojiModels(searchPopulator.populatePage(50,0));
+            }
         }
     };
 
@@ -204,14 +275,24 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (!pages.empty())pages.peek().setHeight(newHeight);
         //categoriesPage.setHeight(newHeight);
     }
-    /*@Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (newHeight!=0)heightMeasureSpec = MeasureSpec.makeMeasureSpec(exactHeight,MeasureSpec.EXACTLY);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }*/
-    void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
-        final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
+
+    //remove last search term
+    void removeSuggestion(){
+        if (usingTrendingAdapter)return;
+        int lastBang = editText.getText().toString().lastIndexOf("!");
+        if (lastBang==-1)return;
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        editText.setText(ssb.subSequence(0,lastBang));
+    }
+    void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
+        SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        if (model.character!= null && !model.character.isEmpty()){
+            ssb.append(model.character);
+            editText.setText(ssb);
+            editText.setSelection(editText.length());
+            return;
+        }
+        final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
         int len = ssb.length();
         ssb.append("\uFFFC");
         ssb.setSpan(mojiSpan, len, ssb.length(),

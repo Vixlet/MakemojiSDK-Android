@@ -28,7 +28,7 @@ public interface MojiApi {
     @GET("emoji/index/used/1/255/{deviceId}")
     Call<List<MojiModel>> getRecentlyUsed(@Path("deviceId") String deviceId);
 
-    @GET("emoji/flashtags")
+    @GET("emoji/allflashtags")
     Call<List<MojiModel>> getFlashtags();
 
     @POST("messages/create")

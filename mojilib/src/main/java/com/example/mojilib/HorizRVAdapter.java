@@ -24,8 +24,10 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     MojiInputLayout mil;
     List<MojiModel> list = new ArrayList<>();
     boolean showNames = false;
-    public HorizRVAdapter(MojiInputLayout mojiInputLayout){
+    float textSize;
+    public HorizRVAdapter(MojiInputLayout mojiInputLayout,float textSize){
         mil = mojiInputLayout;
+        this.textSize = textSize;
     }
     @Override
     public RVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,6 +38,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             public void onClick(View v) {
                 RVHolder rvHolder = ((RVHolder)v.getTag());
                 MojiModel model = list.get(rvHolder.pos);
+                mil.removeSuggestion();
                 mil.addMojiModel(model,
                         rvHolder.image.getDrawable()!=null && rvHolder.image.getDrawable() instanceof BitmapDrawable?
                                 (BitmapDrawable)rvHolder.image.getDrawable(): null);
@@ -51,6 +54,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
         //Moji.loadImage(holder.image,m.image_url);
         holder.image.forceDimen(holder.dimen);
+        holder.image.setTextSize(textSize);
         holder.image.setModel(m);
         holder.pos = position;
     }

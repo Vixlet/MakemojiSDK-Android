@@ -19,7 +19,7 @@ public abstract class PagerPopulator<T> {
     public interface PopulatorObserver{
        @UiThread void onNewDataAvailable();
     }
-    abstract void setup(PopulatorObserver observer);//once done, call the next two
+    protected abstract void setup(PopulatorObserver observer);//once done, call the next two
     abstract List<T> populatePage(int count, int offset);
     int getTotalCount(){
         return mojiModels.size();

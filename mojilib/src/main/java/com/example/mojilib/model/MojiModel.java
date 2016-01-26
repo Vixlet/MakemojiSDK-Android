@@ -15,12 +15,12 @@ import java.util.List;
  */
 public class MojiModel {
     public int id;
-    public int user_id;
-    public int origin_id;
+    public String user_id;
+    public String origin_id;
     public  String name;
     public String image_url;
     public String link_url;
-    public int legacy;
+    public String legacy;
     public String deleted;
     public String created;
     public String access;
@@ -29,7 +29,9 @@ public class MojiModel {
     public int shares;
     public int remoji;
     public int likes;
+    public String character;
 
+    public MojiModel(){}
     public MojiModel(String name, String image_url){
         this.name = name;
         this.image_url = image_url;
