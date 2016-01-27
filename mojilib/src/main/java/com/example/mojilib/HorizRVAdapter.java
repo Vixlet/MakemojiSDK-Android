@@ -90,6 +90,8 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             image = (MojiImageView) v.findViewById(R.id.pic);
             int h = mil.getDefaultSpanDimension();//use same dimension as span to consolidate img fetches
            // (int)(parent.getHeight() *.8);
+            mil.setMinimumWidth(h);
+            mil.setMinimumHeight(h);
             dimen =h;
 
         }

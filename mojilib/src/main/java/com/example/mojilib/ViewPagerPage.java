@@ -32,7 +32,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
     int mojisPerPage = 10;
     CirclePageIndicator circlePageIndicator;
     private static int MOJI_ITEM_HEIGHT = 50;
-    private static final int ROWS = 4;
+    private static final int ROWS = 5;
 
     public ViewPagerPage (String title,MojiInputLayout mojiInputLayout,PagerPopulator p){
         super(R.layout.mm_vp_page,mojiInputLayout);
@@ -45,12 +45,24 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
         heading.setText(title);
         mPopulator.setup(this);
+        vp.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (oldh==v.getHeight() && oldw==v.getWidth())return;
+                oldh = v.getHeight();
+                oldw = v.getWidth();
+                int dimen = (int)(57 * Moji.density);
+                mojisPerPage =Math.max(10,8 * ROWS);
+                onNewDataAvailable();
+            }
+        });
 
     }
+    int oldh,oldw;
     //called by the populater once a query is complete.
     @Override
     public void onNewDataAvailable(){
-        mojisPerPage =Math.max(10,vp.getWidth()/MOJI_ITEM_HEIGHT * ROWS);
+
         count = mPopulator.getTotalCount();
         vpAdapter = new VPAdapter();
         vp.setAdapter(vpAdapter);
@@ -130,6 +142,11 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
                     mMojiInput.addMojiModel(model,bm);
                 }
             });
+            int padding = (int)(4 * Moji.density);
+            holder.imageView.setMinimumWidth((oldw-padding)/8);
+            holder.imageView.setMaxWidth((oldw-padding)/8);
+            holder.imageView.setMinimumHeight((oldh-padding)/ROWS);
+            holder.imageView.setMaxHeight((oldh-padding)/ROWS);
 
         }
     }

@@ -59,7 +59,7 @@ import static android.os.Build.VERSION_CODES.HONEYCOMB;
  * Created by Scott Baar on 12/14/2015.
  */
 public class Moji {
-    static Context context;
+    public static Context context;
     static Resources resources;
 
     //We use our own static import of Picasso to set our own caches, logging behavior, etc

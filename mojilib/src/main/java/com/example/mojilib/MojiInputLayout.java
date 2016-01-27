@@ -46,6 +46,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     RecyclerView rv;
     FrameLayout pageContainer;
     CategoriesPage categoriesPage;
+    ViewPagerPage trendingPage;
+    ViewPagerPage recentPage;
 
     //just used for measurement
     ResizeableLL topScroller;
@@ -57,6 +59,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
     ResizeableLL resizeableLL;
+    public interface SendClickListener{
+        /**
+         * The send layout has been clicked. Returns the raw message and the transformed html
+         * @param html the parsed html of the edit text
+         * @param spanned, the raw spans in the edit text
+         * @return true to clear the input, false to keep it.
+         */
+        boolean onClick(String html, Spanned spanned);
+    }
+
     public MojiInputLayout(Context context) {
         super(context);
         init(null,0);
@@ -105,6 +117,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 toggleCategoryPage();
             }
         });
+        trendingButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleTrendingPage();
+            }
+        });
         backButton = findViewById(R.id._mm_back_button);
         backButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -116,7 +134,17 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                clearStack();
+               // post(new Runnable() {
+                //    @Override
+               //     public void run() {
+                        layoutRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                clearStack();
+                            }
+                        };
+              //      }
+          //      });
             }});
         trendingPopulator = new TrendingPopulator();
         trendingPopulator.setup(trendingObserver);
@@ -128,6 +156,15 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             public void onClick(View v) {
                 editText.setText(TextUtils.concat(editText.getText(),"!"));
                 editText.setSelection(editText.length());
+                topScroller.snapOpen();
+                showKeyboard();
+                if (!pages.empty())
+                    layoutRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            clearStack();
+                        }
+                    };
             }
         });
     }
@@ -198,18 +235,43 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     void toggleCategoryPage(){
         measureHeight=true;
         hideKeyboard();
-        layoutRunnable = new Runnable() {
-            @Override
-            public void run() {
+        if (categoriesPage.isVisible()) {
+            clearStack();
+        }
+        else
+            layoutRunnable = new Runnable() {
+                @Override
+                public void run() {
 
-                if (categoriesPage.isVisible()) {
-                    categoriesPage.hide();
+                        addPage(categoriesPage);
                 }
-                else{
-                    addPage(categoriesPage);
+            };
+
+        if (!keyboardVisible && layoutRunnable!=null){
+            layoutRunnable.run();
+            layoutRunnable=null;
+        }
+    }
+    void toggleTrendingPage(){
+        measureHeight = true;
+        hideKeyboard();
+        if (trendingPage==null)
+            trendingPage = new ViewPagerPage("Trending",this,new TrendingPopulator());
+
+        if (trendingPage.isVisible()){
+            clearStack();
+        }
+        else
+            layoutRunnable = new Runnable() {
+                @Override
+                public void run() {
+                        addPage(trendingPage);
                 }
-            }
-        };
+            };
+        if (!keyboardVisible && layoutRunnable !=null){
+            layoutRunnable.run();
+            layoutRunnable=null;
+        }
     }
     void addPage(MakeMojiPage page){
         if (!pages.isEmpty() && pages.peek()!=null)pages.peek().hide();
@@ -220,11 +282,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     }
     void clearStack(){
-        if (pages.size()==0)return;
-        MakeMojiPage page = pages.pop();
-        page.hide();
-        pages.clear();
-
+        while (!pages.empty()){
+            MakeMojiPage page = pages.pop();
+            page.hide();
+        }
+        backButton.setVisibility(View.GONE);
     }
     void popPage(){
         if (pages.size()==0)return;
@@ -245,11 +307,17 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+    public void showKeyboard(){
+        InputMethodManager keyboard = (InputMethodManager)
+                Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
+        keyboard.showSoftInput(editText, 0);
+    }
 
     boolean kbVisible=false;
     int newHeight;
     boolean measureHeight;
     Runnable layoutRunnable;
+    boolean keyboardVisible;
     @Override
     public void onGlobalLayout() {
 
@@ -263,8 +331,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             measureHeight=false;
             newHeight = heightDifference -topScroller.getHeight() - horizontalLayout.getHeight();
             Log.d("newh","new h "+ newHeight);
+            keyboardVisible=true;
             setHeight();
         }
+        else
+            keyboardVisible=false;
+
         if (layoutRunnable!=null)
         {
             layoutRunnable.run();
@@ -324,15 +396,24 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     public void setCameraButtonClickListener(View.OnClickListener onClickListener){
         cameraImageButton.setOnClickListener(onClickListener);
     }
-    public void setSendLayoutClickListener(final View.OnClickListener onClickListener){
+    public void setSendLayoutClickListener(final SendClickListener sendClickListener){
      sendLayout.setOnClickListener(new OnClickListener() {
          @Override
          public void onClick(View v) {
-             if (onClickListener!=null) onClickListener.onClick(v);
+             if (sendClickListener!=null){
+                 SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+                 String html = Moji.toHtml(ssb);
+                 Moji.mojiApi.sendPressed(html);
+                 if (sendClickListener.onClick(Moji.toHtml(ssb),ssb))
+                     editText.setText("");
+             }
          }
      });
     }
     public String getInputAsHtml(){
        return Moji.toHtml(new SpannableStringBuilder(editText.getText()));
+    }
+    public Spanned getInputAsSpanned(){
+        return new SpannableStringBuilder(editText.getText());
     }
 }

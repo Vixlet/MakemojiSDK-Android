@@ -42,13 +42,16 @@ public class MojiModel {
         JSONObject jo = new JSONObject();
         try {
             jo.put("image_url", m.image_url);
+            jo.put("link_url", m.link_url);
             jo.putOpt("name", m.name);
         }
         catch (Exception e){e.printStackTrace();}
         return jo;
     }
     public static MojiModel fromJson(JSONObject jo){
-        return new MojiModel(jo.optString("name"),jo.optString("image_url"));
+        MojiModel m= new MojiModel(jo.optString("name"),jo.optString("image_url"));
+        m.link_url = jo.optString("link_url",null);
+        return m;
     }
     public static JSONArray toJsonArray(Collection<MojiModel> models){
         JSONArray ja = new JSONArray();

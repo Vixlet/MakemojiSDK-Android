@@ -28,7 +28,7 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
     @Override
     public void setup(PopulatorObserver o) {
         this.obs = o;
-        mojiApi.getByCategory(category.name).enqueue(new SmallCB<List<MojiModel>>() {
+        mojiApi.getByCategory(category.name.replace(' ','_')).enqueue(new SmallCB<List<MojiModel>>() {
             @Override
             public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
                 if (t!=null){

@@ -55,6 +55,10 @@ public class MakeMojiPage {
         mIsSetup=true;
 
     }
+
+    public boolean isSetup(){
+        return mIsSetup;
+    }
     public boolean isVisible(){
         return mIsVisible;
     }

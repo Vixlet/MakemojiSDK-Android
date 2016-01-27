@@ -38,8 +38,9 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             + COL_IMG_URL+ " TEXT, "
             + COL_LINK_URL + " TEXT, "
             + COL_FLASHTAG + " TEXT, "
-            + COL_CHARACTER + " TEXT"
-            + ")";
+            + COL_CHARACTER + " TEXT "
+            +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
+            + ");";
 
     private MojiSQLHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);

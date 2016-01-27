@@ -2,6 +2,7 @@ package com.example.mojilib;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
@@ -18,6 +19,7 @@ import com.squareup.picasso252.Picasso;
 public class MojiImageView extends ImageView  implements Spanimatable{
     MojiModel model;
     float currentAnimationScale =1f;
+    boolean animate;
     public MojiImageView(Context context) {
         super(context);
     }
@@ -50,10 +52,13 @@ public class MojiImageView extends ImageView  implements Spanimatable{
     }
     public void setModel(MojiModel m){
         model = m;
-        Drawable d = getResources().getDrawable(R.drawable.mm_dotted_square);
+        Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
+       // setImageDrawable(d);
+        //setScaleType(ScaleType.CENTER_INSIDE);
         if (!model.image_url.isEmpty()) {
-            if (forceDimen != -1)
+            if (forceDimen != -1) {
                 Picasso.with(getContext()).load(m.image_url).resize(forceDimen, forceDimen).placeholder(d).into(this);
+            }
             else
                 Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
         }
@@ -61,18 +66,20 @@ public class MojiImageView extends ImageView  implements Spanimatable{
             setImageBitmap(makeBMFromString(forceDimen,m.character));
 
         }
-        if (m.link_url==null || m.link_url.isEmpty()){
+        if ((m.link_url==null || m.link_url.isEmpty())){
             Spanimator.unsubscribe(Spanimator.HYPER_PULSE,this);
-            setAlpha(1f);
+            animate =false;
+            setAlpha(255);
         }
         else {
+            animate = true;
             Spanimator.subscribe(Spanimator.HYPER_PULSE,this);
         }
 
     }
     @Override
     public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
-        setAlpha((int)(255*progress));
+        if (animate) setAlpha((int)(255*progress));
 
     }
 
