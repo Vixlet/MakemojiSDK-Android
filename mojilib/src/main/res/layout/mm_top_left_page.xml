@@ -7,8 +7,8 @@
     android:orientation="horizontal" android:layout_width="wrap_content"
     android:id="@+id/_mm_left_buttons"
     android:visibility="visible"
-    android:background="@android:color/holo_red_dark"
-    android:layout_height="wrap_content" android:gravity="right">
+    android:background="@drawable/mm_left_page_gradient"
+    android:layout_height="match_parent" android:gravity="right">
     <FrameLayout
         android:layout_weight="1"
         android:layout_width="0dp"

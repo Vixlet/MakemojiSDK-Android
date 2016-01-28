@@ -6,11 +6,13 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -20,6 +22,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -28,6 +31,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.mojilib.model.MojiModel;
@@ -53,7 +57,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     ResizeableLL topScroller;
     LinearLayout horizontalLayout;
 
-    View trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
+    ImageView trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
     TrendingPopulator trendingPopulator;
     SearchPopulator searchPopulator;
@@ -106,10 +110,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
 
-        categoriesButton = findViewById(R.id._mm_categories_button);
-        flashtagButton = findViewById(R.id._mm_flashtag_button);
-        recentButton = findViewById(R.id._mm_recent_button);
-        trendingButton = findViewById(R.id._mm_trending_button);
+        categoriesButton =(ImageView) findViewById(R.id._mm_categories_button);
+        flashtagButton =(ImageView) findViewById(R.id._mm_flashtag_button);
+        recentButton = (ImageView)findViewById(R.id._mm_recent_button);
+        trendingButton = (ImageView)findViewById(R.id._mm_trending_button);
         categoriesButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +132,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 toggleRecentPage();
             }
         });
-        backButton = findViewById(R.id._mm_back_button);
+        backButton =(ImageView) findViewById(R.id._mm_back_button);
         backButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,21 +140,21 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             }
         });
 
-        editText.setOnClickListener(new OnClickListener() {
+        //don't show kb if pages are showing.
+        editText.setOnTouchListener(new OnTouchListener() {
             @Override
-            public void onClick(View v) {
-               // post(new Runnable() {
-                //    @Override
-               //     public void run() {
-                        layoutRunnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                clearStack();
-                            }
-                        };
-              //      }
-          //      });
-            }});
+            public boolean onTouch(View v, MotionEvent event) {
+                if (pages.empty()) return editText.onTouchEvent(event);
+                else
+                {
+                    int pos = editText.getOffsetForPosition(event.getX(),event.getY());
+                    editText.setSelection(pos);
+                    return true;
+                }
+            }
+        });
+
+
         trendingPopulator = new TrendingPopulator();
         trendingPopulator.setup(trendingObserver);
         searchPopulator = new SearchPopulator();
@@ -159,8 +163,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         flashtagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                editText.setText(TextUtils.concat(editText.getText(),"!"));
-                editText.setSelection(editText.length());
+                editText.getText().insert(Math.max(0,editText.getSelectionStart()),"!");
+                //editText.setSelection(editText.getSelectionStart()+1);
+                //editText.setSelection(editText.length());
                 topScroller.snapOpen();
                 showKeyboard();
                     layoutRunnable = new Runnable() {
@@ -174,6 +179,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 //layoutRunnable=null;
             }
         });
+        int buttonColor = ContextCompat.getColor(getContext(),R.color._mm_left_button_cf);
+        flashtagButton.setColorFilter(buttonColor);
+        recentButton.setColorFilter(buttonColor);
+        trendingButton.setColorFilter(buttonColor);
+        categoriesButton.setColorFilter(buttonColor);
     }
 
     Pattern flashtagPattern = Pattern.compile("(?:.*)!([^\\s])*");
@@ -239,6 +249,31 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
     };
 
+    OnClickListener abcClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showKeyboard();
+            layoutRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    clearStack();
+                }
+            };
+        }
+    };
+    OnClickListener backspaceClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+            int selectionStart = Math.max(editText.getSelectionStart()-1,0);
+            if (selectionStart==0)return;
+            int selectionEnd = Math.min(selectionStart+1,editText.length());
+            ssb.delete(selectionStart,selectionEnd);
+            editText.setText(ssb);
+            editText.setSelection(Math.max(0,selectionStart));
+        }
+    };
+
     void toggleCategoryPage(){
         measureHeight=true;
         hideKeyboard();
@@ -249,7 +284,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
-
+                        clearStack();
                         addPage(categoriesPage);
                 }
             };
@@ -272,6 +307,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    clearStack();
                         addPage(trendingPage);
                 }
             };
@@ -294,6 +330,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    clearStack();
                     addPage(recentPage);
                 }
             };
@@ -348,7 +385,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     boolean measureHeight;
     Runnable layoutRunnable;
     boolean keyboardVisible;
-    int oldh,oldtop;
+    int oldh,oldtop,oldDiff;
     @Override
     public void onGlobalLayout() {
 
@@ -370,15 +407,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             keyboardVisible = false;
         }
 
-        if (layoutRunnable!=null )
+        if (layoutRunnable!=null && (oldDiff!=heightDifference) )
         {
             layoutRunnable.run();
             layoutRunnable=null;
 
         }
 
-        //setHeight();
-        oldh = getHeight();
+        oldDiff = heightDifference;
     }
     void setHeight(){
         if (!pages.empty())pages.peek().setHeight(newHeight);
@@ -391,20 +427,23 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     //remove last search term
     void removeSuggestion(){
-        if (usingTrendingAdapter)return;
-        int lastBang = editText.getText().toString().lastIndexOf("!");
+        if (usingTrendingAdapter|| editText.getSelectionStart()==-1)return;
+        int selectionStart = editText.getSelectionStart();
+        int lastBang = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf("!");
         if (lastBang==-1)return;
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
-        editText.setText(ssb.subSequence(0,lastBang));
+        ssb.delete(lastBang,selectionStart);
+        editText.setText(ssb);
+        editText.setSelection(Math.min(lastBang,ssb.length()));
     }
     void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
         int selectionStart = editText.getSelectionStart();
-        int selectionEnd = editText.getSelectionEnd();
+        if (selectionStart==-1)selectionStart = editText.length();
         if (model.character!= null && !model.character.isEmpty()){
             ssb.insert(selectionStart,model.character);
             editText.setText(ssb);
-            editText.setSelection(selectionStart+1);
+            editText.setSelection(Math.min(selectionStart+2,ssb.length()));
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);

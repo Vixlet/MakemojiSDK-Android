@@ -5,6 +5,7 @@
     android:paddingTop="8dp"
     android:textStyle="bold"
     android:paddingRight="4dp"
-    android:text="Send" android:textSize="14sp" android:textColor="@android:color/black">
+    android:text="Send" android:textSize="14sp"
+    android:textColor="@color/_mm_default_send_text_color">
 
 </TextView>
