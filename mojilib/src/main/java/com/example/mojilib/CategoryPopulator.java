@@ -1,5 +1,7 @@
 package com.example.mojilib;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -19,33 +21,33 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
     Category category;
     PopulatorObserver obs;
     MojiApi mojiApi;
+    SharedPreferences sp;
     public CategoryPopulator(Category category){
         this.category = category;
         mojiApi = Moji.mojiApi;
+        sp =   Moji.context.getSharedPreferences("_mm_categories_cache",0);
     }
 
 
     @Override
     public void setup(PopulatorObserver o) {
         this.obs = o;
-        mojiApi.getByCategory(category.name.replace(' ','_')).enqueue(new SmallCB<List<MojiModel>>() {
-            @Override
-            public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
-                if (t!=null){
-                    Log.e("Category populator",t.getLocalizedMessage());
-                    return;
+        mojiModels = MojiModel.getList(category.name);
+        if (!mojiModels.isEmpty())
+            obs.onNewDataAvailable();
+        else
+            mojiApi.getByCategory(category.name.replace(' ','_')).enqueue(new SmallCB<List<MojiModel>>() {
+                @Override
+                public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
+                    if (t!=null){
+                        Log.e("Category populator",t.getLocalizedMessage());
+                        return;
+                    }
+                    mojiModels = response.body();
+                    MojiModel.saveList(response.body(),category.name);
+                    obs.onNewDataAvailable();
                 }
-                mojiModels = response.body();
-                obs.onNewDataAvailable();
-            }
-        });
-    }
-
-    @Override
-    public List<MojiModel> populatePage(int count, int offset) {
-        if (mojiModels.size()<offset)return new ArrayList<>();//return empty
-        if (offset+count>mojiModels.size())count = mojiModels.size()-offset;
-        return mojiModels.subList(offset,offset+count);
+            });
     }
 
 }

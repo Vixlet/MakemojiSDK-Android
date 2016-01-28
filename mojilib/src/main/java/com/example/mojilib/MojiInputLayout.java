@@ -123,6 +123,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 toggleTrendingPage();
             }
         });
+        recentButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleRecentPage();
+            }
+        });
         backButton = findViewById(R.id._mm_back_button);
         backButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -273,6 +279,28 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable=null;
         }
     }
+    void toggleRecentPage(){
+        measureHeight = true;
+        hideKeyboard();
+        if (recentPage==null)
+            recentPage = new ViewPagerPage("Recent",this,new RecentPopulator());
+
+        if (recentPage.isVisible()){
+            clearStack();
+            recentPage = null;
+        }
+        else
+            layoutRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    addPage(recentPage);
+                }
+            };
+        if (!keyboardVisible && layoutRunnable !=null){
+            layoutRunnable.run();
+            layoutRunnable=null;
+        }
+    }
     void addPage(MakeMojiPage page){
         if (!pages.isEmpty() && pages.peek()!=null)pages.peek().hide();
         pages.push(page);
@@ -402,6 +430,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
          public void onClick(View v) {
              if (sendClickListener!=null){
                  SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+                 MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
+                 for (int i = 0; i< spans.length; i++){
+                     RecentPopulator.addRecent(new MojiModel(spans[i].name,spans[i].getSource()));
+                 }
                  String html = Moji.toHtml(ssb);
                  Moji.mojiApi.sendPressed(html);
                  if (sendClickListener.onClick(Moji.toHtml(ssb),ssb))

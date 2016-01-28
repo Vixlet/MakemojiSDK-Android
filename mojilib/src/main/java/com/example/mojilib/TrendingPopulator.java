@@ -22,13 +22,12 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
     PopulatorObserver obs;
     MojiApi mojiApi;
     SharedPreferences sp;
+    boolean cachedResponseServed;
     public TrendingPopulator(){
         mojiApi = Moji.mojiApi;
         sp = Moji.context.getSharedPreferences("_mm_trending",0);
     }
 
-
-    boolean cachedResponseServed;
     @Override
     public void setup(PopulatorObserver o) {
         this.obs = o;
@@ -83,12 +82,6 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
             }
         }).start();
 
-    }
-    @Override
-    public List<MojiModel> populatePage(int count, int offset) {
-        if (mojiModels.size()<offset)return new ArrayList<>();//return empty
-        if (offset+count>mojiModels.size())count = mojiModels.size()-offset;
-        return mojiModels.subList(offset,offset+count);
     }
 
     @Override

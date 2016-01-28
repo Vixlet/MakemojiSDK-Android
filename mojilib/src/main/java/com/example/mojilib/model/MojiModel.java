@@ -1,7 +1,10 @@
 package com.example.mojilib.model;
 
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+
+import com.example.mojilib.Moji;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +40,15 @@ public class MojiModel {
         this.image_url = image_url;
     }
 
+    @Override
+    public boolean equals(Object o){
+        if (!(o instanceof MojiModel)) return false;
+        MojiModel m = (MojiModel) o;
+        if (m.character!=null && !m.character.equals(character))return false;
+        else if (character!=null && !character.equals(m.character))return false;
+        return  (m.name.equals(name)
+                &&(m.image_url).equals(image_url));
+    }
     public static JSONObject toJson(MojiModel m){
         if ( m.image_url==null||m.name==null)return null;//invalid object
         JSONObject jo = new JSONObject();
@@ -75,5 +87,20 @@ public class MojiModel {
     @Override
     public String toString(){
         return ""+name;
+    }
+
+    public static void saveList(List<MojiModel> list,String name){
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists",0);
+        sp.edit().putString("name",toJsonArray(list).toString()).apply();
+    }
+    public static List<MojiModel> getList(String name){
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists",0);
+        List<MojiModel> models;
+        try{
+            models = fromJSONArray(new JSONArray(sp.getString(name,"[]")));
+        }catch (Exception e){
+            models = new ArrayList<>();
+        }
+        return models;
     }
 }

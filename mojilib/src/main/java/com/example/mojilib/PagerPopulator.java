@@ -20,7 +20,11 @@ public abstract class PagerPopulator<T> {
        @UiThread void onNewDataAvailable();
     }
     protected abstract void setup(PopulatorObserver observer);//once done, call the next two
-    abstract List<T> populatePage(int count, int offset);
+    List<T> populatePage(int count, int offset){
+        if (mojiModels.size()<offset)return new ArrayList<>();//return empty
+        if (offset+count>mojiModels.size())count = mojiModels.size()-offset;
+        return mojiModels.subList(offset,offset+count);
+    }
     int getTotalCount(){
         return mojiModels.size();
     };
