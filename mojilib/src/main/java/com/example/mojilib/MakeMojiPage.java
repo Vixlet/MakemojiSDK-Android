@@ -46,6 +46,9 @@ public class MakeMojiPage {
         mView.setVisibility(View.GONE);
 
     }
+    public void detatch(){
+        mMojiInput.getPageFrame().removeView(mView);
+    }
 
     /**
      * called the first time the view is shown

@@ -105,6 +105,10 @@ public class Spanimator {
 
 
     }
+    public static float getValue(@Spanimation int animation){
+        if (hyperAnimation!=null)return (float)hyperAnimation.getAnimatedValue();
+        else return HYPER_PULSE_MIN;
+    }
     static void onResume(){
         mPaused=false;
         Log.d("Spanimator","spanimator lifecycle resume");

@@ -50,22 +50,19 @@ public class MojiImageView extends ImageView  implements Spanimatable{
         canvas.drawText(s,0,-paint.ascent(),paint);
         return image;
     }
+    String url;
     public void setModel(MojiModel m){
         model = m;
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
-       // setImageDrawable(d);
-        //setScaleType(ScaleType.CENTER_INSIDE);
-        if (!model.image_url.isEmpty()) {
-            if (forceDimen != -1) {
-                Picasso.with(getContext()).load(m.image_url).resize(forceDimen, forceDimen).placeholder(d).into(this);
-            }
-            else
-                Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
-        }
-        else {
-            setImageBitmap(makeBMFromString(forceDimen,m.character));
+            if (!model.image_url.isEmpty()) {
+                if (forceDimen != -1) {
+                    Picasso.with(getContext()).load(m.image_url).resize(forceDimen, forceDimen).placeholder(d).into(this);
+                } else
+                    Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
+            } else {
+                setImageBitmap(makeBMFromString(forceDimen, m.character));
 
-        }
+            }
         if ((m.link_url==null || m.link_url.isEmpty())){
             Spanimator.unsubscribe(Spanimator.HYPER_PULSE,this);
             animate =false;
@@ -74,6 +71,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
         else {
             animate = true;
             Spanimator.subscribe(Spanimator.HYPER_PULSE,this);
+            setAlpha((int)(255*Spanimator.getValue(Spanimator.HYPER_PULSE)));
         }
 
     }

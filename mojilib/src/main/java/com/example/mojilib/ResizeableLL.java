@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.os.SystemClock;
 import android.support.annotation.IntDef;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -39,7 +40,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
 
     View leftView;
-    SnappyRecyclerView recyclerView;
+    RecyclerView recyclerView;
     int minSize, maxSize;
     int expandSizeThreshold =(int) (100 * Moji.density);//bigger than this  after drag -> expand
     boolean lastStateOpened = false; //affinity for snap behavior open or close
@@ -50,7 +51,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     public void onFinishInflate(){
         super.onFinishInflate();
         leftView = findViewById(R.id._mm_left_buttons);
-        recyclerView = (SnappyRecyclerView) findViewById(R.id._mm_recylcer_view);
+        recyclerView = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         //leftView.setOnTouchListener(this);
         setOnTouchListener(this);
 
@@ -138,7 +139,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         int w = recyclerView.getWidth();
         if ((ev.getRawX()< x || ev.getRawX()> x + w ))
             return false;
-        canScrollLeft = ((SnappyLinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition()!=0;
+        canScrollLeft = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition()!=0;
 
         Log.d("asfd","canscroll "+canScrollLeft);
         if (newX<mDragStartX)//drag right

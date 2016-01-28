@@ -58,7 +58,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     TrendingPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
-    ResizeableLL resizeableLL;
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -99,7 +98,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (!cameraVisiblity) cameraImageButton.setVisibility(View.GONE);
         editText = (EditText)findViewById(R.id._mm_edit_text);
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
-        SnappyLinearLayoutManager sllm = new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager sllm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);//new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
         adapter = new HorizRVAdapter(this,editText.getTextSize());
         rv.setAdapter(adapter);
@@ -164,13 +163,15 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 editText.setSelection(editText.length());
                 topScroller.snapOpen();
                 showKeyboard();
-                if (!pages.empty())
                     layoutRunnable = new Runnable() {
                         @Override
                         public void run() {
                             clearStack();
                         }
                     };
+                //layoutRunnable.run();
+               // post(layoutRunnable);
+                //layoutRunnable=null;
             }
         });
     }
@@ -313,6 +314,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         while (!pages.empty()){
             MakeMojiPage page = pages.pop();
             page.hide();
+            page.detatch();
         }
         backButton.setVisibility(View.GONE);
     }
@@ -342,10 +344,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
 
     boolean kbVisible=false;
-    int newHeight;
+    int newHeight =(int)( 200 * Moji.density);//logical default
     boolean measureHeight;
     Runnable layoutRunnable;
     boolean keyboardVisible;
+    int oldh,oldtop;
     @Override
     public void onGlobalLayout() {
 
@@ -357,22 +360,32 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         Log.d("kb","kb h "+ heightDifference + " " + getHeight());
         if (getHeight()!=0 && heightDifference>screenHeight/3) {
             measureHeight=false;
-            newHeight = heightDifference -topScroller.getHeight() - horizontalLayout.getHeight();
+            newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
             Log.d("newh","new h "+ newHeight);
             keyboardVisible=true;
+            oldtop=getTop()-r.bottom;
             setHeight();
         }
-        else
-            keyboardVisible=false;
+        else {
+            keyboardVisible = false;
+        }
 
-        if (layoutRunnable!=null)
+        if (layoutRunnable!=null )
         {
             layoutRunnable.run();
             layoutRunnable=null;
+
         }
+
+        //setHeight();
+        oldh = getHeight();
     }
     void setHeight(){
         if (!pages.empty())pages.peek().setHeight(newHeight);
+        else
+        {
+           // topScroller.getLayoutParams().height=newHeight;
+        }
         //categoriesPage.setHeight(newHeight);
     }
 
@@ -386,16 +399,19 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        int selectionStart = editText.getSelectionStart();
+        int selectionEnd = editText.getSelectionEnd();
         if (model.character!= null && !model.character.isEmpty()){
-            ssb.append(model.character);
+            ssb.insert(selectionStart,model.character);
             editText.setText(ssb);
-            editText.setSelection(editText.length());
+            editText.setSelection(selectionStart+1);
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
         int len = ssb.length();
-        ssb.append("\uFFFC");
-        ssb.setSpan(mojiSpan, len, ssb.length(),
+        ssb.insert(selectionStart,"\uFFFC");
+        int len2 = ssb.length();
+        ssb.setSpan(mojiSpan, selectionStart,selectionStart+1,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
@@ -409,14 +425,13 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     hyperMojiListener.onClick(mojiSpan.getLink());
                 }
             };
-            ssb.setSpan(clickableSpan, len, editText.length(),
+            ssb.setSpan(clickableSpan, selectionStart, selectionStart+1,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            if (editText!=null)editText.setMovementMethod(LinkMovementMethod.getInstance());
+            editText.setMovementMethod(LinkMovementMethod.getInstance());
         }
         editText.setText(ssb);
-        String html = Moji.toHtml(ssb);
         Moji.subSpanimatable(ssb,editText);
-        editText.setSelection(editText.length());
+        editText.setSelection(selectionStart+1);
     }
     public int getDefaultSpanDimension(){
         return MojiSpan.getDefaultSpanDimension(editText.getTextSize());
