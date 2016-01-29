@@ -27,7 +27,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
         adapter = new CategoriesAdapter(this);
         List<Category> categories = Category.getCategories();
         adapter.setCategories(categories);
-        if (!categories.isEmpty())
+        if (categories.isEmpty())
             cacheEmpty=true;
 
         api.getCategories().enqueue(new SmallCB<List<Category>>() {
