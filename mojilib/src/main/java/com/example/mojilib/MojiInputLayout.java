@@ -266,8 +266,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         public void onClick(View v) {
             SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
             int selectionStart = Math.max(editText.getSelectionStart()-1,0);
-            if (selectionStart==0)return;
             int selectionEnd = Math.min(selectionStart+1,editText.length());
+            if (selectionEnd==0)return;
             ssb.delete(selectionStart,selectionEnd);
             editText.setText(ssb);
             editText.setSelection(Math.max(0,selectionStart));

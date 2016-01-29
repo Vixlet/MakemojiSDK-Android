@@ -29,7 +29,7 @@
         <TextView
             android:id="@+id/_mm_abc_tv"
             style="@style/MakeMojiHeaderTextAppearance"
-            android:padding="2dp"
+            android:padding="6dp"
             android:layout_width="wrap_content"
             android:layout_gravity="left"
             android:text="ABC"
@@ -45,7 +45,7 @@
             />
         <ImageView
             android:id="@+id/_mm_backspace_button"
-            android:padding="2dp"
+            android:padding="6dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/mm_back_icon"/>
