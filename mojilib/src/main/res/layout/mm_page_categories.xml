@@ -17,12 +17,14 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:padding="2dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="4dp"
         android:layout_height="wrap_content">
         <TextView
+            style="@style/MakeMojiHeaderTextAppearance"
+            android:padding="2dp"
             android:id="@+id/_mm_abc_tv"
-            android:textColor="@color/_mm_header_text_color"
             android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_gravity="left"

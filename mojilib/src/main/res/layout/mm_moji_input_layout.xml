@@ -28,6 +28,10 @@
         android:background="@android:color/transparent"
         />
     <EditText
+        android:background="@android:color/white"
+        android:minHeight="40dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"

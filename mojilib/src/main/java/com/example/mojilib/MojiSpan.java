@@ -61,11 +61,11 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     private SoftReference<Drawable> mDrawableRef;
     private WeakReference<TextView> mViewRef;
-    private String mLink;
+    private String mLink = "";
     boolean shouldAnimate;
     Drawable mPlaceHolder;
     private static final String TAG = "MojiSpan";
-    private static boolean LOG = true;
+    private static boolean LOG = false;
     String name;
     int id = -1;
 
@@ -95,17 +95,13 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         mDrawable = d;
         mPlaceHolder = d;
         mSource = source;
-        mLink = link;
+        if (link!=null)mLink = link;
         shouldAnimate = (link!=null && !link.isEmpty());
 
         mViewRef = new WeakReference<>(refreshView);
         Moji.picasso.load(mSource)
                 .resize(mWidth,mHeight)
                 .into(t);
-        if (Moji.demo &&  Math.random() <= .2) {
-                shouldAnimate =true;
-                mLink = source;
-        }
     }
 
     public static int getDefaultSpanDimension(float textSize){
@@ -310,8 +306,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     }
 
     public String toHtml() {
-        return "<img style=\\\"vertical-align:text-bottom;width:20px;height:20px;\""
-                + "src=\"" + mSource + "\"" +
+        return "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\""
+                + "src=\"" + mSource + "\" "
+                + "link=\""+getLink()+"\""+
                 (id == -1 ? "" : "id=\"" + id + "\"")//insert id if this came from a model
                 + ">";
     }

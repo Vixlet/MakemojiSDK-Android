@@ -394,11 +394,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         int screenHeight = getRootView().getHeight();
         int heightDifference = screenHeight - (r.bottom - r.top);
-        Log.d("kb","kb h "+ heightDifference + " " + getHeight());
+        //Log.d("kb","kb h "+ heightDifference + " " + getHeight());
         if (getHeight()!=0 && heightDifference>screenHeight/3) {
             measureHeight=false;
             newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
-            Log.d("newh","new h "+ newHeight);
+            //Log.d("newh","new h "+ newHeight);
             keyboardVisible=true;
             oldtop=getTop()-r.bottom;
             setHeight();
@@ -443,7 +443,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (model.character!= null && !model.character.isEmpty()){
             ssb.insert(selectionStart,model.character);
             editText.setText(ssb);
-            editText.setSelection(Math.min(selectionStart+2,ssb.length()));
+            editText.setSelection(Math.min(selectionStart+model.character.length(),ssb.length()));
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
@@ -486,7 +486,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                  SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
                  MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
                  for (int i = 0; i< spans.length; i++){
-                     RecentPopulator.addRecent(new MojiModel(spans[i].name,spans[i].getSource()));
+                     MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
+                     model.link_url = spans[i].getLink();
+                     RecentPopulator.addRecent(model);
                  }
                  String html = Moji.toHtml(ssb);
                  Moji.mojiApi.sendPressed(html);

@@ -55,7 +55,7 @@ public class MojiModel {
         try {
             jo.put("image_url", m.image_url);
             jo.put("link_url", m.link_url);
-            jo.putOpt("name", m.name);
+            jo.put("name", m.name);
         }
         catch (Exception e){e.printStackTrace();}
         return jo;

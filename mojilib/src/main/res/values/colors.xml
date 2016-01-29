@@ -6,5 +6,6 @@
     <color name="_mm_left_button_cf">#555555</color>
     <color name="_mm_horiz_rv_bg">#EDEDED</color>
     <color name="_mm_top_layout_bg">#EDEDED</color>
-    <color name="_mm_default_send_text_color">#BABABA</color>
+    <color name="_mm_default_send_text_color">#3e8ff9</color>
+    <color name="_mm_gradient_bottom">#BABABA</color>
 </resources>

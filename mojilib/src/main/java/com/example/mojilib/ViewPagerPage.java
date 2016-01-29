@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.PopulatorObserver{
 
-    PagerPopulator mPopulator;
+    PagerPopulator<MojiModel> mPopulator;
     ViewPager vp;
     TextView heading;
     int count;
@@ -110,7 +110,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         }
 
         public void setMojiModels(List<MojiModel> models){
-            mojiModels = models;
+            mojiModels = new ArrayList<>(models);
             notifyDataSetChanged();
 
         }
