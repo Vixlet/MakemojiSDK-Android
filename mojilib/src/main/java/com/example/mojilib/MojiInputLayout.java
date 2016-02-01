@@ -96,7 +96,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
-        sendLayout = inflate(getContext(),sendLayoutRes,horizontalLayout);
+        sendLayout = ((LinearLayout)inflate(getContext(),sendLayoutRes,horizontalLayout)).getChildAt(2);
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
         if (!cameraVisiblity) cameraImageButton.setVisibility(View.GONE);
@@ -186,7 +186,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         categoriesButton.setColorFilter(buttonColor);
     }
 
-    Pattern flashtagPattern = Pattern.compile("(?:.*)!([^\\s])*");
     private TextWatcher editTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -279,6 +278,35 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             editText.setSelection(Math.max(0,selectionStart));
         }
     };
+
+    OnTouchListener backspaceTouchListener = new OnTouchListener() {
+        long lastBackTime;
+        boolean isPressed;
+        private Runnable backSpaceRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isPressed){
+                    backspaceClick.onClick(null);
+                    postDelayed(this,110);
+                }
+            }
+        };
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    isPressed = true;
+                    postDelayed(backSpaceRunnable,200);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    isPressed = false;
+
+            }
+            return false;
+        }
+    };
+
 
     void toggleCategoryPage(){
         measureHeight=true;

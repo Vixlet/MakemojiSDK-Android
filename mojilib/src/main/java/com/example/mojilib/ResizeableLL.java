@@ -55,7 +55,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         //leftView.setOnTouchListener(this);
         setOnTouchListener(this);
 
-        mLastPrimaryContentSize = leftView.getMeasuredHeight();
         minSize = (int)(50 *Moji.density);
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
@@ -84,19 +83,11 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
 
     private boolean mDragging;
-    private long mDraggingStarted;
     private float mDragStartX;
-    private float mDragStartY;
-    private float mPointerOffset;
 
-    private int mLastPrimaryContentSize;
-    boolean isClosed,isOpened;
+    final private int MAXIMIZED_VIEW_TOLERANCE_DIP = (int)(30 * Moji.density);
+    final private int MINIMIZED_VIEW_TOLERANCE_DIP = (int)(70 * Moji.density);
 
-    final static private int MAXIMIZED_VIEW_TOLERANCE_DIP = 30;
-    final static private int TAP_DRIFT_TOLERANCE = 3;
-    final static private int SINGLE_TAP_MAX_TIME = 175;
-
-    float mDownX = 0;
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
@@ -109,7 +100,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         }
         else if (action==MotionEvent.ACTION_DOWN){
             mDragStartX = ev.getRawX();
-            mDragStartY = ev.getY();
             mStartWidth = leftView.getMeasuredWidth();
         }
         else if (action==MotionEvent.ACTION_MOVE){
@@ -156,11 +146,8 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     public boolean onTouch(View view, MotionEvent me) {
         int nw = mStartWidth - (int)(mDragStartX - me.getRawX());
         if (me.getAction() == MotionEvent.ACTION_DOWN) {
-            mDraggingStarted = SystemClock.elapsedRealtime();
             mDragStartX = me.getRawX();
-            mDragStartY = me.getY();
             mStartWidth = leftView.getMeasuredWidth();
-                mPointerOffset = me.getRawX() - leftView.getMeasuredWidth();
             mDragging=true;
             return true;
         }
@@ -212,8 +199,8 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
     private void snapOpenOrClose(int currentWidth){
         int goalWidth = maxSize;
-        if ((lastStateOpened && maxSize-currentWidth>expandSizeThreshold)//closed enough to snap close
-                || (!lastStateOpened && minSize+expandSizeThreshold>currentWidth))//not open enough to snap open.
+        if ((lastStateOpened && maxSize-currentWidth>MAXIMIZED_VIEW_TOLERANCE_DIP)//closed enough to snap close
+                || (!lastStateOpened && minSize+MINIMIZED_VIEW_TOLERANCE_DIP>currentWidth))//not open enough to snap open.
             goalWidth = minSize;
 
 

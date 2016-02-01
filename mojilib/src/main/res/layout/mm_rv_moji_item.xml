@@ -2,7 +2,7 @@
 <com.example.mojilib.MojiImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="50dp"
     android:src="@drawable/mm_dotted_square"
-    android:padding="4dp"
+    android:padding="2dp"
     android:adjustViewBounds="true"
     android:layout_height="50dp">
 

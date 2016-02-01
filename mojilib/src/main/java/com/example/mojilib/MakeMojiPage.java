@@ -56,7 +56,9 @@ public class MakeMojiPage {
     @CallSuper
     protected void setup(){
         mView.findViewById(R.id._mm_abc_tv).setOnClickListener(mMojiInput.abcClick);
-        mView.findViewById(R.id._mm_backspace_button).setOnClickListener(mMojiInput.backspaceClick);
+        View backSpace = mView.findViewById(R.id._mm_backspace_button);
+        backSpace.setOnClickListener(mMojiInput.backspaceClick);
+        backSpace.setOnTouchListener(mMojiInput.backspaceTouchListener);
         mIsSetup=true;
 
     }

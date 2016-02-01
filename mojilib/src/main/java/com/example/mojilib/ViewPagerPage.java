@@ -142,7 +142,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
                     mMojiInput.addMojiModel(model,bm);
                 }
             });
-            int padding = (int)(4 * Moji.density);
+            int padding = (int)(2 * Moji.density);
             holder.imageView.setMinimumWidth((oldw-padding)/8);
             holder.imageView.setMaxWidth((oldw-padding)/8);
             holder.imageView.setMinimumHeight((oldh-padding)/ROWS);

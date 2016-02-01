@@ -15,6 +15,7 @@ import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import com.example.mojilib.model.MojiModel;
@@ -43,20 +44,24 @@ public class MojiEditText extends EditText {
         super(context, attrs, defStyleAttr);
         init();
     }
+
+    /**
+     * non-stock keyboards clobber moji spans leaving plain [obj] replacement chars, particularly when typing in the middle
+     * of mojispans. Disabling suggestions is usually enough to fix the problem. The text watcher is a redundant fail safe. Either one
+     * *should* fix the problem. If problem persists, add code to remove orphaned [obj] chars after restoring spans.
+     */
     private void init(){
-        setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         addTextChangedListener(new TextWatcher() {
             MojiSpan spans [];
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 spans = new SpannableStringBuilder(s).getSpans(0,s.length(),MojiSpan.class);
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 String string = s.toString();
