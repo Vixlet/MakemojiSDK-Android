@@ -27,7 +27,7 @@
         android:minWidth="35dp"
         android:background="@android:color/transparent"
         />
-    <EditText
+    <com.example.mojilib.MojiEditText
         android:background="@android:color/white"
         android:minHeight="40dp"
         android:paddingTop="4dp"

@@ -200,13 +200,19 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         @Override
         public void afterTextChanged(Editable s) {
-            String text = s.toString();
+            final String t = s.toString();
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    sendLayout.setEnabled(t.length()>0);
+                }
+            });
             int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
             if (selectionEnd==-1){
                 useTrendingAdapter(true);
                 return;
             }
-            text = text.substring(0,selectionEnd);//only look at what's before selection
+            String text = t.substring(0,selectionEnd);//only look at what's before selection
             int lastBang = text.lastIndexOf('!');
             int lastSpace = text.lastIndexOf(' ');
             if (lastSpace==-1) lastSpace = text.lastIndexOf('\n');

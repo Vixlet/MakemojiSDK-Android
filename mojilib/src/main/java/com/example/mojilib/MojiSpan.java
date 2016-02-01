@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference;
  * Fork of ImageSpan for custom emojis.
  * Created by Scott Baar on 12/3/2015.
  */
-class MojiSpan extends ReplacementSpan implements Spanimatable {
+    public class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     private Drawable mDrawable;
     private Uri mContentUri;
@@ -53,7 +53,7 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
     private float mFontRatio;
 
     // to make mojis stand out from text, always multiply the size by this
-    private static float BASE_SIZE_MULT = 1.35f;
+    private static float BASE_SIZE_MULT = 1.0f;
 
     //proportion to size the moji on next frame when being animated;
     private float currentAnimationScale = 1f;
@@ -97,6 +97,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
         mSource = source;
         if (link!=null)mLink = link;
         shouldAnimate = (link!=null && !link.isEmpty());
+        if (shouldAnimate){
+            currentAnimationScale = Spanimator.getValue(Spanimator.HYPER_PULSE);
+        }
 
         mViewRef = new WeakReference<>(refreshView);
         Moji.picasso.load(mSource)
@@ -311,5 +314,9 @@ class MojiSpan extends ReplacementSpan implements Spanimatable {
                 + "link=\""+getLink()+"\""+
                 (id == -1 ? "" : "id=\"" + id + "\"")//insert id if this came from a model
                 + ">";
+    }
+    public static @Nullable MojiSpan fromHtml(String html){
+        if (!html.startsWith("<img")) return null;
+        return null;
     }
 }
