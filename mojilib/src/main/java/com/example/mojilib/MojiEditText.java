@@ -4,10 +4,13 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,14 +31,55 @@ import java.util.regex.Pattern;
 public class MojiEditText extends EditText {
     public MojiEditText(Context context) {
         super(context);
+        init();
     }
 
     public MojiEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public MojiEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
+    }
+    private void init(){
+        setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        addTextChangedListener(new TextWatcher() {
+            MojiSpan spans [];
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                spans = new SpannableStringBuilder(s).getSpans(0,s.length(),MojiSpan.class);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String string = s.toString();
+                SpannableStringBuilder ssb = new SpannableStringBuilder(s);
+
+                int spanCounter = 0;
+                int spanLength = spans.length;
+                int replaced = 0;
+                for (int i = 0; i <string.length() && spanCounter<spanLength;i++){
+                    MojiSpan spanAtPoint[] = ssb.getSpans(i,i+1,MojiSpan.class);
+                    if (spanAtPoint.length==0 && replacementChar.equals(string.charAt(i))){
+                        ssb.setSpan(spans[spanCounter++],i,i+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        Log.v("MojiEditText","replacing missing span "+ i);
+                        replaced++;
+                    }
+                }
+                if (replaced>0){
+                    setText(ssb);
+                }
+
+            }
+        });
+
     }
 
 
