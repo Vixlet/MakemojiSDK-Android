@@ -122,6 +122,7 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements IS
      * that preceded it, but there is no easy way to get that information without more
      * hacking than I was willing to put into it.
      */
+   /*
     @Override
     public int getFixScrollPos() {
         if (this.getChildCount() == 0) {
@@ -141,6 +142,34 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements IS
             return childPos + 1;
         }
         return childPos;
+    }*/
+
+    @Override
+    public int getFixScrollPos() {
+        if (this.getChildCount() == 0) {
+            return 0;
+        }
+
+        View child = getChildAt(0);
+        int childPos = getPosition(child);
+        int maxChildPos = getPosition(getChildAt(getChildCount()-1));
+        int relativeChildPos = 0;
+        int minPos = childPos%getChildCount() ==0 ?childPos : childPos - childPos%getChildCount();
+        for (int i = 0; i<getChildCount(); i++){
+            child = getChildAt(0);
+            childPos = getPosition(child);
+            relativeChildPos = i;
+            if (childPos % (getChildCount()) ==0)
+                break;
+        }
+
+
+
+        if (relativeChildPos >getChildCount()/2) {
+            // Scrolled  view more than halfway across
+            return maxChildPos+1;
+        }
+        return minPos;
     }
 
 }

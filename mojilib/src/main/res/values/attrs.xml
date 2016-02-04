@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MojiInputLayout">
-        <attr name="_mm_sendButtonLayoutAttr" format="reference" />
-        <attr name="_mm_inputTextAppearance" format="reference"/>
-        <attr name="_mm_categoryTextAppearanceAttr" format="reference"/>
-        <attr name="_mm_cameraButtonDrawableAttr" format="reference"/>
-        <attr name="_mm_cameraButtonVisiblityAttr" format="boolean"/>
+        <attr name="_mm_sendButtonLayout" format="reference" />
+        <attr name="_mm_backSpaceButtonDrawable" format="reference" />
+        <attr name="_mm_cameraButtonDrawable" format="reference"/>
+        <attr name="_mm_cameraButtonVisible" format="boolean"/>
+        <attr name="_mm_topBg" format="color"/>
+        <attr name="_mm_leftButtonColor" format="color"/>
+        <attr name="_mm_leftButtonsBg" format="reference"/>
+        <attr name="_mm_headerTextColor" format="color"/>
+        <attr name="_mm_editTextStyle" format="reference"/>
     </declare-styleable>
 </resources>

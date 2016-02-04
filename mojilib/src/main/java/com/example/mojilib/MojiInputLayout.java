@@ -87,10 +87,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         init(attrs,defStyle);
     }
     public void init(AttributeSet attributeSet, int defStyle){
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,defStyle);
-        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawableAttr,R.drawable.mm_camera_icon);
-        int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayoutAttr,R.layout.mm_default_send_layout);
-        boolean cameraVisiblity = a.getBoolean(R.styleable.MojiInputLayout__mm_sendButtonLayoutAttr,true);
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,R.style.MojiInputLayoutDefaultStyle);
+        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawable,R.drawable.mm_camera_icon);
+        int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout,R.layout.mm_default_send_layout);
+        boolean cameraVisiblity = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible,true);
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
@@ -102,7 +102,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (!cameraVisiblity) cameraImageButton.setVisibility(View.GONE);
         editText = (EditText)findViewById(R.id._mm_edit_text);
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
-        LinearLayoutManager sllm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);//new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager sllm =
+                new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+       // new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
         adapter = new HorizRVAdapter(this,editText.getTextSize());
         rv.setAdapter(adapter);
@@ -366,6 +368,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 public void run() {
                     clearStack();
                     addPage(recentPage);
+                    recentPage.onNewDataAvailable();
                 }
             };
         if (!keyboardVisible && layoutRunnable !=null){

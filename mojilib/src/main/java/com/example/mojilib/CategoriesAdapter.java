@@ -37,7 +37,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.mm_item_category, parent, false);
         //v.getLayoutParams().height = parent.getHeight()/2;
-        return new Holder(v);
+        return new Holder(v,parent);
     }
 
     @Override
@@ -69,12 +69,15 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
         public TextView title;
         public View view;
         public int position =-1;
-        public Holder(View itemView) {
+        public Holder(View itemView, ViewGroup parent) {
             super(itemView);
             view = itemView;
             view.setOnClickListener(catClick);
             image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
+            int padding = image.getPaddingLeft()*2;
+            image.setMinimumWidth((parent.getWidth()/4)-padding);
+            image.setMaxWidth((parent.getWidth()/4)-padding);
         }
     }
 }

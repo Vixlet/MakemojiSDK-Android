@@ -41,7 +41,8 @@ public final class SnappyRecyclerView extends RecyclerView {
         if (lm instanceof ISnappyLayoutManager
                 && (e.getAction() == MotionEvent.ACTION_UP ||
                 e.getAction() == MotionEvent.ACTION_CANCEL)
-                && getScrollState() == SCROLL_STATE_IDLE) {
+          //      && getScrollState() == SCROLL_STATE_IDLE
+                ) {
             // The layout manager is a SnappyLayoutManager, which means that the
             // children should be snapped to a grid at the end of a drag or
             // fling. The motion event is either a user lifting their finger or

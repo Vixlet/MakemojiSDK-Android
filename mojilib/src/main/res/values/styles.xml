@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources >
-    <style name="CustomMojiInputLayoutStyle">
-        <item name="_mm_cameraButtonDrawableAttr">@drawable/mm_dotted_square</item>
-    </style>
     <style name="MakeMojiHeaderTextAppearance" >
         <item name="android:textColor">@color/_mm_header_text_color</item>
         <item name="android:textAllCaps">true</item>
@@ -21,5 +18,14 @@
         <item name="android:paddingTop">4dp</item>
         <item name="android:layout_width">23dp</item>
         <item name="android:layout_height">23dp</item>
+    </style>
+    <style name="MojiInputLayoutDefaultStyle">
+        <item name="_mm_sendButtonLayout">@layout/mm_default_send_layout</item>
+        <item name="_mm_backSpaceButtonDrawable">@drawable/mm_backspace_grey600_24dp</item>
+        <item name="_mm_cameraButtonDrawable">@drawable/mm_camera_icon</item>
+        <item name="_mm_cameraButtonVisible">true</item>
+        <item name="_mm_topBg">@color/_mm_top_layout_bg</item>
+        <item name="_mm_leftButtonColor">@drawable/mm_left_page_gradient</item>
+        <item name="_mm_leftButtonsBg">@drawable/mm_left_page_gradient</item>
     </style>
 </resources>
