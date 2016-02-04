@@ -1,5 +1,7 @@
 package com.example.mojilib;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Rect;
@@ -207,6 +209,14 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         animator = ValueAnimator.ofInt(currentWidth,goalWidth);
         animator.setDuration(200);
         animator.setInterpolator(new DecelerateInterpolator());
+        if (goalWidth==minSize)
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ((MojiInputLayout)getParent().getParent()).onLeftClosed();
+                }
+            });
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

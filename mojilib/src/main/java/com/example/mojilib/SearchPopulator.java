@@ -46,22 +46,40 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
     public void search(@NonNull String query){
         final String runQuery = query;
         currentQuery = query;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final List<MojiModel> models = mojiSQLHelper.search(runQuery,50);
-                Moji.handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (runQuery.equals(currentQuery)){
-                            mojiModels = models;
-                            obs.onNewDataAvailable();
-                        }
-                    }
-                });
 
-            }
-        }).start();
+        if (query.isEmpty()){
+            Moji.mojiApi.getTrendingFlashtags().enqueue(new SmallCB<List<MojiModel>>() {
+                @Override
+                public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
+                    if (t!=null){
+                        t.printStackTrace();
+                        return;
+                    }
+                    if (runQuery.equals(currentQuery)){
+                        mojiModels = response.body();
+                        obs.onNewDataAvailable();
+
+                    }
+                }
+            });
+        }
+        else
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final List<MojiModel> models = mojiSQLHelper.search(runQuery,50);
+                    Moji.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (runQuery.equals(currentQuery)){
+                                mojiModels = models;
+                                obs.onNewDataAvailable();
+                            }
+                        }
+                    });
+
+                }
+            }).start();
 
     }
 }

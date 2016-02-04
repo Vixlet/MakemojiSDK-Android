@@ -50,6 +50,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     @Override
     public void onBindViewHolder(RVHolder holder, int position) {
         MojiModel m = list.get(position);
+        Mojilytics.trackView(m.id);
         holder.name.setText(m.name);
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
         //Moji.loadImage(holder.image,m.image_url);

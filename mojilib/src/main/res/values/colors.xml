@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="_mm_light_grey">#aeabab</color>
-    <color name="_mm_header_text_color">#505050</color>
+    <color name="_mm_header_text_color">#6c6c6c</color>
 
     <color name="_mm_left_button_cf">#555555</color>
     <color name="_mm_horiz_rv_bg">#EDEDED</color>

@@ -5,10 +5,14 @@ import com.example.mojilib.model.MojiModel;
 
 import java.util.List;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 /**
@@ -16,6 +20,7 @@ import retrofit2.http.Path;
  */
 public interface MojiApi {
     String BASE_URL = "https://api.makemoji.com/sdk/";
+
     @GET("emoji/index/trending")
     Call<List<MojiModel>> getTrending();
 
@@ -31,7 +36,13 @@ public interface MojiApi {
     @GET("emoji/allflashtags")
     Call<List<MojiModel>> getFlashtags();
 
+    @GET("emoji/index/trendingflashtags")
+    Call<List<MojiModel>> getTrendingFlashtags();
+
     @POST("messages/create")
     Call<Integer> sendPressed(@Body String htmlMessage);
+
+    @POST("emoji/viewTrack")
+    Call<Void> trackViews( @Body RequestBody array);
 
 }

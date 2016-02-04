@@ -48,10 +48,9 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         vp.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if (oldh==v.getHeight() && oldw==v.getWidth())return;
+                if (oldh==v.getHeight() && oldw==v.getWidth()-100)return;
                 oldh = v.getHeight();
-                oldw = v.getWidth();
-                int dimen = (int)(57 * Moji.density);
+                oldw = v.getWidth()-100;
                 mojisPerPage =Math.max(10,8 * ROWS);
                 onNewDataAvailable();
             }
@@ -132,6 +131,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         public void onBindViewHolder(final Holder holder, int position) {
             final MojiModel model = mojiModels.get(position);
             holder.imageView.forceDimen(holder.dimen);
+            Mojilytics.trackView(model.id);
             holder.imageView.setModel(model);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -221,10 +221,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 return;
             }
             String query = text.substring(lastBang+1,selectionEnd);
-            if (!query.isEmpty()) {
                 useTrendingAdapter(false);
                 searchPopulator.search(query);
-            }
+
 
         }
     };
@@ -257,13 +256,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     OnClickListener abcClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            showKeyboard();
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
                     clearStack();
                 }
             };
+            //postDelayed(layoutRunnable,65);
+            //layoutRunnable.run();
+            //layoutRunnable=null;
+            showKeyboard();
         }
     };
     OnClickListener backspaceClick = new OnClickListener() {
@@ -280,7 +282,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     };
 
     OnTouchListener backspaceTouchListener = new OnTouchListener() {
-        long lastBackTime;
         boolean isPressed;
         private Runnable backSpaceRunnable = new Runnable() {
             @Override
@@ -312,7 +313,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         measureHeight=true;
         hideKeyboard();
         if (categoriesPage.isVisible()) {
-            clearStack();
+            onLeftClosed();
         }
         else
             layoutRunnable = new Runnable() {
@@ -335,7 +336,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             trendingPage = new ViewPagerPage("Trending",this,new TrendingPopulator());
 
         if (trendingPage.isVisible()){
-            clearStack();
+            onLeftClosed();
         }
         else
             layoutRunnable = new Runnable() {
@@ -357,8 +358,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             recentPage = new ViewPagerPage("Recent",this,new RecentPopulator());
 
         if (recentPage.isVisible()){
-            clearStack();
-            recentPage = null;
+            onLeftClosed();
         }
         else
             layoutRunnable = new Runnable() {
@@ -385,8 +385,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         while (!pages.empty()){
             MakeMojiPage page = pages.pop();
             page.hide();
-            page.detatch();
         }
+        int old = newHeight;
         backButton.setVisibility(View.GONE);
     }
     void popPage(){
@@ -432,16 +432,17 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (getHeight()!=0 && heightDifference>screenHeight/3) {
             measureHeight=false;
             newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
-            //Log.d("newh","new h "+ newHeight);
+            Log.d("newh","new h "+ newHeight);
             keyboardVisible=true;
             oldtop=getTop()-r.bottom;
             setHeight();
         }
         else {
             keyboardVisible = false;
+            Log.d("newh", "kb not visible " + heightDifference );
         }
 
-        if (layoutRunnable!=null && (oldDiff!=heightDifference) )
+        if (layoutRunnable!=null && oldDiff!=heightDifference)
         {
             layoutRunnable.run();
             layoutRunnable=null;
@@ -532,6 +533,24 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
          }
      });
     }
+    void onLeftClosed(){
+        showKeyboard();
+        layoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                clearStack();
+            }
+        };
+
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Mojilytics.forceSend();
+    }
+
     public String getInputAsHtml(){
        return Moji.toHtml(new SpannableStringBuilder(editText.getText()));
     }
