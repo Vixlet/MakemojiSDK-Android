@@ -389,8 +389,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             MakeMojiPage page = pages.pop();
             page.hide();
         }
-        int old = newHeight;
         backButton.setVisibility(View.GONE);
+        getPageFrame().setVisibility(View.GONE);
     }
     void popPage(){
         if (pages.size()==0)return;
@@ -399,6 +399,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         page.hide();
         if (oldPage!=null) oldPage.show();
         backButton.setVisibility(pages.size()>1?View.VISIBLE:View.GONE);
+        if (pages.empty())getPageFrame().setVisibility(View.GONE);
     }
     protected ViewGroup getPageFrame(){
         return pageContainer;
@@ -418,7 +419,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
 
     boolean kbVisible=false;
-    int newHeight =(int)( 200 * Moji.density);//logical default
     boolean measureHeight;
     Runnable layoutRunnable;
     boolean keyboardVisible;
@@ -434,11 +434,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         //Log.d("kb","kb h "+ heightDifference + " " + getHeight());
         if (getHeight()!=0 && heightDifference>screenHeight/3) {
             measureHeight=false;
-            newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
-            Log.d("newh","new h "+ newHeight);
+            //newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
+           // Log.d("newh","new h "+ newHeight);
             keyboardVisible=true;
             oldtop=getTop()-r.bottom;
-            setHeight();
         }
         else {
             keyboardVisible = false;
@@ -455,12 +454,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         oldDiff = heightDifference;
     }
     void setHeight(){
-        if (!pages.empty())pages.peek().setHeight(newHeight);
+        getPageFrame().setVisibility(View.VISIBLE);
+       /* if (!pages.empty())pages.peek().setHeight(newHeight);
         else
         {
            // topScroller.getLayoutParams().height=newHeight;
         }
         //categoriesPage.setHeight(newHeight);
+        */
     }
 
     //remove last search term
@@ -485,9 +486,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
-        int len = ssb.length();
         ssb.insert(selectionStart,"\uFFFC");
-        int len2 = ssb.length();
         ssb.setSpan(mojiSpan, selectionStart,selectionStart+1,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 

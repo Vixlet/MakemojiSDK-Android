@@ -8,7 +8,8 @@
     android:layout_height="match_parent">
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         tools:src="@drawable/mm_grid_icon"
         tools:layout_width="80dp"
         tools:layout_height="80dp"

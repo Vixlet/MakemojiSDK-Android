@@ -62,8 +62,8 @@
         </com.example.mojilib.ResizeableLL>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="250dp"
+        android:visibility="gone"
         android:animateLayoutChanges="false"
         android:id="@+id/_mm_page_container">
         <ViewStub
