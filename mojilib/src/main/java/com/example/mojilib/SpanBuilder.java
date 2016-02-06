@@ -341,7 +341,7 @@ class SpanBuilder implements ContentHandler {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
-                if (refreshView!=null)refreshView.setHighlightColor(Color.TRANSPARENT);
+               // if (refreshView!=null)refreshView.setHighlightColor(Color.TRANSPARENT);
                 ClickableSpan clickableSpan = new ClickableSpan() {
                     @Override
                     public void onClick(View widget) {

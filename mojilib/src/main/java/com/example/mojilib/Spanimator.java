@@ -62,6 +62,7 @@ public class Spanimator {
         spanimatable.onUnsubscribed();
         if (subscribers.isEmpty() && hyperAnimation!=null){
             hyperAnimation.end();
+            hyperAnimation=null;
         }
     }
     private static synchronized void setupStartAnimation(@Spanimation int spanimation){
@@ -81,7 +82,7 @@ public class Spanimator {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float progress = (float) animation.getAnimatedValue();
                 Set<Spanimatable> set = subscribers.keySet();
-                //Log.d("Spanimator","spanimator subscruber size "+ set.size());
+                Log.d("Spanimator","spanimator subscruber size "+ set.size());
                 if (set.size()==0 && animation.getAnimatedFraction()!=0f)
                     mainHandler.post(new Runnable() {
                         @Override
@@ -111,12 +112,12 @@ public class Spanimator {
     }
     static void onResume(){
         mPaused=false;
-       // Log.d("Spanimator","spanimator lifecycle resume");
+        Log.d("Spanimator","spanimator lifecycle resume");
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
     }
     static void onPause(){
         mPaused=true;
-       // Log.d("Spanimator","spanimator lifecycle pause");
+        Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
         System.gc();
 

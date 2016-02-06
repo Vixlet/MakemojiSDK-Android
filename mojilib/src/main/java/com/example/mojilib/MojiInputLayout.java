@@ -50,8 +50,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     RecyclerView rv;
     FrameLayout pageContainer;
     CategoriesPage categoriesPage;
-    ViewPagerPage trendingPage;
-    ViewPagerPage recentPage;
+    MakeMojiPage trendingPage;
+    MakeMojiPage recentPage;
 
     //just used for measurement
     ResizeableLL topScroller;
@@ -151,6 +151,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 {
                     int pos = editText.getOffsetForPosition(event.getX(),event.getY());
                     editText.setSelection(pos);
+                    /*if (event.getAction()== MotionEvent.ACTION_UP){
+                        ClickableSpan spans[] =editText.getText().getSpans(pos,pos,ClickableSpan.class);
+                        if (spans.length>0)spans[0].onClick(editText);
+                    }*/
                     return true;
                 }
             }
@@ -166,8 +170,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             @Override
             public void onClick(View v) {
                 editText.getText().insert(Math.max(0,editText.getSelectionStart()),"!");
-                //editText.setSelection(editText.getSelectionStart()+1);
-                //editText.setSelection(editText.length());
                 topScroller.snapOpen();
                 showKeyboard();
                     layoutRunnable = new Runnable() {
@@ -176,9 +178,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                             clearStack();
                         }
                     };
-                //layoutRunnable.run();
-               // post(layoutRunnable);
-                //layoutRunnable=null;
             }
         });
         int buttonColor = ContextCompat.getColor(getContext(),R.color._mm_left_button_cf);
@@ -202,12 +201,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         @Override
         public void afterTextChanged(Editable s) {
             final String t = s.toString();
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    sendLayout.setEnabled(t.length()>0);
-                }
-            });
+            sendLayout.setEnabled(t.length()>0);
+
             int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
             if (selectionEnd==-1){
                 useTrendingAdapter(true);
@@ -335,7 +330,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         measureHeight = true;
         hideKeyboard();
         if (trendingPage==null)
-            trendingPage = new ViewPagerPage("Trending",this,new TrendingPopulator());
+            trendingPage = new OneGridPage("Trending",this,new TrendingPopulator());
 
         if (trendingPage.isVisible()){
             onLeftClosed();
@@ -453,14 +448,13 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         oldDiff = heightDifference;
     }
-    void setHeight(){
+    void setHeight() {
         getPageFrame().setVisibility(View.VISIBLE);
        /* if (!pages.empty())pages.peek().setHeight(newHeight);
         else
         {
            // topScroller.getLayoutParams().height=newHeight;
         }
-        //categoriesPage.setHeight(newHeight);
         */
     }
 
@@ -491,7 +485,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
-            if (editText!=null)editText.setHighlightColor(Color.TRANSPARENT);
             ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {

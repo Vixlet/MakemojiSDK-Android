@@ -13,7 +13,7 @@ import com.example.mojilib.MojiInputLayout;
  * A page selected with one of the three control buttons on the left.
  * Created by Scott Baar on 1/10/2016.
  */
-public class MakeMojiPage {
+public class MakeMojiPage implements PagerPopulator.PopulatorObserver{
 
     boolean mIsVisible;
     boolean mIsSetup;
@@ -80,4 +80,9 @@ public class MakeMojiPage {
         mView.invalidate();
     }
 
+//should probably override except for category page
+    @Override
+    public void onNewDataAvailable() {
+
+    }
 }

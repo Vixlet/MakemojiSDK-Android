@@ -50,9 +50,9 @@ public class MojiImageView extends ImageView  implements Spanimatable{
         canvas.drawText(s,0,-paint.ascent(),paint);
         return image;
     }
-    String url;
     public void setModel(MojiModel m){
         model = m;
+        setContentDescription(""+model.name);
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
             if (!model.image_url.isEmpty()) {
                 if (forceDimen != -1) {

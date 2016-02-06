@@ -19,6 +19,7 @@ public abstract class PagerPopulator<T> {
     public interface PopulatorObserver{
        @UiThread void onNewDataAvailable();
     }
+    //call when ready to recieve data
     protected abstract void setup(PopulatorObserver observer);//once done, call the next two
     List<T> populatePage(int count, int offset){
         if (mojiModels.size()<offset)return new ArrayList<>();//return empty
