@@ -1,5 +1,6 @@
 package com.example.mojilib;
 
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -44,17 +46,25 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
         heading.setText(title);
         mPopulator.setup(this);
+        mView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (oldh==mView.getHeight())return;
+                oldh = mView.getHeight();
+                onNewDataAvailable();
+            }
+        });
 
 
     }
-    int oldh,oldw;
+    int oldh;
     //called by the populater once a query is complete.
     @Override
     public void onNewDataAvailable(){
-        oldh = mView.getHeight();
-        oldw = mView.getWidth();
-        mojisPerPage =Math.max(10,8 * ROWS);
         count = mPopulator.getTotalCount();
+        if (count==0 || mView.getHeight()==0)return;
+        oldh = mView.getHeight();
+        mojisPerPage =Math.max(10,8 * ROWS);
         vpAdapter = new VPAdapter();
         vp.setAdapter(vpAdapter);
         circlePageIndicator.setViewPager(vp);
@@ -79,9 +89,24 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
             View view = LayoutInflater.from(mMojiInput.getContext()).inflate(R.layout.mm_vp_page_content,container,false);
             container.addView(view);
             RecyclerView rv = (RecyclerView) view;
-            MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>(),mMojiInput,ROWS);
+
+            int size = container.getHeight()/ROWS;
+            int vSpace = (container.getHeight() - (size*ROWS))/ROWS;
+            int hSpace = (container.getWidth() - (size*8))/16;
+
+            MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>(),mMojiInput,ROWS,size);
             gridAdapter.setMojiModels(mPopulator.populatePage(mojisPerPage,position*mojisPerPage));
-            GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),ROWS,GridLayoutManager.HORIZONTAL,false);
+            GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),ROWS,GridLayoutManager.HORIZONTAL,false){
+                @Override
+                public boolean canScrollHorizontally() {
+                    return false;
+                }
+                @Override
+                public boolean canScrollVertically() {
+                    return false;
+                }
+            };
+            rv.addItemDecoration(new SpacesItemDecoration(vSpace,hSpace));
             rv.setLayoutManager(glm);
             rv.setAdapter(gridAdapter);
             return view;
@@ -92,5 +117,4 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         }
 
     }
-
 }

@@ -14,11 +14,12 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/_mm_page_grid"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         tools:height="100dp"
         android:layout_weight="1"
         />
     <LinearLayout
+        android:id="@+id/_mm_one_grid_footer"
         android:layout_width="match_parent"
         android:layout_gravity="center_vertical|bottom"
         android:gravity="center_vertical"

@@ -87,7 +87,7 @@ public class Spanimator {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            hyperAnimation.end();
+                            if (hyperAnimation!=null)hyperAnimation.end();
                         }
                     });
                 for (Spanimatable spanimatable : set){

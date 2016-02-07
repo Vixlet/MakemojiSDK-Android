@@ -19,11 +19,13 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     List<MojiModel> mojiModels = new ArrayList<>();
     MojiInputLayout mojiInputLayout;
     final int ROWS;
+    int spanSize;
 
-    public MojiGridAdapter (List<MojiModel> models, MojiInputLayout mojiInputLayout,int rows) {
+    public MojiGridAdapter (List<MojiModel> models, MojiInputLayout mojiInputLayout,int rows, int spanSize) {
         mojiModels = models;
         this.mojiInputLayout = mojiInputLayout;
         ROWS = rows;
+        this.spanSize = spanSize;
     }
 
     public void setMojiModels(List<MojiModel> models){
@@ -57,7 +59,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 BitmapDrawable bm=null;
                 if (holder.imageView.getDrawable()!=null && holder.imageView.getDrawable() instanceof BitmapDrawable)
                     bm = (BitmapDrawable) holder.imageView.getDrawable();
-                mojiInputLayout.addMojiModel(model,bm);
+                mojiInputLayout.addMojiModel(model,null);
             }
         });
 
@@ -71,16 +73,8 @@ class Holder extends RecyclerView.ViewHolder {
 
     public Holder(View v, ViewGroup parent) {
         super(v);
-        dimen = mojiInputLayout.getDefaultSpanDimension();
         imageView = (MojiImageView) v;
-
-        int padding = (int) (2 * Moji.density);
-        int oldw = parent.getWidth();
-        int oldh = parent.getWidth();
-        imageView.setMinimumWidth((oldw - padding) / 8);
-        imageView.setMaxWidth((oldw - padding) / 8);
-        imageView.setMinimumHeight((oldh - padding) / ROWS);
-        imageView.setMaxHeight((oldh - padding) / ROWS);
+        dimen = spanSize;
 
     }
 }

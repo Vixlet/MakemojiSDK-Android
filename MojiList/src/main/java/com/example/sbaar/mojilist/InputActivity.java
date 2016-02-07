@@ -51,7 +51,7 @@ public class InputActivity extends AppCompatActivity {
 
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
             }
-        },100);
+        },1000);
 
     }
 }
