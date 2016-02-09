@@ -39,9 +39,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
                 RVHolder rvHolder = ((RVHolder)v.getTag());
                 MojiModel model = list.get(rvHolder.pos);
                 mil.removeSuggestion();
-                mil.addMojiModel(model,
-                        rvHolder.image.getDrawable()!=null && rvHolder.image.getDrawable() instanceof BitmapDrawable?
-                                (BitmapDrawable)rvHolder.image.getDrawable(): null);
+                mil.addMojiModel(model, null);
             }
         });
         return new RVHolder(v,parent);
@@ -89,10 +87,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             v.setTag(this);
             name = (TextView) v.findViewById(R.id.tv);
             image = (MojiImageView) v.findViewById(R.id.pic);
-            int h = mil.getDefaultSpanDimension();//use same dimension as span to consolidate img fetches
-           // (int)(parent.getHeight() *.8);
-            mil.setMinimumWidth(h);
-            mil.setMinimumHeight(h);
+            int h =  (int)(parent.getHeight() *.85);
             dimen =h;
 
         }

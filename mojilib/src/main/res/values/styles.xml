@@ -18,6 +18,7 @@
         <item name="android:paddingTop">4dp</item>
         <item name="android:layout_width">23dp</item>
         <item name="android:layout_height">23dp</item>
+        <item name="android:background">@drawable/mm_left_button_item_bg</item>
     </style>
     <style name="MojiInputLayoutDefaultStyle">
         <item name="_mm_sendButtonLayout">@layout/mm_default_send_layout</item>

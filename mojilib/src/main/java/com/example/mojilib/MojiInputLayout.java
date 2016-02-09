@@ -305,10 +305,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
     };
 
+    void deactiveButtons(){
+        categoriesButton.setActivated(false);
+        recentButton.setActivated(false);
+        trendingButton.setActivated(false);
+    }
 
     void toggleCategoryPage(){
         measureHeight=true;
         hideKeyboard();
+        deactiveButtons();
         if (categoriesPage.isVisible()) {
             onLeftClosed();
         }
@@ -316,6 +322,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
+                        categoriesButton.setActivated(true);
                         clearStack();
                         addPage(categoriesPage);
                 }
@@ -329,6 +336,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     void toggleTrendingPage(){
         measureHeight = true;
         hideKeyboard();
+        deactiveButtons();
         if (trendingPage==null)
             trendingPage = new OneGridPage("Trending",this,new TrendingPopulator());
 
@@ -339,6 +347,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             layoutRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    trendingButton.setActivated(true);
                     clearStack();
                         addPage(trendingPage);
                 }
@@ -351,6 +360,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     void toggleRecentPage(){
         measureHeight = true;
         hideKeyboard();
+        deactiveButtons();
         if (recentPage==null)
             recentPage = new ViewPagerPage("Recent",this,new RecentPopulator());
 
@@ -362,6 +372,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 @Override
                 public void run() {
                     clearStack();
+                    recentButton.setActivated(true);
                     addPage(recentPage);
                     recentPage.onNewDataAvailable();
                 }
