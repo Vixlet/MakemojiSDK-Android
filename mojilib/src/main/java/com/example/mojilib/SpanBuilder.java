@@ -258,12 +258,12 @@ class SpanBuilder implements ContentHandler {
                     return;
                 }
 
-                text.append("\n");
+               // text.append("\n");
                 return;
             }
 
             if (len != 0) {
-                text.append("\n\n");
+               // text.append("\n\n");
             }
         }
 

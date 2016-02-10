@@ -299,6 +299,7 @@ public class Moji {
             }
             withinStyle(sb,spanned,i,next);
         }
+        sb.append("</p>");
         return sb.toString();
     }
 
@@ -325,9 +326,14 @@ public class Moji {
                         out.append("&#").append(codepoint).append(";");
                     }
                 }
+            }
+            else if (c =='\n'){
+                out.append("<br \\>");
+                i++;
             } else if (c > 0x7E || c < ' ') {
                 out.append("&#").append((int) c).append(";");
-            } else if (c == ' ') {
+            }
+              else if (c == ' ') {
                 while (i + 1 < end && text.charAt(i + 1) == ' ') {
                     out.append("&nbsp;");
                     i++;
