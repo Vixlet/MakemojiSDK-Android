@@ -112,7 +112,7 @@ import java.lang.ref.WeakReference;
         return (int) (DEFAULT_INCOMING_IMG_WH * Moji.density * BASE_SIZE_MULT * ratio);
     }
     public static MojiSpan fromModel(MojiModel model, TextView tv, @Nullable BitmapDrawable bitmapDrawable){
-        Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_dotted_square);
+        Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_placeholder);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
         MojiSpan span = new MojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
         span.name = model.name;

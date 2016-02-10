@@ -75,7 +75,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
             view.setOnClickListener(catClick);
             image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
-            int padding = image.getPaddingLeft()*2;
+            int padding = view.getPaddingLeft()*2 ;
             image.setMinimumWidth((parent.getWidth()/4)-padding);
             image.setMaxWidth((parent.getWidth()/4)-padding);
         }

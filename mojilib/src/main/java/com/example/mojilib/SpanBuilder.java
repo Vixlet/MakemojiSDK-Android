@@ -328,7 +328,7 @@ class SpanBuilder implements ContentHandler {
                 d = //Resources.getSystem().
                         Moji.resources.
                                 //getDrawable(R.drawable.mm_unknown_image);
-                                getDrawable(R.drawable.mm_dotted_square);
+                                getDrawable(R.drawable.mm_placeholder);
                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
             }
 

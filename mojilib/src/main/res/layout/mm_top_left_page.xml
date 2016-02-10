@@ -28,27 +28,27 @@
 
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
-        android:layout_width="35dp"
+        android:layout_width="45dp"
         android:layout_height="match_parent"
         android:id="@+id/_mm_categories_button"
         android:src="@drawable/mm_grid_icon"/>
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
-        android:layout_width="35dp"
+        android:layout_width="45dp"
         android:layout_height="match_parent"
         android:id="@+id/_mm_trending_button"
         android:src="@drawable/mm_trending_icon"/>
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
-        android:layout_width="35dp"
+        android:layout_width="45dp"
         android:layout_height="match_parent"
         android:id="@+id/_mm_recent_button"
         android:src="@drawable/mm_recent"/>
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
         android:layout_marginRight="0dp"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="45dp"
+        android:layout_height="match_parent"
         android:id="@+id/_mm_flashtag_button"
         android:src="@drawable/mm_flashtag_icon"/>
     <View

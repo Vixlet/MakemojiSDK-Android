@@ -136,7 +136,7 @@ public class MojiEditText extends EditText {
                     try{
                         model.id = Integer.valueOf(idString);
                     }catch (Exception e){/**/}
-                    spansToInsert.add(new MojiSpan(Moji.resources.getDrawable(R.drawable.mm_dotted_square),
+                    spansToInsert.add(new MojiSpan(Moji.resources.getDrawable(R.drawable.mm_placeholder),
                             src,MojiSpan.DEFAULT_INCOMING_IMG_WH,MojiSpan.DEFAULT_INCOMING_IMG_WH,
                             MojiSpan.DEFAULT_INCOMING_FONT_PT, true,link,this));
                    paste = paste.replaceFirst("<img (.*?)>","\uFFFC");
