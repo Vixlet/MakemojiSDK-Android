@@ -165,6 +165,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         flashtagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                deactiveButtons();
                 editText.getText().insert(Math.max(0,editText.getSelectionStart()),"!");
                 topScroller.snapOpen();
                 showKeyboard();
@@ -512,6 +513,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     void onLeftClosed(){
         showKeyboard();
+        deactiveButtons();
         layoutRunnable = new Runnable() {
             @Override
             public void run() {
