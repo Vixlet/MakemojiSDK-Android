@@ -106,80 +106,21 @@ public class MojiEditText extends EditText {
             max = Math.max(0, Math.max(selStart, selEnd));
         }
 
-        //replace image tags with replacement chars, then insert emojis over them.
+        //convert
         if (id == android.R.id.paste) {
             ClipboardManager clipboard =
                     (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = clipboard.getPrimaryClip();
             if (clip==null || clip.getItemCount()==0)return true;
             String paste = clip.getItemAt(0).coerceToText(getContext()).toString();
-            String matchString = "<img style=";
 
-            List<MojiSpan> spansToInsert = new ArrayList<>();
+            ParsedAttributes pa = Moji.parseHtml(paste,this,true);
 
-            int index = paste.indexOf(matchString);
-            int end = paste.indexOf('>',index);
-
-            while (index!=-1 && end !=-1){
-                String subString = paste.substring(index,end);
-                String src = null, link =null, idString =null;
-                Matcher m = srcPattern.matcher(subString);
-                if (m.find()) src = m.group(1);
-                m = linkPattern.matcher(subString);
-                if (m.find()) link = m.group(1);
-                m = idPattern.matcher(subString);
-                if (m.find()) idString = m.group(1);
-                if (src!=null){
-                    MojiModel model = new MojiModel();
-                    model.image_url = src;
-                    model.link_url = link;
-                    try{
-                        model.id = Integer.valueOf(idString);
-                    }catch (Exception e){/**/}
-                    spansToInsert.add(new MojiSpan(Moji.resources.getDrawable(R.drawable.mm_placeholder),
-                            src,MojiSpan.DEFAULT_INCOMING_IMG_WH,MojiSpan.DEFAULT_INCOMING_IMG_WH,
-                            MojiSpan.DEFAULT_INCOMING_FONT_PT, true,link,this));
-                   paste = paste.replaceFirst("<img (.*?)>","\uFFFC");
-                }
-                else
-
-                index = paste.indexOf(matchString,index);
-                end = paste.indexOf('>',index);
-
-            }
-
-            int spanCounter = 0;
-            int spanLength = spansToInsert.size();
-            SpannableStringBuilder ssb = new SpannableStringBuilder(paste);
-            SpannableStringBuilder pastedSpan = new SpannableStringBuilder();
-            for (int i = 0; i<ssb.length() && spanCounter<spanLength;i++){
-                if (replacementChar.equals((paste.charAt(i)))) {
-                    pastedSpan.append(replacementChar);
-                    final MojiSpan span = spansToInsert.get(spanCounter++);
-                    pastedSpan.setSpan(span, pastedSpan.length()-1, pastedSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    if (span.getLink() != null && !span.getLink().isEmpty()) {
-                        ClickableSpan clickableSpan = new ClickableSpan() {
-                            @Override
-                            public void onClick(View widget) {
-                                HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);
-                                if (hyperMojiListener == null)
-                                    hyperMojiListener = Moji.getDefaultHyperMojiClickBehavior();
-                                hyperMojiListener.onClick(span.getLink());
-                            }
-                        };
-                        pastedSpan.setSpan(clickableSpan, pastedSpan.length()-1, pastedSpan.length(),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
-                }
-                else{
-                    pastedSpan.append(paste.charAt(i));
-                }
-            }
             SpannableStringBuilder original = new SpannableStringBuilder(getText());
             Spanned newText = new SpannableStringBuilder
-                    ( TextUtils.concat(original.subSequence(0,min),pastedSpan,original.subSequence(max,original.length())));
+                    ( TextUtils.concat(original.subSequence(0,min),pa.spanned,original.subSequence(max,original.length())));
             setText(newText);
-            setSelection(Math.min(min+paste.length(),newText.length()));
+            setSelection(Math.min(min+pa.spanned.length(),newText.length()));
             Moji.subSpanimatable(newText,this);
             stopActionMode();
             return true;
