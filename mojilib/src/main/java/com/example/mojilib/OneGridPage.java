@@ -28,6 +28,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     int mojisPerPage = 10;
     public static final int ROWS = 5;
     RecyclerView rv;
+    RecyclerView.ItemDecoration itemDecoration;
 
     private int oldH;
     public OneGridPage(String title, MojiInputLayout mojiInputLayout, PagerPopulator p) {
@@ -55,8 +56,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     @Override
     public void onNewDataAvailable() {
         if (mView.getHeight()==0 || mPopulator.getTotalCount()==0)return;
-        int h = (mView.getHeight() - mView.findViewById(R.id._mm_abc_tv).getHeight()
-                - mView.findViewById(R.id._mm_one_grid_footer).getHeight());
+        int h = rv.getHeight();
         int size = h / ROWS;
         int vSpace = (h - (size * ROWS)) / ROWS;
         int hSpace = (mView.getWidth() - (size * 8)) / 16;
@@ -65,7 +65,9 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         mojisPerPage = Math.max(10, 8 * ROWS);
         count = mPopulator.getTotalCount();
         MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, ROWS, size);
-        rv.addItemDecoration(new SpacesItemDecoration(vSpace, hSpace));
+        if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
+        itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
+        rv.addItemDecoration(itemDecoration);
         rv.setAdapter(adapter);
 
     }
