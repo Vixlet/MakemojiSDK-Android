@@ -126,7 +126,7 @@ public class MojiEditText extends EditText {
             return true;
         }
         //convert to html, copy
-        if (id == android.R.id.copy) {
+        if (id == android.R.id.copy || id == android.R.id.cut) {
             SpannableStringBuilder text = new SpannableStringBuilder(getText().subSequence(min, max));
             StringBuilder sb = new StringBuilder(text.toString());
             MojiSpan[] spans = text.getSpans(0,text.length()    , MojiSpan.class);
@@ -143,6 +143,10 @@ public class MojiEditText extends EditText {
                     getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setPrimaryClip(clip);
 
+            if (id == android.R.id.cut){
+                setText(getText().delete(min,max));
+                setSelection(Math.min(min,getText().length()));
+            }
             stopActionMode();
             return true;
         }

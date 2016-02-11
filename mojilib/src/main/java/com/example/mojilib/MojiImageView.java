@@ -38,7 +38,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
         forceDimen = dimen;
 
     }
-
+//http://stackoverflow.com/questions/12166476/android-canvas-drawtext-set-font-size-from-width
     Bitmap makeBMFromString(int dimen,String s){
         Paint paint = new Paint();
         Bitmap image = Bitmap.createBitmap(dimen,dimen, Bitmap.Config.ARGB_8888);
