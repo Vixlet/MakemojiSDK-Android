@@ -24,10 +24,8 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     MojiInputLayout mil;
     List<MojiModel> list = new ArrayList<>();
     boolean showNames = false;
-    float textSize;
-    public HorizRVAdapter(MojiInputLayout mojiInputLayout,float textSize){
+    public HorizRVAdapter(MojiInputLayout mojiInputLayout){
         mil = mojiInputLayout;
-        this.textSize = textSize;
     }
     @Override
     public RVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -53,7 +51,6 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
         //Moji.loadImage(holder.image,m.image_url);
         holder.image.forceDimen(holder.dimen);
-        holder.image.setTextSize(textSize);
         holder.image.setModel(m);
         holder.pos = position;
     }

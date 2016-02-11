@@ -62,7 +62,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
 
     @Override
     public void onClick(Category category) {
-        ViewPagerPage vpp = new ViewPagerPage(category.name,mMojiInput,new CategoryPopulator(category));
-        mMojiInput.addPage(vpp);
+        MakeMojiPage mmp = new OneGridPage(category.name,mMojiInput,new CategoryPopulator(category));
+        mMojiInput.addPage(mmp);
     }
 }

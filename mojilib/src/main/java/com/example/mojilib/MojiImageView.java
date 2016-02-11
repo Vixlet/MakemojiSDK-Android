@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -31,10 +32,6 @@ public class MojiImageView extends ImageView  implements Spanimatable{
     public MojiImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-    private float textSize;
-    void setTextSize(float size){
-        textSize=size;
-    }
 
    private int forceDimen = -1;
     public void forceDimen(int dimen){
@@ -44,9 +41,22 @@ public class MojiImageView extends ImageView  implements Spanimatable{
 
     Bitmap makeBMFromString(int dimen,String s){
         Paint paint = new Paint();
-        paint.setTextSize(textSize);
         Bitmap image = Bitmap.createBitmap(dimen,dimen, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
+
+        final float testTextSize = 48f;
+
+        // Get the bounds of the text, using our testTextSize.
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(s, 0, s.length(), bounds);
+
+        // Calculate the desired size as a proportion of our testTextSize.
+        float desiredTextSize = testTextSize * dimen / bounds.width();
+
+        // Set the paint for that size.
+        paint.setTextSize(desiredTextSize);
+
         canvas.drawText(s,0,-paint.ascent(),paint);
         return image;
     }
@@ -61,6 +71,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
                     Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
             } else {
                 setImageBitmap(makeBMFromString(forceDimen, m.character));
+                setScaleType(ScaleType.CENTER_INSIDE);
 
             }
         if ((m.link_url==null || m.link_url.isEmpty())){

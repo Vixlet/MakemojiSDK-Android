@@ -2,21 +2,16 @@ package com.example.mojilib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Html;
-import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -37,10 +32,11 @@ import android.widget.LinearLayout;
 import com.example.mojilib.model.MojiModel;
 
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
+ * To switch between emoji pages that paginate or that are one cotinuous list, change new OneGridPage(...) to ViewPagerPage
+ * in toggleTrending, toggleRecent, and in CategoriesPage onclick
+ *
  * Created by Scott Baar on 1/4/2016.
  */
 public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener{
@@ -106,7 +102,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
        // new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
-        adapter = new HorizRVAdapter(this,editText.getTextSize());
+        adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
@@ -362,7 +358,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         hideKeyboard();
         deactiveButtons();
         if (recentPage==null)
-            recentPage = new ViewPagerPage("Recent",this,new RecentPopulator());
+            recentPage = new OneGridPage("Recent",this,new RecentPopulator());
 
         if (recentPage.isVisible()){
             onLeftClosed();
@@ -411,14 +407,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         return pageContainer;
     }
 
-    public void hideKeyboard(){
+    void hideKeyboard(){
         View view = editText;
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
-    public void showKeyboard(){
+    void showKeyboard(){
         InputMethodManager keyboard = (InputMethodManager)
                 Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
         keyboard.showSoftInput(editText, 0);
@@ -513,32 +509,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         Moji.subSpanimatable(ssb,editText);
         editText.setSelection(selectionStart+1);
     }
-    public int getDefaultSpanDimension(){
-        return MojiSpan.getDefaultSpanDimension(editText.getTextSize());
-    }
-    public void setCameraButtonClickListener(View.OnClickListener onClickListener){
-        cameraImageButton.setOnClickListener(onClickListener);
-    }
-    public void setSendLayoutClickListener(final SendClickListener sendClickListener){
-     sendLayout.setOnClickListener(new OnClickListener() {
-         @Override
-         public void onClick(View v) {
-             if (sendClickListener!=null){
-                 SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
-                 MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
-                 for (int i = 0; i< spans.length; i++){
-                     MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
-                     model.link_url = spans[i].getLink();
-                     RecentPopulator.addRecent(model);
-                 }
-                 String html = Moji.toHtml(ssb);
-                 Moji.mojiApi.sendPressed(html);
-                 if (sendClickListener.onClick(Moji.toHtml(ssb),ssb))
-                     editText.setText("");
-             }
-         }
-     });
-    }
+
     void onLeftClosed(){
         showKeyboard();
         layoutRunnable = new Runnable() {
@@ -550,7 +521,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         };
 
     }
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -562,5 +532,40 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     public Spanned getInputAsSpanned(){
         return new SpannableStringBuilder(editText.getText());
+    }
+
+    /**
+     * the action when a hypermoji is clicked in the edit text.
+     * @param ocl
+     */
+    public void setHyperMojiClickListener(OnClickListener ocl){
+        editText.setTag(R.id._makemoji_hypermoji_listener_tag_id,ocl);
+    }
+
+    public void setCameraButtonClickListener(View.OnClickListener onClickListener){
+        cameraImageButton.setOnClickListener(onClickListener);
+    }
+    public void setCameraVisibility(boolean visible){
+        cameraImageButton.setVisibility(visible?View.VISIBLE:View.GONE);
+    }
+    public void setSendLayoutClickListener(final SendClickListener sendClickListener){
+        sendLayout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sendClickListener!=null){
+                    SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+                    MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
+                    for (int i = 0; i< spans.length; i++){
+                        MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
+                        model.link_url = spans[i].getLink();
+                        RecentPopulator.addRecent(model);
+                    }
+                    String html = Moji.toHtml(ssb);
+                    Moji.mojiApi.sendPressed(html);
+                    if (sendClickListener.onClick(Moji.toHtml(ssb),ssb))
+                        editText.setText("");
+                }
+            }
+        });
     }
 }

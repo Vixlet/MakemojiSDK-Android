@@ -106,7 +106,7 @@ public class MojiEditText extends EditText {
             max = Math.max(0, Math.max(selStart, selEnd));
         }
 
-        //convert
+        //convert from html, paste
         if (id == android.R.id.paste) {
             ClipboardManager clipboard =
                     (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -125,6 +125,7 @@ public class MojiEditText extends EditText {
             stopActionMode();
             return true;
         }
+        //convert to html, copy
         if (id == android.R.id.copy) {
             SpannableStringBuilder text = new SpannableStringBuilder(getText().subSequence(min, max));
             StringBuilder sb = new StringBuilder(text.toString());

@@ -72,7 +72,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
     }
     public void jiggle(){
-        ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(50 * Moji.density),minSize);
+        ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(60 * Moji.density),minSize);
         animator.setInterpolator(new OvershootInterpolator());
         animator.setDuration(1000);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -167,7 +167,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
 
     private boolean setPrimaryContentWidth(int newWidth) {
-        newWidth=  Math.max((int)(minSize *.9),newWidth);
+        newWidth=  Math.max((int)(minSize *.5),newWidth);
         newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
         lp.width=newWidth;
