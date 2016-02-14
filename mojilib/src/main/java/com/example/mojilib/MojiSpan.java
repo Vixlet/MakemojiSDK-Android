@@ -62,7 +62,7 @@ import java.lang.ref.WeakReference;
     boolean shouldAnimate;
     Drawable mPlaceHolder;
     private static final String TAG = "MojiSpan";
-    private static boolean LOG = true;
+    private static boolean LOG = false;
     String name;
     int id = -1;
 

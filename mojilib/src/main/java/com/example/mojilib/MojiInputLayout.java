@@ -100,7 +100,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         LinearLayoutManager sllm =
                 new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-       // new SnappyLinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(sllm);
         adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
@@ -426,6 +425,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     Runnable layoutRunnable;
     boolean keyboardVisible;
     int oldh,oldtop,oldDiff;
+    int maxTopScrollherH;
     @Override
     public void onGlobalLayout() {
 
@@ -441,10 +441,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
            // Log.d("newh","new h "+ newHeight);
             keyboardVisible=true;
             oldtop=getTop()-r.bottom;
+            maxTopScrollherH = Math.max(topScroller.getHeight(),maxTopScrollherH);
+            int parentHeight = ((ViewGroup)getParent()).getHeight()
+                    - editText.getPaddingBottom()-editText.getPaddingTop() -(int) (20 * Moji.density);
+            editText.setMaxHeight(parentHeight -maxTopScrollherH);
         }
         else {
             keyboardVisible = false;
-            Log.d("newh", "kb not visible " + heightDifference );
+           // Log.d("newh", "kb not visible " + heightDifference );
         }
 
         if (layoutRunnable!=null && oldDiff!=heightDifference)
