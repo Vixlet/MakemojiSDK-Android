@@ -40,10 +40,7 @@ import java.lang.ref.WeakReference;
     private int mFontSize;
 
     // the baseline "normal" font size in sp.
-    static final int BASE_TEXT_PT = 14;
-
-    //most incoming messages will be at this size. Use it to calculate default span dimension
-    public static int DEFAULT_INCOMING_FONT_PT = 16;
+    static final int BASE_TEXT_PT = 16;
 
     //most incoming images will be at this size in px. Use it to calculate default span dimension
     public static int DEFAULT_INCOMING_IMG_WH = 20;
@@ -65,7 +62,7 @@ import java.lang.ref.WeakReference;
     boolean shouldAnimate;
     Drawable mPlaceHolder;
     private static final String TAG = "MojiSpan";
-    private static boolean LOG = false;
+    private static boolean LOG = true;
     String name;
     int id = -1;
 
@@ -102,8 +99,9 @@ import java.lang.ref.WeakReference;
         }
 
         mViewRef = new WeakReference<>(refreshView);
+        if (LOG) Log.d(TAG,"starting load " + name + " " +System.currentTimeMillis());
         Moji.picasso.load(mSource)
-                .resize(mWidth,mHeight)
+                //.resize(mWidth,mHeight)
                 .into(t);
     }
 
@@ -123,7 +121,7 @@ import java.lang.ref.WeakReference;
     Target t = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            if (LOG)Log.d(TAG,"loaded "+name);
+            if (LOG)Log.d(TAG,"loaded "+name + " " + System.currentTimeMillis());
             mDrawable = new BitmapDrawable(Moji.resources,bitmap);
             mDrawable.setBounds(0,0,mWidth,mHeight);
             mDrawableRef = new SoftReference<>(mDrawable);

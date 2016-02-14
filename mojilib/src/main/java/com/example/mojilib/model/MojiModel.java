@@ -2,6 +2,7 @@ package com.example.mojilib.model;
 
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.example.mojilib.Moji;
@@ -9,6 +10,7 @@ import com.example.mojilib.Moji;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

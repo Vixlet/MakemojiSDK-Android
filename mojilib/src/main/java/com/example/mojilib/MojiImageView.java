@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.example.mojilib.model.MojiModel;
+import com.squareup.picasso252.Callback;
 import com.squareup.picasso252.Picasso;
 
 /**
@@ -63,12 +64,12 @@ public class MojiImageView extends ImageView  implements Spanimatable{
     public void setModel(MojiModel m){
         model = m;
         setContentDescription(""+model.name);
+        int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
             if (!model.image_url.isEmpty()) {
-                if (forceDimen != -1) {
-                    Picasso.with(getContext()).load(m.image_url).resize(forceDimen, forceDimen).placeholder(d).into(this);
-                } else
-                    Picasso.with(Moji.context).load(model.image_url).fit().centerInside().placeholder(d).into(this);
+                    Moji.picasso.load(m.image_url)
+                            //.resize(size, size)
+                            .placeholder(d).into(this);
             } else {
                 setImageBitmap(makeBMFromString(forceDimen, m.character));
                 setScaleType(ScaleType.CENTER_INSIDE);
