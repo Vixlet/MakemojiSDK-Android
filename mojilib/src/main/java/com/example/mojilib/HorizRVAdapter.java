@@ -83,6 +83,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             this.v = v;
             v.setTag(this);
             name = (TextView) v.findViewById(R.id.tv);
+            name.setTextColor(mil.getHeaderTextColor());
             image = (MojiImageView) v.findViewById(R.id.pic);
             int h =  (int)(parent.getHeight() *.85);
             dimen =h;

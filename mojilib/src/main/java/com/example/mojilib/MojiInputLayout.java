@@ -4,8 +4,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -37,6 +44,9 @@ import java.util.Stack;
  * To switch between emoji pages that paginate or that are one cotinuous list, change new OneGridPage(...) to ViewPagerPage
  * in toggleTrending, toggleRecent, and in CategoriesPage onclick
  *
+ * Customize colors and properties by applying a style in xml inheriting from MojiInputLayoutDefaultStyle. To customize the editText's appearance
+ * set a default "android:editTextStyle" in a theme then apply that theme to this view in xml.
+ *
  * Created by Scott Baar on 1/4/2016.
  */
 public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener{
@@ -58,6 +68,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     TrendingPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
+
+    @ColorInt int headerTextColor;
+    @DrawableRes int backSpaceDrawableRes;
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -85,22 +98,33 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     public void init(AttributeSet attributeSet, int defStyle){
         TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,R.style.MojiInputLayoutDefaultStyle);
         int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawable,R.drawable.mm_camera_icon);
+        backSpaceDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_backSpaceButtonDrawable,R.drawable.mm_backspace_grey600_24dp);
         int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout,R.layout.mm_default_send_layout);
-        boolean cameraVisiblity = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible,true);
+        boolean cameraVisibility = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible,true);
+        int buttonColor = a.getColor(R.styleable.MojiInputLayout__mm_leftButtonColor,ContextCompat.getColor(getContext(),R.color._mm_left_button_cf));
+        Drawable buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
+        headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor,ContextCompat.getColor(getContext(),R.color._mm_header_text_color));
+        Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
+        @ColorInt int mainBgColor = a.getColor(R.styleable.MojiInputLayout__mm_mainBgColor,ContextCompat.getColor(getContext(),R.color._mm_top_layout_bg));
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
+        getChildAt(0).setBackgroundColor(mainBgColor);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
         sendLayout = ((LinearLayout)inflate(getContext(),sendLayoutRes,horizontalLayout)).getChildAt(2);
+        findViewById(R.id._mm_left_buttons).setBackgroundDrawable(leftContainerDrawable);
+
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
-        if (!cameraVisiblity) cameraImageButton.setVisibility(View.GONE);
+        if (!cameraVisibility) cameraImageButton.setVisibility(View.GONE);
+
         editText = (EditText)findViewById(R.id._mm_edit_text);
+
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
-        LinearLayoutManager sllm =
-                new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        rv.setLayoutManager(sllm);
+        rv.setBackgroundColor(mainBgColor);
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        rv.setLayoutManager(llm);
         adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
@@ -176,11 +200,18 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     };
             }
         });
-        int buttonColor = ContextCompat.getColor(getContext(),R.color._mm_left_button_cf);
+        flashtagButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
+        recentButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
+        trendingButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
+        categoriesButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
+
         flashtagButton.setColorFilter(buttonColor);
         recentButton.setColorFilter(buttonColor);
         trendingButton.setColorFilter(buttonColor);
         categoriesButton.setColorFilter(buttonColor);
+    }
+    @ColorInt int getHeaderTextColor(){
+        return headerTextColor;
     }
 
     private TextWatcher editTextWatcher = new TextWatcher() {

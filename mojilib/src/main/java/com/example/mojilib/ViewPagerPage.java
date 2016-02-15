@@ -44,6 +44,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
      //   VPAdapter vpAdapter = new VPAdapter();
       //  vp.setAdapter(vpAdapter);
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
+        heading.setTextColor(mMojiInput.getHeaderTextColor());
         heading.setText(title);
         mPopulator.setup(this);
         mView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

@@ -5,10 +5,10 @@
         <attr name="_mm_backSpaceButtonDrawable" format="reference" />
         <attr name="_mm_cameraButtonDrawable" format="reference"/>
         <attr name="_mm_cameraButtonVisible" format="boolean"/>
-        <attr name="_mm_topBg" format="color"/>
         <attr name="_mm_leftButtonColor" format="color"/>
-        <attr name="_mm_leftButtonsBg" format="reference"/>
+        <attr name="_mm_leftButtonBg" format="reference"/>
+        <attr name="_mm_leftContainerDrawable" format="integer"/>
         <attr name="_mm_headerTextColor" format="color"/>
-        <attr name="_mm_editTextStyle" format="reference"/>
+        <attr name="_mm_mainBgColor" format="color"/>
     </declare-styleable>
 </resources>

@@ -5,6 +5,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewStub;
+import android.widget.TextView;
 
 import com.example.mojilib.model.Category;
 
@@ -24,7 +25,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     public CategoriesPage(ViewStub stub, MojiApi mojiApi, MojiInputLayout mojiInputLayout){
         super(stub,mojiInputLayout);
         api=mojiApi;
-        adapter = new CategoriesAdapter(this);
+        adapter = new CategoriesAdapter(this,mojiInputLayout.getHeaderTextColor());
         List<Category> categories = Category.getCategories();
         adapter.setCategories(categories);
         if (categories.isEmpty())
@@ -50,6 +51,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
         glm = new GridLayoutManager(mView.getContext(),2, LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(glm);
         rv.setAdapter(adapter);
+        ((TextView)mView.findViewById(R.id._mm_page_heading)).setTextColor(mMojiInput.getHeaderTextColor());
 
     }
     public void show(){

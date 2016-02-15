@@ -35,6 +35,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         super(R.layout.mm_one_grid_page, mojiInputLayout);
         mPopulator = p;
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
+        heading.setTextColor(mMojiInput.getHeaderTextColor());
         heading.setText(title);
         rv = (RecyclerView) mView.findViewById(R.id._mm_page_grid);
         rv.setLayoutManager(new GridLayoutManager(mojiInputLayout.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));

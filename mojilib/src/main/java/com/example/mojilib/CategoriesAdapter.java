@@ -1,5 +1,7 @@
 package com.example.mojilib;
 
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +21,14 @@ import java.util.List;
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Holder>{
     List<Category> categories = new ArrayList<>();
     ICatListener iCatListener;
+    @ColorInt int textColor;
     public interface ICatListener{
         void onClick(Category category);
     }
 
-    public CategoriesAdapter(ICatListener iCatListener){
+    public CategoriesAdapter(ICatListener iCatListener, @ColorInt int textColor){
         this.iCatListener = iCatListener;
+        this.textColor = textColor;
 
     }
     public void setCategories(List<Category> newCategories){
@@ -75,6 +79,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
             view.setOnClickListener(catClick);
             image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
+            title.setTextColor(textColor);
             int padding = view.getPaddingLeft()*2 ;
             image.setMinimumWidth((parent.getWidth()/4)-padding);
             image.setMaxWidth((parent.getWidth()/4)-padding);

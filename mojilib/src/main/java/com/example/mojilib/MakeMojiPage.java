@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.mojilib.MojiInputLayout;
 
@@ -55,10 +57,17 @@ public class MakeMojiPage implements PagerPopulator.PopulatorObserver{
      */
     @CallSuper
     protected void setup(){
-        mView.findViewById(R.id._mm_abc_tv).setOnClickListener(mMojiInput.abcClick);
-        View backSpace = mView.findViewById(R.id._mm_backspace_button);
-        backSpace.setOnClickListener(mMojiInput.backspaceClick);
-        backSpace.setOnTouchListener(mMojiInput.backspaceTouchListener);
+        TextView abc = (TextView)mView.findViewById(R.id._mm_abc_tv);
+        ImageView backSpace = (ImageView) mView.findViewById(R.id._mm_backspace_button);
+        if (abc!=null){
+            abc.setTextColor(mMojiInput.getHeaderTextColor());
+            abc.setOnClickListener(mMojiInput.abcClick);
+        }
+        if (backSpace!=null) {
+            backSpace.setOnClickListener(mMojiInput.backspaceClick);
+            backSpace.setOnTouchListener(mMojiInput.backspaceTouchListener);
+            backSpace.setImageResource(mMojiInput.backSpaceDrawableRes);
+        }
         mIsSetup=true;
 
     }
