@@ -26,7 +26,7 @@
         android:minWidth="35dp"
         android:background="@android:color/transparent"
         />
-    <com.example.mojilib.MojiEditText
+    <com.makemoji.mojilib.MojiEditText
         android:background="@drawable/mm_et_bg"
         android:inputType="textMultiLine|textVisiblePassword|textNoSuggestions"
         android:minHeight="40dp"
@@ -45,7 +45,7 @@
         android:id="@+id/_mm_edit_text"/>
     </LinearLayout>
 
-        <com.example.mojilib.ResizeableLL
+        <com.makemoji.mojilib.ResizeableLL
             android:layout_width="match_parent"
             android:id="@+id/_mm_horizontal_top_scroller"
             android:orientation="horizontal"
@@ -55,7 +55,7 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 />
-            <com.example.mojilib.SnappyRecyclerView
+            <com.makemoji.mojilib.SnappyRecyclerView
                 android:paddingLeft="4dp"
             android:id="@+id/_mm_recylcer_view"
             tools:listitem="@layout/mm_horiz_moji_item"
@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="45dp" />
-        </com.example.mojilib.ResizeableLL>
+        </com.makemoji.mojilib.ResizeableLL>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="250dp"

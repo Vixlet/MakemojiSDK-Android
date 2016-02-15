@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.sbaar.mojilist.InputActivity"
+    tools:context="com.makemoji.sbaar.mojilist.InputActivity"
     tools:showIn="@layout/activity_input">
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
-   <com.example.mojilib.MojiInputLayout
+   <com.makemoji.mojilib.MojiInputLayout
        android:id="@+id/mojiInput"
        android:layout_height="wrap_content"
        android:layout_width="match_parent"

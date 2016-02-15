@@ -10,6 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:id="@+id/list_view"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.sbaar.mojilist.MainActivity"
+    tools:context="com.makemoji.sbaar.mojilist.MainActivity"
     tools:showIn="@layout/activity_main"/>
 

@@ -5,7 +5,7 @@
     android:layout_gravity="center"
     android:paddingRight="4dp"
     android:layout_height="match_parent">
-    <com.example.mojilib.MojiImageView
+    <com.makemoji.mojilib.MojiImageView
         android:layout_width="wrap_content"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
