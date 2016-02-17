@@ -55,7 +55,7 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
     List<MojiModel> populatePage(int count, int offset){
         if (getRecents().size()<offset)return new ArrayList<>();//return empty
         if (offset+count>getRecents().size())count = getRecents().size()-offset;
-        return getRecents().subList(offset,offset+count);
+        return new ArrayList<>(getRecents().subList(offset,offset+count));
     }
     int getTotalCount(){
         return getRecents().size();
