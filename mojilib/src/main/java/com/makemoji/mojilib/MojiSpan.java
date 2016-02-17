@@ -28,7 +28,8 @@ import java.lang.ref.WeakReference;
  * A note about resolutions: MojiImageView and MojiSpan both use getDefaultSpanDimension to determine the width/height to store the downloaded
  * bitmap in memory. This prevents storing two copies of the bitmap in memory. However, if the text size is a lot larger than BASE_TEXT_PT, such
  * as by a factor of 2 or 4, then MojiSpan will appear to be a low resolution. If this is an issue, change resize(size,size) in the picasso request
- * to use mWidth and mHeight to get a bitmap at the actual resolution it will be displayed.
+ * to use mWidth and mHeight to get a bitmap at the actual resolution it will be displayed, or change BASE_TEXT_PT to a larger number to always
+ * get a bigger image in all cases.
  * Created by Scott Baar on 12/3/2015.
  */
     public class MojiSpan extends ReplacementSpan implements Spanimatable {
