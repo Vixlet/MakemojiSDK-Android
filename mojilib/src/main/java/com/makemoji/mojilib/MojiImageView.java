@@ -12,9 +12,10 @@ import android.widget.ImageView;
 import com.makemoji.mojilib.model.MojiModel;
 
 /**
+ * Don't use this outsid
  * Created by Scott Baar on 1/24/2016.
  */
-public class MojiImageView extends ImageView  implements Spanimatable{
+class MojiImageView extends ImageView  implements Spanimatable{
     MojiModel model;
     float currentAnimationScale =1f;
     boolean animate;
@@ -64,7 +65,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
             if (!model.image_url.isEmpty()) {
                     Moji.picasso.load(m.image_url)
-                            //.resize(size, size)
+                            .resize(size, size)
                             .placeholder(d).into(this);
             } else {
                 setImageBitmap(makeBMFromString(forceDimen, m.character));

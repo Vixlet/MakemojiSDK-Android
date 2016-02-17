@@ -25,6 +25,10 @@ import java.lang.ref.WeakReference;
 
 /**
  * Fork of ImageSpan for custom emojis.
+ * A note about resolutions: MojiImageView and MojiSpan both use getDefaultSpanDimension to determine the width/height to store the downloaded
+ * bitmap in memory. This prevents storing two copies of the bitmap in memory. However, if the text size is a lot larger than BASE_TEXT_PT, such
+ * as by a factor of 2 or 4, then MojiSpan will appear to be a low resolution. If this is an issue, change resize(size,size) in the picasso request
+ * to use mWidth and mHeight to get a bitmap at the actual resolution it will be displayed.
  * Created by Scott Baar on 12/3/2015.
  */
     public class MojiSpan extends ReplacementSpan implements Spanimatable {
@@ -99,8 +103,9 @@ import java.lang.ref.WeakReference;
 
         mViewRef = new WeakReference<>(refreshView);
         if (LOG) Log.d(TAG,"starting load " + name + " " +System.currentTimeMillis());
-        Moji.picasso.load(mSource)
-                //.resize(mWidth,mHeight)
+        int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
+            Moji.picasso.load(mSource)
+                .resize(size,size)
                 .into(t);
     }
 
