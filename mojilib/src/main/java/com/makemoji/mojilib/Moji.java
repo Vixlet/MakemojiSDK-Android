@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -71,9 +73,10 @@ public class Moji {
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
      * @param app The application object. Needed for resources and to register activity callbacks.
+     * @param key The sdk key.
      * @param cacheSizeBytes the in-memory cache size in bytes
      */
-    public static void initialize(Application app, int cacheSizeBytes){
+    public static void initialize(@NonNull Application app,@NonNull final String key, int cacheSizeBytes){
         context = app.getApplicationContext();
         resources = context.getResources();
         density = resources.getDisplayMetrics().density;
@@ -105,6 +108,13 @@ public class Moji {
         builder.memoryCache(new LruCache(cacheSieBytes));
         //builder.loggingEnabled(true);
         picasso = builder.build();
+        SharedPreferences sp = app.getSharedPreferences("_mm_id",0);
+        String id = sp.getString("id",null);
+        if  (id ==null) {
+            id = UUID.randomUUID().toString();
+            sp.edit().putString("id",id).apply();
+        }
+        final String deviceId = id;
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
@@ -113,8 +123,8 @@ public class Moji {
 
                 // Customize the request
                 Request request = original.newBuilder()
-                        .header("makemoji-sdkkey", "940ced93abf2ca4175a4a865b38f1009d8848a58")
-                        .header("makemoji-deviceId", "uniqueidiandsnasdfad")
+                        .header("makemoji-sdkkey", key)
+                        .header("makemoji-deviceId", deviceId)
                         .method(original.method(), original.body())
                         .build();
 
@@ -126,18 +136,10 @@ public class Moji {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(MojiApi.BASE_URL).client(okHttpClient).
                 addConverterFactory(GsonConverterFactory.create()).build();
         mojiApi = retrofit.create(MojiApi.class);
-        mojiApi.getTrending().enqueue(new SmallCB<List<MojiModel>>() {
-            @Override
-            public void done(retrofit2.Response<List<MojiModel>> response, @Nullable Throwable t) {
-               if (t==null){
-                   List<MojiModel> mojiModels = response.body();
-               }
-            }
-        });
     }
     //calls initialize with the default cache size, 5%
-    public static void initialize(Application app){
-        initialize(app,calculateMemoryCacheSize(app));
+    public static void initialize(@NonNull Application app, @NonNull String key){
+        initialize(app,key,calculateMemoryCacheSize(app));
     }
 
     /**
