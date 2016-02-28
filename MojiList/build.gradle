@@ -29,18 +29,18 @@ dependencies {
 //exactly one of the two chunks of code below should be commented out at a time.
 
     //this will compile from source, creating an aar at mojilib/build/outputs/aar
-    //compile project(':mojilib')
+    compile project(':mojilib')
 
     //the following chunk builds from an aar placed in mojilist/libs
     //TODO REMOVE BEFORE RELEASE
 
-compile (name:'mojilib-release',ext:'aar')
+/*compile (name:'mojilib-release',ext:'aar')
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.squareup.okhttp:okhttp:2.7.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.githang:viewpagerindicator:2.4.2@aar'
-
+*/
 }
 //TODO REMOVE BEFORE RELEASE
 repositories {

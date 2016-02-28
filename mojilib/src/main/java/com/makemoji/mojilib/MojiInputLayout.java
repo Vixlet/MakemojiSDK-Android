@@ -184,7 +184,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             @Override
             public void onClick(View v) {
                 deactiveButtons();
-                editText.getText().insert(Math.max(0,editText.getSelectionStart()),"!");
+                int index = Math.max(0,editText.getSelectionStart());
+                editText.getText().insert(index,"!");
+                editText.setSelection(index+1);
                 topScroller.snapOpen();
                 showKeyboard();
                     layoutRunnable = new Runnable() {
