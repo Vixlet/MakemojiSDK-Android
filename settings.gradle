@@ -1,1 +1,1 @@
-include ':MojiList', ':mojilib'
+include ':MojiList', ':makemoji-sdk-android'

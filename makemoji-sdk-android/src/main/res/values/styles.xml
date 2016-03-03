@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources >
+    <style name="MakeMojiHeaderTextAppearance" >
+        <item name="android:textColor">@color/_mm_header_text_color</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        </style>
+    <style name="MakeMojiLeftButtonStyle">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@drawable/mm_left_button_item_bg</item>
+    </style>
+    <style name="MojiInputLayoutDefaultStyle">
+        <item name="_mm_sendButtonLayout">@layout/mm_default_send_layout</item>
+        <item name="_mm_backSpaceButtonDrawable">@drawable/mm_backspace_grey600_24dp</item>
+        <item name="_mm_cameraButtonDrawable">@drawable/mm_camera_icon</item>
+        <item name="_mm_cameraButtonVisible">true</item>
+        <item name="_mm_mainBgColor">@color/_mm_top_layout_bg</item>
+        <item name="_mm_headerTextColor">@color/_mm_header_text_color</item>
+        <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>
+        <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
+        <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
+    </style>
+</resources>

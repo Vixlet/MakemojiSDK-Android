@@ -26,26 +26,20 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3.1'
 
-//exactly one of the two chunks of code below should be commented out at a time.
 
     //this will compile from source, creating an aar at mojilib/build/outputs/aar
-    compile project(':mojilib')
+    //compile project(':makemoji-sdk-android')
 
-    //the following chunk builds from an aar placed in mojilist/libs
-    //TODO REMOVE BEFORE RELEASE
 
-/*compile (name:'mojilib-release',ext:'aar')
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.squareup.okhttp:okhttp:2.7.0'
-    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
-    compile 'com.githang:viewpagerindicator:2.4.2@aar'
-*/
+    compile 'com.makemoji:makemoji-sdk-android:0.9.5'
 }
-//TODO REMOVE BEFORE RELEASE
 repositories {
     mavenCentral()
+    jcenter()
     flatDir {
         dirs 'libs'
+    }
+    maven {
+        url 'https://dl.bintray.com/scottmoji/maven/'
     }
 }

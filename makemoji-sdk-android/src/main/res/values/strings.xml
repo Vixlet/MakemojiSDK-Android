@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="app_name" type="string">MakeMojiLib</item>
+    <item name="nested_scroll_long_text" type="string">asfnajsfdasjfdbhasdapfdhbasbaspdfasfd asnfasnfd aapfbasfdasfdasfdasfasfdsbajdf;jasfdbasfdasfdfasfdafd</item>
+
+    <string name="_mm_abc">ABC</string>
+    <string name="_mm_backspace">backspace</string>
+</resources>
