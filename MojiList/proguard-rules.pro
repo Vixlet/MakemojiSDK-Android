@@ -15,3 +15,22 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class com.makemoji.** { *; }
+-keep class com.retrofit2.** { *; }
+-keep class com.viewpagerindicator.** { *; }
+-keep class org.ccil.** { *; }
+-keep class com.squareup.** { *; }
+
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+-dontwarn okio.**
+-dontwarn retrofit2.**
+-dontwarn com.viewpagerindicator.**
+-dontwarn rx.**
+
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+
+-keepattributes Signature
+-keepattributes Exceptions
