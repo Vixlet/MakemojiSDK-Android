@@ -42,7 +42,7 @@ public class MojiEditText extends EditText {
      */
     private void init(){
         //setInputType(getInputType()|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD|EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+        //setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD|EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
         addTextChangedListener(new TextWatcher() {
             MojiSpan spans [];
             @Override

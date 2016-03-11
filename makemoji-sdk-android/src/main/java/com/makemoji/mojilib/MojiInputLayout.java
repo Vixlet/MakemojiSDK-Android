@@ -520,8 +520,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
-        ssb.insert(selectionStart,"\uFFFC");
-        ssb.setSpan(mojiSpan, selectionStart,selectionStart+1,
+        ssb.insert(selectionStart," \uFFFC ");
+        ssb.setSpan(mojiSpan, selectionStart,selectionStart+3,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
@@ -540,7 +540,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
         editText.setText(ssb);
         Moji.subSpanimatable(ssb,editText);
-        editText.setSelection(selectionStart+1);
+        editText.setSelection(selectionStart+3);
     }
 
     void onLeftClosed(){

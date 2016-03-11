@@ -57,10 +57,12 @@ class SpanBuilder implements ContentHandler {
         private TextView refreshView;
         private ParsedAttributes parsedAttributes;
         private boolean mSimple;
+        private boolean addSpaces;//add spaces to mojispans
 
         public SpanBuilder(
                 String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler,
-                Parser parser, boolean simple,TextView refreshView) {
+                Parser parser, boolean simple,TextView refreshView,boolean addSpaces) {
+
             mSource = source;
             mSpannableStringBuilder = new SpannableStringBuilder();
             mImageGetter = imageGetter;
@@ -69,6 +71,7 @@ class SpanBuilder implements ContentHandler {
             this.refreshView=refreshView;
             parsedAttributes = new ParsedAttributes();
             mSimple =simple;
+            this.addSpaces = addSpaces;
         }
 
         public ParsedAttributes convert() {
@@ -154,7 +157,7 @@ class SpanBuilder implements ContentHandler {
                 handleP(mSpannableStringBuilder);
                 start(mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
             } else if (tag.equalsIgnoreCase("img")) {
-                startImg(mSpannableStringBuilder, attributes,parsedAttributes, mImageGetter,refreshView,mSimple);
+                startImg(mSpannableStringBuilder, attributes,parsedAttributes, mImageGetter,refreshView,mSimple,addSpaces);
             }
             else if (tag.equalsIgnoreCase("span")){
                 parseSpanTag(mSpannableStringBuilder,attributes,parsedAttributes);
@@ -306,7 +309,7 @@ class SpanBuilder implements ContentHandler {
     static Pattern heightPattern = Pattern.compile("(?:height:)(\\d+)(?:.*)");
         private static void startImg(SpannableStringBuilder text,
                                      Attributes attributes, ParsedAttributes parsedAttributes, Html.ImageGetter img,TextView refreshView,
-                                     boolean simple) {
+                                     boolean simple,boolean addSpaces) {
             String src = attributes.getValue("", "src");
             String style = attributes.getValue("", "style");
             String link = attributes.getValue("", "link");
@@ -333,7 +336,8 @@ class SpanBuilder implements ContentHandler {
             }
 
             int len = text.length();
-            text.append("\uFFFC");
+            if (addSpaces) text.append(" \uFFFC ");
+            else text.append("\uFFFC");
 
             final MojiSpan mojiSpan =new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,link,refreshView);
 

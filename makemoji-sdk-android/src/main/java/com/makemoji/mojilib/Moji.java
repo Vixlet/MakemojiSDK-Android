@@ -148,11 +148,12 @@ public class Moji {
      * @param html the html message to parse
      * @param tv the TextView to set the text on. Used for sizing the emoji spans.
      * @param simple If true, will not apply any styling information beyond setting the parsed message with emojis.
+     * @param padEmojis bookend emojis with spaces, needed for edittexts
      * @return Returns the parsed attributes from the html so you can cherry pick which styles to apply.
      */
     @UiThread
-    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple){
-        ParsedAttributes parsedAttributes =parseHtml(html,tv,simple);
+    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple,boolean padEmojis){
+        ParsedAttributes parsedAttributes =parseHtml(html,tv,simple,padEmojis);
         setText(parsedAttributes.spanned,tv);
         if (!simple){
             tv.setPadding((int)(parsedAttributes.marginLeft *density),(int)(parsedAttributes.marginTop *density),
@@ -161,6 +162,10 @@ public class Moji {
             if (parsedAttributes.fontSizePt!=-1) tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,parsedAttributes.fontSizePt);
         }
         return parsedAttributes;
+    }
+    @UiThread
+    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple){
+        return setText(html,tv,simple,false);
     }
 
     /**
@@ -207,11 +212,16 @@ public class Moji {
      * Parse the html message without side effect. Returns the spanned and attributes.
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
+     * @param padEmojis addSpaces between emojis to help keyboards in edittexts
      * @return An @ParsedAttributes object containing the spanned and style attributes.
      */
     @CheckResult
+    public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple,boolean padEmojis){
+        return new SpanBuilder(html,null,null,getParser(),simple,tv,padEmojis).convert();
+    }
+    @CheckResult
     public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
-        return new SpanBuilder(html,null,null,getParser(),simple,tv).convert();
+        return parseHtml(html,tv,simple,false);
     }
 
     //gets the parser for the current thread.
@@ -283,14 +293,18 @@ public class Moji {
             next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
             MojiSpan[] style = spanned.getSpans(i, next,
                     MojiSpan.class);
-            for (int j = 0; j < style.length; j++) {
-                sb.append(style[j].toHtml());
-            }
-            withinStyle(sb,spanned,i,next);
+            if (style.length>0)//if the mojispan has length >1, ignore the rest
+                for (int j = 0; j < style.length; j++) {
+                    sb.append(style[j].toHtml());
+                }
+            else
+                withinStyle(sb,spanned,i,next);
         }
         sb.append("</p>");
         return sb.toString();
     }
+
+
 
     private static void withinStyle(StringBuilder out, CharSequence text,
                                     int start, int end) {
@@ -340,7 +354,7 @@ public class Moji {
      * Only invalidate once a frame.
      * @param tv
      */
-    static void invalidateTextView(TextView tv){
+    public static void invalidateTextView(TextView tv){
         if (tv ==null)return;
 
         long lastInvalidated = tv.getTag(R.id._makemoji_last_invalidated_id)==null?0:

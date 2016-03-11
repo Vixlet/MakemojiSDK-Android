@@ -28,7 +28,7 @@
         />
     <com.makemoji.mojilib.MojiEditText
         android:background="@drawable/mm_et_bg"
-        android:inputType="textMultiLine|textVisiblePassword|textNoSuggestions"
+        android:inputType="textMultiLine"
         android:minHeight="40dp"
         android:padding="4dp"
         android:paddingTop="6dp"
