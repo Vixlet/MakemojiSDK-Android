@@ -8,6 +8,11 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.makemoji.sbaar.mojilist.InputActivity"
     tools:showIn="@layout/activity_input">
+    <com.makemoji.mojilib.MojiEditText
+        android:visibility="gone"
+        android:id="@+id/outside_met"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"

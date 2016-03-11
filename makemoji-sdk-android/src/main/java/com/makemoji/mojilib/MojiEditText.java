@@ -36,13 +36,49 @@ public class MojiEditText extends EditText {
     }
 
     /**
-     * non-stock keyboards clobber moji spans leaving plain [obj] replacement chars, particularly when typing in the middle
-     * of mojispans. Disabling suggestions is usually enough to fix the problem. The text watcher is a redundant fail safe. Either one
-     * *should* fix the problem. If problem persists, add code to remove orphaned [obj] chars after restoring spans.
+     *
      */
     private void init(){
-        //setInputType(getInputType()|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        //setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD|EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+
+        //If any mojispans span less than three characters, remove them because a backspace has happened.
+        addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                String string = s.toString();
+                SpannableStringBuilder ssb = new SpannableStringBuilder(s);
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+
+                for (int i = 0; i < string.length();) {
+                    MojiSpan spanAtPoint[] = ssb.getSpans(i, i + 1, MojiSpan.class);
+                    if (spanAtPoint.length == 0) {//not a moji
+                        builder.append(s.charAt(i));
+                        i++;
+                    }
+                    else{
+                        MojiSpan span = spanAtPoint[0];
+                        int start = ssb.getSpanStart(span);
+                        int end = ssb.getSpanEnd(span);
+                        int spanLength = end-start;
+                        if (spanLength==3) {//valid emoji, add it
+                            builder.append(ssb.subSequence(start, end));
+                        }
+                            i+=spanLength;//invalid emoji, skip
+                        }
+                    }
+                if (ssb.length()>builder.length()){//mojis have been deleted
+                    int selection = getSelectionStart()-(ssb.length()-builder.length());
+                    setText(builder);
+                    setSelection(Math.max(0,selection));
+                }
+                }
+            });
+
+        /*
+        //This fixes spans that have been stripped of their styling by the keyboard. Probably not neccesary anymore.
         addTextChangedListener(new TextWatcher() {
             MojiSpan spans [];
             @Override
@@ -74,13 +110,11 @@ public class MojiEditText extends EditText {
 
             }
         });
+        */
 
     }
 
 
-    static Pattern srcPattern = Pattern.compile("(?:.*)(?:src=\")(.*?)(?:\")(?:.*)");
-    static Pattern linkPattern = Pattern.compile("(?:.*)(?:link=\")(.*?)(?:\")(?:.*)");
-    static Pattern idPattern = Pattern.compile("(?:.*)(?:id=\")(.*?)(?:\")(?:.*)");
     Character replacementChar = "\uFFFC".charAt(0);
 
     @Override
@@ -104,11 +138,13 @@ public class MojiEditText extends EditText {
             if (clip==null || clip.getItemCount()==0)return true;
             String paste = clip.getItemAt(0).coerceToText(getContext()).toString();
 
-            ParsedAttributes pa = Moji.parseHtml(paste,this,true);
+            ParsedAttributes pa = Moji.parseHtml(paste,this,true,true);
 
             SpannableStringBuilder original = new SpannableStringBuilder(getText());
             Spanned newText = new SpannableStringBuilder
-                    ( TextUtils.concat(original.subSequence(0,min),pa.spanned,original.subSequence(max,original.length())));
+                    ( TextUtils.concat(original.subSequence(0,min),
+                            pa.spanned,
+                            original.subSequence(max,original.length())));
             setText(newText);
             setSelection(Math.min(min+pa.spanned.length(),newText.length()));
             Moji.subSpanimatable(newText,this);

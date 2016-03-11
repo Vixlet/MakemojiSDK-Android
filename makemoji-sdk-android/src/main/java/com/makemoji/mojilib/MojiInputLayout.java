@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +47,8 @@ import java.util.Stack;
  */
 public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener{
     ImageButton cameraImageButton;
-    EditText editText;
+    EditText editText;//active
+    EditText myEditText;
     View sendLayout;
     RecyclerView rv;
     FrameLayout pageContainer;
@@ -115,6 +117,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (!cameraVisibility) cameraImageButton.setVisibility(View.GONE);
 
         editText = (EditText)findViewById(R.id._mm_edit_text);
+        myEditText = editText;
 
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         rv.setBackgroundColor(mainBgColor);
@@ -298,7 +301,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             if (selectionEnd==0)return;
             ssb.delete(selectionStart,selectionEnd);
             editText.setText(ssb);
-            editText.setSelection(Math.max(0,selectionStart));
+            editText.setSelection(Math.max(0, selectionStart - (ssb.length()-editText.getText().length())));
         }
     };
 
@@ -309,7 +312,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             public void run() {
                 if (isPressed){
                     backspaceClick.onClick(null);
-                    postDelayed(this,110);
+                    postDelayed(this,120);
                 }
             }
         };
@@ -572,11 +575,23 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.setText(cs);
     }
 
+    public void attatchMojiEditText(@NonNull MojiEditText met){
+        editText = met;
+        if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
+        horizontalLayout.setVisibility(View.GONE);
+    }
+    public void detachMojiEditText(){
+        editText = myEditText;
+        horizontalLayout.setVisibility(View.VISIBLE);
+    }
+
     /**
      * the action when a hypermoji is clicked in the edit text.
      * @param hml
      */
+    HyperMojiListener hyperMojiListener;
     public void setHyperMojiClickListener(HyperMojiListener hml){
+        hyperMojiListener = hml;
         editText.setTag(R.id._makemoji_hypermoji_listener_tag_id,hml);
     }
 

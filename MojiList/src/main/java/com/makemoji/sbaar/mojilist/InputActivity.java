@@ -6,17 +6,22 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.makemoji.mojilib.HyperMojiListener;
+import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
 
 import java.util.ArrayList;
 
 public class InputActivity extends AppCompatActivity {
+    MojiEditText outsideMojiEdit;
+    MojiInputLayout mojiInputLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +29,10 @@ public class InputActivity extends AppCompatActivity {
         setContentView(R.layout.activity_input);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        MojiInputLayout mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
+        mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
         final MAdapter mAdapter = new MAdapter(this,new ArrayList<MojiMessage>(),true);
         ListView lv = (ListView) findViewById(R.id.list_view);
+        outsideMojiEdit = (MojiEditText) findViewById(R.id.outside_met);
         lv.setAdapter(mAdapter);
         mojiInputLayout.setSendLayoutClickListener(new MojiInputLayout.SendClickListener() {
             @Override
@@ -58,5 +64,31 @@ public class InputActivity extends AppCompatActivity {
             }
         },1000);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_input, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+
+        if (id ==R.id.action_attach){
+            mojiInputLayout.attatchMojiEditText(outsideMojiEdit);
+            outsideMojiEdit.setVisibility(View.VISIBLE);
+            return true;
+        }
+        else if (id ==R.id.action_detach) {
+            mojiInputLayout.detachMojiEditText();
+            outsideMojiEdit.setVisibility(View.GONE);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
