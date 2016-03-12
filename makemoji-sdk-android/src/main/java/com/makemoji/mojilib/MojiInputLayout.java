@@ -599,6 +599,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     public void detachMojiEditText(){
         editText = myEditText;
         horizontalLayout.setVisibility(View.VISIBLE);
+        editText.requestFocus();
         outsideEditText = false;
     }
 
