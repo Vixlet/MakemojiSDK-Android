@@ -1,5 +1,13 @@
 apply plugin: 'com.android.library'
+/* How to upload to bintray
+Update library version below
+Add to local.properties your jcenter name/pw
+bintray.user=arcshod
+bintray.apikey=151985234y208
 
+Click terminal in android studio or navigate to project root
+> gradlew bintrayUpload
+ */
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'com.makemoji:makemoji-sdk-android'
