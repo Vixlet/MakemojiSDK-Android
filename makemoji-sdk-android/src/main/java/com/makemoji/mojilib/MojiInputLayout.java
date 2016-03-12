@@ -344,6 +344,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         deactiveButtons();
         if (categoriesPage.isVisible()) {
             onLeftClosed();
+            if (outsideEditText) {
+                layoutRunnable.run();
+                layoutRunnable = null;
+            }
         }
         else
             layoutRunnable = new Runnable() {
@@ -369,6 +373,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         if (trendingPage.isVisible()){
             onLeftClosed();
+            if (outsideEditText) {
+                layoutRunnable.run();
+                layoutRunnable = null;
+            }
         }
         else
             layoutRunnable = new Runnable() {
@@ -379,6 +387,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                         addPage(trendingPage);
                 }
             };
+
         if (!keyboardVisible && layoutRunnable !=null){
             layoutRunnable.run();
             layoutRunnable=null;
@@ -393,6 +402,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         if (recentPage.isVisible()){
             onLeftClosed();
+            if (outsideEditText) {
+                layoutRunnable.run();
+                layoutRunnable = null;
+            }
         }
         else
             layoutRunnable = new Runnable() {
@@ -404,6 +417,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     recentPage.onNewDataAvailable();
                 }
             };
+
         if (!keyboardVisible && layoutRunnable !=null){
             layoutRunnable.run();
             layoutRunnable=null;
@@ -575,14 +589,17 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.setText(cs);
     }
 
+    boolean outsideEditText = false;
     public void attatchMojiEditText(@NonNull MojiEditText met){
         editText = met;
         if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
         horizontalLayout.setVisibility(View.GONE);
+        outsideEditText = true;
     }
     public void detachMojiEditText(){
         editText = myEditText;
         horizontalLayout.setVisibility(View.VISIBLE);
+        outsideEditText = false;
     }
 
     /**
