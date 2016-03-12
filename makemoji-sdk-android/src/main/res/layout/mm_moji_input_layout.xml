@@ -55,7 +55,7 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 />
-            <com.makemoji.mojilib.SnappyRecyclerView
+            <android.support.v7.widget.RecyclerView
                 android:paddingLeft="4dp"
             android:id="@+id/_mm_recylcer_view"
             tools:listitem="@layout/mm_horiz_moji_item"

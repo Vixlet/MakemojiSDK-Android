@@ -123,6 +123,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         rv.setBackgroundColor(mainBgColor);
         LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(llm);
+        rv.setItemViewCacheSize(20);
         adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
@@ -254,8 +255,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     boolean usingTrendingAdapter = true;
     void useTrendingAdapter(boolean trending){
+        boolean wasUsingTrending = usingTrendingAdapter;
         usingTrendingAdapter =trending;
-        if (usingTrendingAdapter) {
+        if (usingTrendingAdapter && !wasUsingTrending) {
             adapter.showNames(false);
             adapter.setMojiModels(trendingPopulator.populatePage(200, 0));
         }
@@ -286,10 +288,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     clearStack();
                 }
             };
-            //postDelayed(layoutRunnable,65);
-            //layoutRunnable.run();
-            //layoutRunnable=null;
             showKeyboard();
+            deactiveButtons();
         }
     };
     OnClickListener backspaceClick = new OnClickListener() {

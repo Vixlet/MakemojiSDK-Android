@@ -81,6 +81,7 @@ public class InputActivity extends AppCompatActivity {
         if (id ==R.id.action_attach){
             mojiInputLayout.attatchMojiEditText(outsideMojiEdit);
             outsideMojiEdit.setVisibility(View.VISIBLE);
+            outsideMojiEdit.requestFocus();
             return true;
         }
         else if (id ==R.id.action_detach) {

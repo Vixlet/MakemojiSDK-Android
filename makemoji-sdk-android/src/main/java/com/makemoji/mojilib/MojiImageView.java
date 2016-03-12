@@ -59,6 +59,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
         return image;
     }
     public void setModel(MojiModel m){
+        if (m.equals(model))return;
         model = m;
         setContentDescription(""+model.name);
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
@@ -69,7 +70,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                             .placeholder(d).into(this);
             } else {
                 setImageBitmap(makeBMFromString(forceDimen, m.character));
-                setScaleType(ScaleType.CENTER_INSIDE);
+                //setScaleType(ScaleType.CENTER_INSIDE);
 
             }
         if ((m.link_url==null || m.link_url.isEmpty())){

@@ -2,6 +2,7 @@ package com.makemoji.mojilib;
 
 import android.support.v7.widget.RecyclerView.*;
 import android.support.v7.widget.RecyclerView.Adapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
                 mil.addMojiModel(model, null);
             }
         });
+        Log.d("oncreate","oncreateviewholder");
         return new RVHolder(v,parent);
     }
 
@@ -45,7 +47,6 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         Mojilytics.trackView(m.id);
         holder.name.setText(m.name);
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
-        //Moji.loadImage(holder.image,m.image_url);
         holder.image.forceDimen(holder.dimen);
         holder.image.setModel(m);
         holder.pos = position;
@@ -81,7 +82,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             name = (TextView) v.findViewById(R.id.tv);
             name.setTextColor(mil.getHeaderTextColor());
             image = (MojiImageView) v.findViewById(R.id.pic);
-            int h =  (int)(parent.getHeight() *.85);
+            int h = (int)(45.0*Moji.density *.85);
             dimen =h;
 
         }
