@@ -41,6 +41,7 @@ public class MojiEditText extends EditText {
     private void init(){
 
         //If any mojispans span less than three characters, remove them because a backspace has happened.
+        setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -154,17 +155,11 @@ public class MojiEditText extends EditText {
         //convert to html, copy
         if (id == android.R.id.copy || id == android.R.id.cut) {
             SpannableStringBuilder text = new SpannableStringBuilder(getText().subSequence(min, max));
-            StringBuilder sb = new StringBuilder(text.toString());
-            MojiSpan[] spans = text.getSpans(0,text.length()    , MojiSpan.class);
 
-            int spanCounter = 0;
-            int spanLength = spans.length;
+            Log.d("met copy","met copy " +text.toString());
 
-            //replace mojispans with their html representation
-            while ((sb.indexOf("\uFFFC") != -1) && spanCounter < spanLength) {
-                sb.replace(sb.indexOf("\uFFFC"), sb.indexOf("\uFFFC") + 1, spans[spanCounter++].toHtml());
-            }
-            ClipData clip = ClipData.newPlainText(null, sb);
+            String html = Moji.toHtml(text);
+            ClipData clip = ClipData.newPlainText(null, html);
             ClipboardManager clipboard = (ClipboardManager) getContext().
                     getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setPrimaryClip(clip);
