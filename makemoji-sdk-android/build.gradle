@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 /* How to upload to bintray
-Update library version below
+Update library version number below
 Add to local.properties your jcenter name/pw
 bintray.user=arcshod
 bintray.apikey=151985234y208
@@ -21,7 +21,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
 
-    libraryVersion = '0.9.5'
+    libraryVersion = '0.9.51'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'
