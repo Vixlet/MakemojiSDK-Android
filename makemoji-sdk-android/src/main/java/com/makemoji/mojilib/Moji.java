@@ -77,7 +77,7 @@ public class Moji {
     static MojiApi mojiApi;
     //randomly seed some mojispans with links when in demo mode
     static boolean demo = false;
-    static Handler handler = new Handler(Looper.getMainLooper());
+    static Handler handler;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
@@ -91,6 +91,7 @@ public class Moji {
         density = resources.getDisplayMetrics().density;
         MojiSpan.BASE_TEXT_PX_SCALED = MojiSpan.BASE_TEXT_PT*density;
 
+        handler = new Handler(Looper.getMainLooper());
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
@@ -348,6 +349,7 @@ public class Moji {
     public static String plainTextToHtml(String plainText){
         return toHtml(plainTextToSpanned(plainText));
     }
+    public static Base62 base62 = new Base62();
     public static Spanned plainTextToSpanned(String plainText){
         String modifiedText = plainText;
         SpannableStringBuilder ssb = new SpannableStringBuilder();
@@ -360,7 +362,7 @@ public class Moji {
             String name = m.group(1);
             String idString = m.group(2);
             String url = m.group(3);
-            int id = Base62.toBase10(idString);
+            int id = (int)base62.decodeBase62(idString);
             MojiModel model = MojiSQLHelper.getInstance(context).get(id);
             if (model ==null){
                 Log.d("Make Moji plain text", "cannot find emoji with id "+ id);

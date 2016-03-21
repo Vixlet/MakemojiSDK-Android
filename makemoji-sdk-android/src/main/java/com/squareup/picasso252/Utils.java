@@ -133,7 +133,7 @@ final class Utils {
 
   static void checkMain() {
     if (!isMain()) {
-      throw new IllegalStateException("Method call should happen from the main thread.");
+     // throw new IllegalStateException("Method call should happen from the main thread.");
     }
   }
 

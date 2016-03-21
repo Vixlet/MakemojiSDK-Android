@@ -542,7 +542,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
-            ClickableSpan clickableSpan = new ClickableSpan() {
+            ClickableSpan clickableSpan = new MojiClickableSpan() {
                 @Override
                 public void onClick(View widget) {
                     HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);

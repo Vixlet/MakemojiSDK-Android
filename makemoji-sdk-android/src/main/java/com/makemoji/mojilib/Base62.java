@@ -6,39 +6,72 @@ package com.makemoji.mojilib;
  */
 public class Base62 {
 
-    public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        private String characters;
 
-    public static final int BASE = ALPHABET.length();
-
-    private Base62() {}
-
-    public static String fromBase10(int i) {
-        StringBuilder sb = new StringBuilder("");
-        while (i > 0) {
-            i = fromBase10(i, sb);
+        /**
+         * Constructs a Base62 object with the default charset (0..9a..zA..Z).
+         */
+        public Base62() {
+            this("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
-        return sb.reverse().toString();
-    }
 
-    private static int fromBase10(int i, final StringBuilder sb) {
-        int rem = i % BASE;
-        sb.append(ALPHABET.charAt(rem));
-        return i / BASE;
-    }
-
-    public static int toBase10(String str) {
-        return toBase10(new StringBuilder(str).reverse().toString().toCharArray());
-    }
-
-    private static int toBase10(char[] chars) {
-        int n = 0;
-        for (int i = chars.length - 1; i >= 0; i--) {
-            n += toBase10(ALPHABET.indexOf(chars[i]), i);
+        /**
+         * Constructs a Base62 object with a custom charset.
+         *
+         * @param characters
+         *            the charset to use. Must be 62 characters.
+         * @throws <code>IllegalArgumentException<code> if the supplied charset is not 62 characters long.
+         */
+        public Base62(String characters) {
+            if (!(characters.length() == 62)) {
+                throw new IllegalArgumentException("Invalid string length, must be 62.");
+            }
+            this.characters = characters;
         }
-        return n;
-    }
 
-    private static int toBase10(int n, int pow) {
-        return n * (int) Math.pow(BASE, pow);
-    }
+        /**
+         * Encodes a decimal value to a Base62 <code>String</code>.
+         *
+         * @param b10
+         *            the decimal value to encode, must be nonnegative.
+         * @return the number encoded as a Base62 <code>String</code>.
+         */
+        public String encodeBase10(long b10) {
+            if (b10 < 0) {
+                throw new IllegalArgumentException("b10 must be nonnegative");
+            }
+            String ret = "";
+            while (b10 > 0) {
+                ret = characters.charAt((int) (b10 % 62)) + ret;
+                b10 /= 62;
+            }
+            return ret;
+
+        }
+
+        /**
+         * Decodes a Base62 <code>String</code> returning a <code>long</code>.
+         *
+         * @param b62
+         *            the Base62 <code>String</code> to decode.
+         * @return the decoded number as a <code>long</code>.
+         * @throws IllegalArgumentException
+         *             if the given <code>String</code> contains characters not
+         *             specified in the constructor.
+         */
+        public long decodeBase62(String b62) {
+            for (char character : b62.toCharArray()) {
+                if (!characters.contains(String.valueOf(character))) {
+                    throw new IllegalArgumentException("Invalid character(s) in string: " + character);
+                }
+            }
+            long ret = 0;
+            b62 = new StringBuffer(b62).reverse().toString();
+            long count = 1;
+            for (char character : b62.toCharArray()) {
+                ret += characters.indexOf(character) * count;
+                count *= 62;
+            }
+            return ret;
+        }
 }

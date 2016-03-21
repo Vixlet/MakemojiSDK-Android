@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.style.ClickableSpan;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.widget.TextView;
@@ -315,16 +316,37 @@ if (mSource!=null && !mSource.isEmpty())
 
     public String toHtml() {
         return "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\""
+                +
+        (id == -1 ? " " : " id=\"" + id + "\"")//insert id if this came from a model
                 + "src=\"" + mSource + "\" "
                 + "name=\"" + name + "\" "
-                + "link=\""+getLink()+"\""+
-                (id == -1 ? "" : "id=\"" + id + "\"")//insert id if this came from a model
+                + "link=\""+getLink()+"\""
                 + ">";
     }
     public String toPlainText(){
 
-        String b62Id = Base62.fromBase10(id);
+        String b62Id = Moji.base62.encodeBase10(id);
         return  "[" + name + '.' + b62Id + (mLink == null ||mLink.isEmpty() ? "]" :
                 " " + mLink+"]");
     }
+    @Override
+    public boolean equals (Object o){
+        MojiSpan other;
+        if (o instanceof MojiSpan)
+            other = (MojiSpan) o;
+        else
+            return false;
+        if (id!=other.id)return false;
+        if (name!=null && !name.equals(other.name)) return false;
+        if (other.name!=null && !other.name.equals(name)) return false;
+
+        if (mLink!=null && !mLink.equals(other.mLink)) return false;
+        if (other.mLink!=null && !other.mLink.equals(mLink)) return false;
+
+        return true;
+    }
+    @Override public int hashCode() {
+        return (41 * (41 + id) *(41*(""+name).hashCode())) + (""+mLink).hashCode();
+    }
+
 }

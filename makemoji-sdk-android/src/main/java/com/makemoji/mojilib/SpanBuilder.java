@@ -356,7 +356,7 @@ class SpanBuilder implements ContentHandler {
 
             if (mojiSpan.getLink()!=null && !mojiSpan.getLink().isEmpty()) {
                // if (refreshView!=null)refreshView.setHighlightColor(Color.TRANSPARENT);
-                ClickableSpan clickableSpan = new ClickableSpan() {
+                ClickableSpan clickableSpan = new MojiClickableSpan() {
                     @Override
                     public void onClick(View widget) {
                         HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);
