@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.makemoji.mojilib.HyperMojiListener;
+import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
 
@@ -22,7 +24,9 @@ import java.util.ArrayList;
 public class InputActivity extends AppCompatActivity {
     MojiEditText outsideMojiEdit;
     MojiInputLayout mojiInputLayout;
+    boolean plainTextConversion = true;
 
+    public static final String TAG = "InputActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,18 @@ public class InputActivity extends AppCompatActivity {
             public boolean onClick(String html, Spanned spanned) {
                 MojiMessage mojiMessage = new MojiMessage(html);
                 mAdapter.add(mojiMessage);
+
+                if (plainTextConversion) {
+                    String plainText = Moji.htmlToPlainText(html);
+                    plainText = Moji.spannedToPlainText(spanned);
+                    Spanned convertedSpanned = Moji.plainTextToSpanned(plainText);
+                    Log.d(TAG, "plain text " + plainText);
+                    Log.d(TAG, "new spanned text " + convertedSpanned);
+                    MojiMessage message2 = new MojiMessage(plainText);
+                    MojiMessage message3 = new MojiMessage(Moji.toHtml(convertedSpanned));
+                    mAdapter.add(message2);
+                    mAdapter.add(message3);
+                }
                 return true;
             }
         });

@@ -14,9 +14,15 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.annotation.WorkerThread;
+import android.support.v4.util.SparseArrayCompat;
+import android.text.Html;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.CharacterStyle;
+import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,10 +38,13 @@ import org.ccil.cowan.tagsoup2.Parser;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -148,12 +157,12 @@ public class Moji {
      * @param html the html message to parse
      * @param tv the TextView to set the text on. Used for sizing the emoji spans.
      * @param simple If true, will not apply any styling information beyond setting the parsed message with emojis.
-     * @param padEmojis bookend emojis with spaces, needed for edittexts
+     * @param paddingForEditText bookend emojis with spaces, needed for edittexts
      * @return Returns the parsed attributes from the html so you can cherry pick which styles to apply.
      */
     @UiThread
-    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple,boolean padEmojis){
-        ParsedAttributes parsedAttributes =parseHtml(html,tv,simple,padEmojis);
+    public static ParsedAttributes setText(@NonNull String html, @NonNull TextView tv, boolean simple,boolean paddingForEditText){
+        ParsedAttributes parsedAttributes =parseHtml(html,tv,simple,paddingForEditText);
         setText(parsedAttributes.spanned,tv);
         if (!simple){
             tv.setPadding((int)(parsedAttributes.marginLeft *density),(int)(parsedAttributes.marginTop *density),
@@ -212,12 +221,12 @@ public class Moji {
      * Parse the html message without side effect. Returns the spanned and attributes.
      * @param html the html message to parse
      * @param tv An optional textview to size the emoji spans.
-     * @param padEmojis addSpaces between emojis to help keyboards in edittexts
+     * @param paddingForEditText addSpaces between emojis to help keyboards in edittexts
      * @return An @ParsedAttributes object containing the spanned and style attributes.
      */
     @CheckResult
-    public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple,boolean padEmojis){
-        return new SpanBuilder(html,null,null,getParser(),simple,tv,padEmojis).convert();
+    public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple,boolean paddingForEditText){
+        return new SpanBuilder(html,null,null,getParser(),simple,tv,paddingForEditText).convert();
     }
     @CheckResult
     public static ParsedAttributes parseHtml(@NonNull String html, @Nullable TextView tv, boolean simple){
@@ -287,7 +296,7 @@ public class Moji {
      StringBuilder sb = new StringBuilder();
         Spanned spanned = new SpannableStringBuilder(cs);
         sb.append("<p dir=\"auto\" style=\"margin-bottom:16px;font-family:'.Helvetica Neue Interface';font-size:16px;\"><span style=\"color:#000000;\">");
-        int next =0;
+        int next;
         int end = spanned.length();
         for (int i = 0; i < end; i = next) {
             next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
@@ -304,7 +313,85 @@ public class Moji {
         return sb.toString();
     }
 
+    /**
+     * <br /> converted to \n
+     * emoji images <img> converted to [flashtagname.base62emojiid hypermojiurl]
+     * @param spanned
+     * @return
+     */
+    @WorkerThread
+    public static String spannedToPlainText(Spanned spanned){
+        StringBuilder sb = new StringBuilder();
+        int next;
+        int end = spanned.length();
+        for (int i = 0; i < end; i = next) {
+            next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
+            MojiSpan[] style = spanned.getSpans(i, next,
+                    MojiSpan.class);
+            if (style.length>0)//if the mojispan has length >1, ignore the rest
+                for (int j = 0; j < style.length; j++) {
+                    sb.append(style[j].toPlainText());
+                }
+            else
+                sb.append(spanned.charAt(i));
+        }
+        String s =sb.toString();
+        s = s.replace("<br \\>","\n");
+        s = s.replace("<br\\>","\n");
+        return s;
+    }
+    @WorkerThread
+    public static String htmlToPlainText(String html){
+        return spannedToPlainText(parseHtml(html,null,true,false).spanned);
+    }
+    static Pattern plainMojiRegex = Pattern.compile("(?:\\[(\\S*)\\.([^\\[\\s]+)(?:\\s*)( [^\\]\\s]+)?\\])");
+    @WorkerThread
+    public static String plainTextToHtml(String plainText){
+        return toHtml(plainTextToSpanned(plainText,false));
+    }
+    @WorkerThread
+    public static Spanned plainTextToSpanned(String plainText) {
+        return plainTextToSpanned(plainText,false);
+    }
+    @WorkerThread
+    public static Spanned plainTextToSpanned(String plainText,boolean paddingForEditText){
+        String modifiedText = plainText;
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        List<MojiSpan> spans = new ArrayList<>();
+        Matcher m = plainMojiRegex.matcher(modifiedText);
+        if (!m.matches())
+            return new SpannableStringBuilder(plainText);
 
+        while (m.matches()){
+            String name = m.group(1);
+            String idString = m.group(2);
+            String url = m.group(3);
+            int id = Base62.toBase10(idString);
+            MojiModel model = MojiSQLHelper.getInstance(context).get(id);
+            if (model ==null){
+                Log.d("Make Moji plain text", "cannot find emoji with id "+ id);
+                modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
+                m = plainMojiRegex.matcher(modifiedText);
+                continue;
+            }
+            model.name = name;
+            model.link_url = url;
+            MojiSpan mojiSpan = MojiSpan.fromModel(model,null,null);
+            spans.add(mojiSpan);
+            modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
+            m = plainMojiRegex.matcher(modifiedText);
+        }
+        int spanCount = 0;
+        for (int i = 0; i<modifiedText.length();i++){
+            char c = modifiedText.charAt(i);
+            ssb.append(modifiedText.charAt(i));
+            if (MojiEditText.replacementChar.equals(c) && spanCount<spans.size()){
+                ssb.setSpan(spans.get(spanCount), i,i+1,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+        return ssb;
+    }
 
     private static void withinStyle(StringBuilder out, CharSequence text,
                                     int start, int end) {

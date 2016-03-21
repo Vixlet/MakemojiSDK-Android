@@ -54,6 +54,7 @@ public class MojiModel {
             jo.put("image_url", m.image_url);
             jo.put("link_url", m.link_url);
             jo.put("name", m.name);
+            jo.put("id", m.id);
         }
         catch (Exception e){e.printStackTrace();}
         return jo;
@@ -61,6 +62,7 @@ public class MojiModel {
     public static MojiModel fromJson(JSONObject jo){
         MojiModel m= new MojiModel(jo.optString("name"),jo.optString("image_url"));
         m.link_url = jo.optString("link_url",null);
+        m.id = jo.optInt("id",-1);
         return m;
     }
     public static JSONArray toJsonArray(Collection<MojiModel> models){
@@ -88,11 +90,11 @@ public class MojiModel {
     }
 
     public static void saveList(List<MojiModel> list,String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists",0);
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists2",0);
         sp.edit().putString("name",toJsonArray(list).toString()).apply();
     }
     public static List<MojiModel> getList(String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists",0);
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists2",0);
         List<MojiModel> models;
         try{
             models = fromJSONArray(new JSONArray(sp.getString(name,"[]")));

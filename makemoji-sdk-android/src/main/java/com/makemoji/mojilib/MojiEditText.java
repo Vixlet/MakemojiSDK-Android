@@ -116,7 +116,7 @@ public class MojiEditText extends EditText {
     }
 
 
-    Character replacementChar = "\uFFFC".charAt(0);
+    public static Character replacementChar = "\uFFFC".charAt(0);
 
     @Override
     public boolean onTextContextMenuItem(int id) {

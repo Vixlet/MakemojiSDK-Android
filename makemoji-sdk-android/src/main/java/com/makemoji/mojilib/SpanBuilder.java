@@ -312,7 +312,15 @@ class SpanBuilder implements ContentHandler {
                                      boolean simple,boolean addSpaces) {
             String src = attributes.getValue("", "src");
             String style = attributes.getValue("", "style");
+            String name = attributes.getValue("", "name");
+            String id = attributes.getValue("", "id");
+            int idInt = -1;
             String link = attributes.getValue("", "link");
+            try{
+                idInt = Integer.parseInt(id);
+            }
+            catch (Exception e){
+            }
             int width = 20;
             int height = 20;
             if (style!=null){
@@ -340,6 +348,8 @@ class SpanBuilder implements ContentHandler {
             else text.append("\uFFFC");
 
             final MojiSpan mojiSpan =new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,link,refreshView);
+            mojiSpan.name = name;
+            mojiSpan.id = idInt;
 
             text.setSpan(mojiSpan, len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

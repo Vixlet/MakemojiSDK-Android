@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 import com.makemoji.mojilib.model.MojiModel;
 
@@ -80,6 +82,32 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
         db.setTransactionSuccessful();
         db.endTransaction();
 
+    }
+
+    @WorkerThread
+    public @Nullable MojiModel get(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        MojiModel mm = null;
+        String raw = "SELECT * FROM "+TABLE_MM + " WHERE "+COL_ID_INT + " = "+id;
+        Cursor c = db.rawQuery(raw,null);
+        try{
+            c.moveToFirst();
+            mm = new MojiModel();
+            mm.id = c.getInt(1);
+            mm.name = c.getString(2);
+            mm.image_url = c.getString(3);
+            mm.link_url = c.getString(4);
+            mm.flashtag = c.getString(5);
+            mm.character = c.getString(6);
+        }
+        catch (Exception e){
+            mm = null;
+            e.printStackTrace();
+        }
+        finally {
+            c.close();
+        }
+        return mm;
     }
     public List<MojiModel> search(String query, int limit){
         SQLiteDatabase db = this.getReadableDatabase();

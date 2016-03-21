@@ -85,7 +85,8 @@ import java.lang.ref.WeakReference;
     public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
         //scale based on font size
         if (simple){ //scale based on current text size
-            mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
+          if (refreshView!=null)  mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
+            else mFontRatio = BASE_TEXT_PX_SCALED;
         }
         else{//scale based on font size to be set
             mFontRatio = (fontSize*Moji.density)/BASE_TEXT_PX_SCALED;
@@ -105,7 +106,8 @@ import java.lang.ref.WeakReference;
         mViewRef = new WeakReference<>(refreshView);
         if (LOG) Log.d(TAG,"starting load " + name + " " +System.currentTimeMillis());
         int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
-            Moji.picasso.load(mSource)
+if (mSource!=null && !mSource.isEmpty())
+    Moji.picasso.load(mSource)
                 .resize(size,size)
                 .into(t);
     }
@@ -114,7 +116,7 @@ import java.lang.ref.WeakReference;
         float ratio = (textSize)/BASE_TEXT_PX_SCALED;
         return (int) (DEFAULT_INCOMING_IMG_WH * Moji.density * BASE_SIZE_MULT * ratio);
     }
-    public static MojiSpan fromModel(MojiModel model, TextView tv, @Nullable BitmapDrawable bitmapDrawable){
+    public static MojiSpan fromModel(MojiModel model, @Nullable TextView tv, @Nullable BitmapDrawable bitmapDrawable){
         Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_placeholder);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
         MojiSpan span = new MojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
@@ -302,7 +304,7 @@ import java.lang.ref.WeakReference;
         mDrawable = null;//get rid of hard reference to bitmap
     }
     public void onSubscribed(){
-        if (mDrawableRef!=null && mDrawableRef.get()==null) //if bitmap was gced, get it again. don't bother refetching for a new size.
+        if (mDrawableRef!=null && mDrawableRef.get()==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
             Moji.picasso.load(mSource)
                     //.resize(mWidth,mHeight)
                     .into(t);
@@ -314,12 +316,15 @@ import java.lang.ref.WeakReference;
     public String toHtml() {
         return "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\""
                 + "src=\"" + mSource + "\" "
+                + "name=\"" + name + "\" "
                 + "link=\""+getLink()+"\""+
                 (id == -1 ? "" : "id=\"" + id + "\"")//insert id if this came from a model
                 + ">";
     }
-    public static @Nullable MojiSpan fromHtml(String html){
-        if (!html.startsWith("<img")) return null;
-        return null;
+    public String toPlainText(){
+
+        String b62Id = Base62.fromBase10(id);
+        return  "[" + name + '.' + b62Id + (mLink == null ||mLink.isEmpty() ? "]" :
+                " " + mLink+"]");
     }
 }
