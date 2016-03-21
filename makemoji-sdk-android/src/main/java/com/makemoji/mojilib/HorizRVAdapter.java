@@ -37,7 +37,6 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
                 mil.addMojiModel(model, null);
             }
         });
-        Log.d("oncreate","oncreateviewholder");
         return new RVHolder(v,parent);
     }
 

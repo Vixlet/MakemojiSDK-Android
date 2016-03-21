@@ -13,4 +13,9 @@
         android:orderInCategory="100"
         android:title="Detach EditText"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_plain_conversion"
+        android:orderInCategory="100"
+        android:title="Plaint Text and Back"
+        app:showAsAction="never" />
 </menu>

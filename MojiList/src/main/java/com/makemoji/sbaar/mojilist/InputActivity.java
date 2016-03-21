@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class InputActivity extends AppCompatActivity {
     MojiEditText outsideMojiEdit;
     MojiInputLayout mojiInputLayout;
-    boolean plainTextConversion = true;
+    boolean plainTextConversion = false;
 
     public static final String TAG = "InputActivity";
     @Override
@@ -46,12 +46,10 @@ public class InputActivity extends AppCompatActivity {
 
                 if (plainTextConversion) {
                     String plainText = Moji.htmlToPlainText(html);
-                    plainText = Moji.spannedToPlainText(spanned);
-                    Spanned convertedSpanned = Moji.plainTextToSpanned(plainText);
-                    Log.d(TAG, "plain text " + plainText);
-                    Log.d(TAG, "new spanned text " + convertedSpanned);
+                    String htmlFromPlain = Moji.plainTextToHtml(plainText);
+                    Log.d(TAG, "plain text " + plainText);//must convert to html to show new lines
                     MojiMessage message2 = new MojiMessage(plainText);
-                    MojiMessage message3 = new MojiMessage(Moji.toHtml(convertedSpanned));
+                    MojiMessage message3 = new MojiMessage(htmlFromPlain);
                     mAdapter.add(message2);
                     mAdapter.add(message3);
                 }
@@ -104,6 +102,9 @@ public class InputActivity extends AppCompatActivity {
             mojiInputLayout.detachMojiEditText();
             outsideMojiEdit.setVisibility(View.GONE);
             return true;
+        }
+        else if (id == R.id.action_plain_conversion){
+            plainTextConversion=!plainTextConversion;
         }
 
         return super.onOptionsItemSelected(item);

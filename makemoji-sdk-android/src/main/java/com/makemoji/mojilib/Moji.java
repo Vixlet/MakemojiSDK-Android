@@ -324,45 +324,39 @@ public class Moji {
         StringBuilder sb = new StringBuilder();
         int next;
         int end = spanned.length();
-        for (int i = 0; i < end; i = next) {
-            next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
+        for (int i = 0; i < end;) {
+            next = spanned.nextSpanTransition(i, i+1, CharacterStyle.class);
             MojiSpan[] style = spanned.getSpans(i, next,
                     MojiSpan.class);
-            if (style.length>0)//if the mojispan has length >1, ignore the rest
-                for (int j = 0; j < style.length; j++) {
-                    sb.append(style[j].toPlainText());
+            if (style.length>0){//if the mojispan has length >1, ignore the rest
+                    sb.append(style[0].toPlainText());
+                    i += spanned.getSpanEnd(style[0])-spanned.getSpanStart(style[0]);
                 }
-            else
+            else {
                 sb.append(spanned.charAt(i));
+                i++;
+            }
         }
-        String s =sb.toString();
-        s = s.replace("<br \\>","\n");
-        s = s.replace("<br\\>","\n");
-        return s;
+        return sb.toString();
     }
     @WorkerThread
     public static String htmlToPlainText(String html){
         return spannedToPlainText(parseHtml(html,null,true,false).spanned);
     }
-    static Pattern plainMojiRegex = Pattern.compile("(?:\\[(\\S*)\\.([^\\[\\s]+)(?:\\s*)( [^\\]\\s]+)?\\])");
+    static Pattern plainMojiRegex = Pattern.compile("\\[([^\\.]+)\\.([^\\[\\]\\s]+)( [^\\]\\s]+)?\\]");
     @WorkerThread
     public static String plainTextToHtml(String plainText){
-        return toHtml(plainTextToSpanned(plainText,false));
+        return toHtml(plainTextToSpanned(plainText));
     }
-    @WorkerThread
-    public static Spanned plainTextToSpanned(String plainText) {
-        return plainTextToSpanned(plainText,false);
-    }
-    @WorkerThread
-    public static Spanned plainTextToSpanned(String plainText,boolean paddingForEditText){
+    public static Spanned plainTextToSpanned(String plainText){
         String modifiedText = plainText;
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         List<MojiSpan> spans = new ArrayList<>();
         Matcher m = plainMojiRegex.matcher(modifiedText);
-        if (!m.matches())
+        if (!m.find())
             return new SpannableStringBuilder(plainText);
-
-        while (m.matches()){
+        m.reset();
+        while (m.find()){
             String name = m.group(1);
             String idString = m.group(2);
             String url = m.group(3);
@@ -370,6 +364,10 @@ public class Moji {
             MojiModel model = MojiSQLHelper.getInstance(context).get(id);
             if (model ==null){
                 Log.d("Make Moji plain text", "cannot find emoji with id "+ id);
+                model = new MojiModel(name,"http://s3.amazonaws.com/me-source/emoji/854@2x.png");
+                model.link_url = url;
+                MojiSpan mojiSpan = MojiSpan.fromModel(model,null,null);
+                spans.add(mojiSpan);
                 modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
                 m = plainMojiRegex.matcher(modifiedText);
                 continue;
@@ -388,6 +386,7 @@ public class Moji {
             if (MojiEditText.replacementChar.equals(c) && spanCount<spans.size()){
                 ssb.setSpan(spans.get(spanCount), i,i+1,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spanCount++;
             }
         }
         return ssb;
@@ -419,7 +418,6 @@ public class Moji {
             }
             else if (c =='\n'){
                 out.append("<br \\>");
-                i++;
             } else if (c > 0x7E || c < ' ') {
                 out.append("&#").append((int) c).append(";");
             }
