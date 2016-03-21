@@ -44,7 +44,7 @@ public class InputActivity extends AppCompatActivity {
                 MojiMessage mojiMessage = new MojiMessage(html);
                 mAdapter.add(mojiMessage);
 
-                if (plainTextConversion) {
+                if (plainTextConversion) {//not needed usually, only to facilitate sharing to 3rd party places legibly
                     String plainText = Moji.htmlToPlainText(html);
                     String htmlFromPlain = Moji.plainTextToHtml(plainText);
                     Log.d(TAG, "plain text " + plainText);//must convert to html to show new lines
