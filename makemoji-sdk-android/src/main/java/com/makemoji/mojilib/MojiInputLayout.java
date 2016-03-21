@@ -555,8 +555,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             editText.setMovementMethod(LinkMovementMethod.getInstance());
         }
-        editText.setText(ssb);
-        Moji.subSpanimatable(ssb,editText);
+        Moji.setText(ssb,editText);
         editText.setSelection(selectionStart+3);
     }
 

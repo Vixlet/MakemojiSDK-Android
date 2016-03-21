@@ -52,6 +52,7 @@ public class InputActivity extends AppCompatActivity {
                     MojiMessage message3 = new MojiMessage(htmlFromPlain);
                     mAdapter.add(message2);
                     mAdapter.add(message3);
+                    mAdapter.add(mojiMessage);
                 }
                 return true;
             }
@@ -69,14 +70,6 @@ public class InputActivity extends AppCompatActivity {
             }
         });
 
-        //we want the edit text in the moji input layout to show the keyboard on creation, but not when we come back to the activity.
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-            }
-        },1000);
 
     }
 

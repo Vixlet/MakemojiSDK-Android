@@ -350,7 +350,7 @@ public class Moji {
         return toHtml(plainTextToSpanned(plainText));
     }
     public static Base62 base62 = new Base62();
-    public static Spanned plainTextToSpanned(String plainText){
+    private static Spanned plainTextToSpanned(String plainText){
         String modifiedText = plainText;
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         List<MojiSpan> spans = new ArrayList<>();

@@ -55,7 +55,7 @@ import java.lang.ref.WeakReference;
     private float mFontRatio;
 
     // to make mojis stand out from text, always multiply the size by this
-    private static float BASE_SIZE_MULT = 1.0f;
+    public static float BASE_SIZE_MULT = 1.0f;
 
     //proportion to size the moji on next frame when being animated;
     private float currentAnimationScale = 1f;
@@ -329,8 +329,7 @@ if (mSource!=null && !mSource.isEmpty())
         return  "[" + name + '.' + b62Id + (mLink == null ||mLink.isEmpty() ? "]" :
                 " " + mLink+"]");
     }
-    @Override
-    public boolean equals (Object o){
+    public boolean equivelant (Object o){
         MojiSpan other;
         if (o instanceof MojiSpan)
             other = (MojiSpan) o;

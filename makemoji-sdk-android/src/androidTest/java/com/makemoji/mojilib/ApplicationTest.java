@@ -80,7 +80,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         String html = Moji.toHtml(ssb);
         Spanned newSpanned = Moji.parseHtml(html,null,true).spanned;
-        assertTrue(ssb.equals(newSpanned));
+        assertTrue(SSBEquals(ssb,newSpanned));
 
     }
     @Test
@@ -94,6 +94,39 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         String newHtml = Moji.toHtml(spanned);
         assertEquals(originalHtml,newHtml);
 
+    }
+
+    public boolean SSBEquals(SpannableStringBuilder ssb, Object o){
+        if (o instanceof Spanned &&
+                toString().equals(o.toString())) {
+            Spanned other = (Spanned) o;
+            // Check span data
+            Object[] otherSpans = other.getSpans(0, other.length(), Object.class);
+            Object[] mSpans = ssb.getSpans(0, other.length(), Object.class);
+            if (mSpans.length == otherSpans.length) {
+                for (int i = 0; i < mSpans.length; ++i) {
+                    Object thisSpan = mSpans[i];
+                    Object otherSpan = otherSpans[i];
+                    if (thisSpan == this) {
+                        if (other != otherSpan ||
+                                ssb.getSpanStart(thisSpan) != other.getSpanStart(otherSpan) ||
+                                ssb.getSpanEnd(thisSpan) != other.getSpanEnd(otherSpan) ||
+                                ssb.getSpanFlags(thisSpan) != other.getSpanFlags(otherSpan)) {
+                            return false;
+                        }
+                    } else if (
+                            ssb.getSpanStart(thisSpan) != other.getSpanStart(otherSpan) ||
+                            ssb.getSpanEnd(thisSpan) != other.getSpanEnd(otherSpan) ||
+                            ssb.getSpanFlags(thisSpan) != other.getSpanFlags(otherSpan)
+                            || !(otherSpan instanceof MojiSpan && thisSpan instanceof MojiSpan &&
+                                    ((MojiSpan) otherSpan).equivelant(thisSpan))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 }
