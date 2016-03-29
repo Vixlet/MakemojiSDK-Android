@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/MojiList" />
             <option value="$PROJECT_DIR$/makemoji-sdk-android" />
+            <option value="$PROJECT_DIR$/mojiKB" />
           </set>
         </option>
         <option name="myModules">
@@ -19,6 +20,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/MojiList" />
             <option value="$PROJECT_DIR$/makemoji-sdk-android" />
+            <option value="$PROJECT_DIR$/mojiKB" />
           </set>
         </option>
       </GradleProjectSettings>

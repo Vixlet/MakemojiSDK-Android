@@ -114,8 +114,7 @@ public class Moji {
 
         Picasso.Builder builder = new Picasso.Builder(context);
 
-        int cacheSieBytes = calculateMemoryCacheSize(context);
-        builder.memoryCache(new LruCache(cacheSieBytes));
+        builder.memoryCache(new LruCache(cacheSizeBytes));
         //builder.loggingEnabled(true);
         picasso = builder.build();
         SharedPreferences sp = app.getSharedPreferences("_mm_id",0);
