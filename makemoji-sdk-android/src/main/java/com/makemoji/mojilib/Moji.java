@@ -299,7 +299,7 @@ public class Moji {
         int next;
         int end = spanned.length();
         for (int i = 0; i < end; i = next) {
-            next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
+            next = spanned.nextSpanTransition(i, end, MojiSpan.class);
             MojiSpan[] style = spanned.getSpans(i, next,
                     MojiSpan.class);
             if (style.length>0)//if the mojispan has length >1, ignore the rest
@@ -325,7 +325,7 @@ public class Moji {
         int next;
         int end = spanned.length();
         for (int i = 0; i < end;) {
-            next = spanned.nextSpanTransition(i, i+1, CharacterStyle.class);
+            next = spanned.nextSpanTransition(i, i+1, MojiSpan.class);
             MojiSpan[] style = spanned.getSpans(i, next,
                     MojiSpan.class);
             if (style.length>0){//if the mojispan has length >1, ignore the rest

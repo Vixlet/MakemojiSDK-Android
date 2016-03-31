@@ -632,7 +632,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     }
                     String html = Moji.toHtml(ssb);
                     Moji.mojiApi.sendPressed(html);
-                    if (sendClickListener.onClick(Moji.toHtml(ssb),ssb))
+                    if (sendClickListener.onClick(html,ssb))
                         editText.setText("");
                 }
             }
