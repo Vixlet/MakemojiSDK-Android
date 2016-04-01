@@ -21,7 +21,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
 
-    libraryVersion = '0.9.52'
+    libraryVersion = '0.9.54'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'

@@ -2,7 +2,10 @@ package com.makemoji.mojilib.model;
 
 
 import android.content.SharedPreferences;
+import android.support.annotation.WorkerThread;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.makemoji.mojilib.Moji;
 
 import org.json.JSONArray;
@@ -16,6 +19,7 @@ import java.util.List;
  * Created by Scott Baar on 1/9/2016.
  */
 public class MojiModel {
+    static Gson gson = new Gson();
     public int id;
     public String user_id;
     public String origin_id;
@@ -33,6 +37,11 @@ public class MojiModel {
     public int likes;
     public String character;
 
+    @SerializedName("native")
+    public boolean _native;
+    public boolean phrase;
+    public List<MojiModel> emoji;
+
     public MojiModel(){}
     public MojiModel(String name, String image_url){
         this.name = name;
@@ -49,21 +58,43 @@ public class MojiModel {
     }
     public static JSONObject toJson(MojiModel m){
         if ( m.image_url==null||m.name==null)return null;//invalid object
+        try{
+            return new JSONObject(gson.toJson(m));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+        /*
         JSONObject jo = new JSONObject();
         try {
             jo.put("image_url", m.image_url);
             jo.put("link_url", m.link_url);
             jo.put("name", m.name);
             jo.put("id", m.id);
+            jo.put("phrase",m.phrase);
+            if (m.emoji!=null){
+                JSONArray ja = new JSONArray();
+                for (MojiModel emoji : m.emoji) ja.put(toJson(emoji));
+                jo.put("emoji",ja.toString());
+            }
         }
         catch (Exception e){e.printStackTrace();}
         return jo;
+        */
     }
     public static MojiModel fromJson(JSONObject jo){
-        MojiModel m= new MojiModel(jo.optString("name"),jo.optString("image_url"));
+       return gson.fromJson(jo.toString(),MojiModel.class);
+        /*MojiModel m= new MojiModel(jo.optString("name"),jo.optString("image_url"));
         m.link_url = jo.optString("link_url",null);
         m.id = jo.optInt("id",-1);
-        return m;
+        m.phrase = jo.optBoolean("phrase");
+        if (jo.has("emoji")){
+            JSONArray ja = jo.optJSONArray("emoji");
+            m.emoji = new ArrayList<>();
+            for (int i = 0; i < ja.length();i++) m.emoji.add
+        }
+        return m;*/
     }
     public static JSONArray toJsonArray(Collection<MojiModel> models){
         JSONArray ja = new JSONArray();
@@ -88,13 +119,14 @@ public class MojiModel {
     public String toString(){
         return ""+name;
     }
-
+    @WorkerThread
     public static void saveList(List<MojiModel> list,String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists2",0);
-        sp.edit().putString("name",toJsonArray(list).toString()).apply();
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists3",0);
+        sp.edit().putString(""+name,toJsonArray(list).toString()).apply();
     }
+    @WorkerThread
     public static List<MojiModel> getList(String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists2",0);
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists3",0);
         List<MojiModel> models;
         try{
             models = fromJSONArray(new JSONArray(sp.getString(name,"[]")));
@@ -103,4 +135,5 @@ public class MojiModel {
         }
         return models;
     }
+    public boolean isNative(){return _native;}
 }
