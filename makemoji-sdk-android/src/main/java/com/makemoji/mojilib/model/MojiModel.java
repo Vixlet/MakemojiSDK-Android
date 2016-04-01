@@ -38,8 +38,8 @@ public class MojiModel {
     public String character;
 
     @SerializedName("native")
-    public boolean _native;
-    public boolean phrase;
+    public int _native;
+    public int phrase;
     public List<MojiModel> emoji;
 
     public MojiModel(){}
@@ -121,12 +121,12 @@ public class MojiModel {
     }
     @WorkerThread
     public static void saveList(List<MojiModel> list,String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists3",0);
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists4",0);
         sp.edit().putString(""+name,toJsonArray(list).toString()).apply();
     }
     @WorkerThread
     public static List<MojiModel> getList(String name){
-        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists3",0);
+        SharedPreferences sp = Moji.context.getSharedPreferences("_mm_cached_lists4",0);
         List<MojiModel> models;
         try{
             models = fromJSONArray(new JSONArray(sp.getString(name,"[]")));
@@ -135,5 +135,6 @@ public class MojiModel {
         }
         return models;
     }
-    public boolean isNative(){return _native;}
+    public boolean isNative(){return _native==1;}
+    public boolean isPhrase(){return phrase==1;}
 }

@@ -39,6 +39,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     }
 
 
+   /* @Override public int getItemViewType(int position){
+        return mojiModels.get(position).phrase?1:0;
+    }*/
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
