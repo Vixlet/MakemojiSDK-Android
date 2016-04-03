@@ -319,7 +319,6 @@ public class Moji {
      * @param spanned
      * @return
      */
-    @WorkerThread
     public static String spannedToPlainText(Spanned spanned){
         StringBuilder sb = new StringBuilder();
         int next;
@@ -349,7 +348,8 @@ public class Moji {
         return toHtml(plainTextToSpanned(plainText));
     }
     public static Base62 base62 = new Base62();
-    private static Spanned plainTextToSpanned(String plainText){
+    @WorkerThread
+    public static Spanned plainTextToSpanned(String plainText){
         String modifiedText = plainText;
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         List<MojiSpan> spans = new ArrayList<>();

@@ -4,7 +4,6 @@
     android:src="@drawable/mm_dotted_square"
     android:paddingTop="2dp"
     android:paddingBottom="2dp"
-    android:adjustViewBounds="true"
     android:layout_height="match_parent">
 
 </com.makemoji.mojilib.MojiImageView>

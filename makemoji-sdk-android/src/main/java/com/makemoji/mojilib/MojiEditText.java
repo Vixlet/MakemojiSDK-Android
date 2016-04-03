@@ -3,9 +3,12 @@ package com.makemoji.mojilib;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -184,4 +187,36 @@ public class MojiEditText extends EditText {
         }
 
     }
+
+    @Override
+    public Parcelable onSaveInstanceState()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putString("html",Moji.toHtml(getText()));
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state)
+    {
+        String html = null;
+        if (state instanceof Bundle)
+        {
+            Bundle bundle = (Bundle) state;
+            html = bundle.getString("html",null);
+            state = bundle.getParcelable("superState");
+        }
+        super.onRestoreInstanceState(state);
+        if (html ==null) return;
+        final String storedHtml = html;
+        post(new Runnable() {//let the ui thread handle it when it's free.
+            @Override
+            public void run() {
+               Moji.setText(storedHtml,MojiEditText.this,true,true);
+            }
+        });
+
+    }
+
 }

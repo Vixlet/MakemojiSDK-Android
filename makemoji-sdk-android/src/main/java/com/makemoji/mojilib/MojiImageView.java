@@ -5,8 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.makemoji.mojilib.model.MojiModel;
@@ -39,10 +41,13 @@ class MojiImageView extends ImageView  implements Spanimatable{
 //http://stackoverflow.com/questions/12166476/android-canvas-drawtext-set-font-size-from-width
     Bitmap makeBMFromString(int dimen,String s){
         Paint paint = new Paint();
+        int adJusteddimen=dimen - 2*(getPaddingTop()+getPaddingBottom());
+        //paint.setStyle(Paint.Style.FILL);
+       // paint.setTextAlign(Paint.Align.LEFT);
         Bitmap image = Bitmap.createBitmap(dimen,dimen, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
 
-        final float testTextSize = 48f;
+        final float testTextSize = 250f;
 
         // Get the bounds of the text, using our testTextSize.
         paint.setTextSize(testTextSize);
@@ -50,17 +55,20 @@ class MojiImageView extends ImageView  implements Spanimatable{
         paint.getTextBounds(s, 0, s.length(), bounds);
 
         // Calculate the desired size as a proportion of our testTextSize.
-        float desiredTextSize = testTextSize * dimen / bounds.width();
-
+        float desiredTextSize = testTextSize * adJusteddimen / Math.max(bounds.height(),bounds.width());
         // Set the paint for that size.
+        //paint.setTextSize(Math.min(desiredTextSize,testTextSize*2f));
         paint.setTextSize(desiredTextSize);
+        paint.getTextBounds(s, 0, s.length(), bounds);
 
-        canvas.drawText(s,0,-paint.ascent(),paint);
+        //Log.d(VIEW_LOG_TAG,model.name + " " + model.character + " " +bounds.top + " "+ bounds.bottom + " "+ paint.getTextSize());
+        canvas.drawText(s,-bounds.left, -bounds.top +getPaddingBottom(),paint);
         return image;
     }
     public void setModel(MojiModel m){
         if (m.equals(model))return;
         model = m;
+        Moji.picasso.cancelRequest(this);
         setContentDescription(""+model.name);
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
@@ -69,7 +77,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                             .resize(size, size)
                             .placeholder(d).into(this);
             } else {
-                setImageBitmap(makeBMFromString(forceDimen, m.character));
+                setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));
                 //setScaleType(ScaleType.CENTER_INSIDE);
 
             }

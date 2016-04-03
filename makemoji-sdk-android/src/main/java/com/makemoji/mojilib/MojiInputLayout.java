@@ -67,6 +67,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     HorizRVAdapter adapter;
 
     @ColorInt int headerTextColor;
+    @ColorInt int phraseBgColor;
     @DrawableRes int backSpaceDrawableRes;
     public interface SendClickListener{
         /**
@@ -101,6 +102,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         int buttonColor = a.getColor(R.styleable.MojiInputLayout__mm_leftButtonColor,ContextCompat.getColor(getContext(),R.color._mm_left_button_cf));
         Drawable buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
         headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor,ContextCompat.getColor(getContext(),R.color._mm_header_text_color));
+        phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
         @ColorInt int mainBgColor = a.getColor(R.styleable.MojiInputLayout__mm_mainBgColor,ContextCompat.getColor(getContext(),R.color._mm_top_layout_bg));
         a.recycle();

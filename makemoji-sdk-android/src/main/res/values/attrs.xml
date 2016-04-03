@@ -10,5 +10,6 @@
         <attr name="_mm_leftContainerDrawable" format="integer"/>
         <attr name="_mm_headerTextColor" format="color"/>
         <attr name="_mm_mainBgColor" format="color"/>
+        <attr name="_mm_phraseBgColor" format="color"/>
     </declare-styleable>
 </resources>

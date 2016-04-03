@@ -40,7 +40,7 @@ public class MojiModel {
     @SerializedName("native")
     public int _native;
     public int phrase;
-    public List<MojiModel> emoji;
+    public List<MojiModel> emoji = new ArrayList<>();
 
     public MojiModel(){}
     public MojiModel(String name, String image_url){
