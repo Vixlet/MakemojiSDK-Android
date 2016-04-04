@@ -73,7 +73,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout);
         for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
         tabLayout.setOnTabSelectedListener(this);
-        tabs.get(0).select();
+
         inputView.findViewById(R.id.kb_backspace_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +91,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         inputView.findViewById(R.id.share_kb_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCurrentInputConnection().setComposingText(" Check out the MakeMoji: Keyboard " +
+                getCurrentInputConnection().setComposingText(" Check out the MakeMoji Keyboard " +
                         "http://play.google.com/store/apps/details?id="+BuildConfig.APPLICATION_ID+ " ",1);
                 getCurrentInputConnection().finishComposingText();
             }
@@ -103,6 +103,13 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
     @Override public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         packageName = attribute.packageName;
+    }
+    boolean firstStart =true;
+    @Override
+    public void onStartInputView(EditorInfo info, boolean restarting){
+        if (firstStart)
+            onTabSelected(tabLayout.getTabAt(0));
+        firstStart=false;
 
     }
 

@@ -18,7 +18,10 @@
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
 
-        <activity android:name=".ImePreferences" android:label="@string/settings_name">
+        <activity android:name="ActivateActivity" android:label="MakeMoji Keyboard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />

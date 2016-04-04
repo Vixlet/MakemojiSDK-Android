@@ -26,6 +26,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:tabMode="scrollable"
+            app:tabIndicatorColor="@android:color/transparent"
             />
         <ImageView
             android:id="@+id/kb_backspace_button"

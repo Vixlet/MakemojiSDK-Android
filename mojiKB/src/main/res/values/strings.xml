@@ -12,8 +12,9 @@
     <string name="label_send_key">Send</string>
 
     <!-- Labels for subtype -->
-    <string name="label_subtype_generic">%s</string>
+    <string name="label_subtype_generic">%s MakeMoji Keyboard</string>
     <string name="label_subtype_en_GB">English (GB)</string>
+    <string name="label_subtype_en_US">MakeMoji Keyboard</string>
 
     <!-- Titles for ImePreference -->
     <string name="settings_name">Sample Soft Keyboard Settings</string>

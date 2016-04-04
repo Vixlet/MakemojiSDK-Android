@@ -9,17 +9,15 @@ import java.util.List;
  * Created by DouglasW on 3/29/2016.
  */
 public class KBCategory {
-    private static String [] categories = {"trending","animals","objects","clothing","sports",
-            "pop culture","politics","hands","food","expression"};
-    private static int [] icons = {R.drawable.trending,R.drawable.animals,R.drawable.objects,R.drawable.clothing,R.drawable.sports,
-            R.drawable.popculture,R.drawable.politics,R.drawable.hands,R.drawable.food,R.drawable.expression};
-    public static int getCount(){
-        return categories.length;
-    }
+    private static String [] categories = {"trending","animals","clothing","expression","food",
+            "hands","objects","politics","pop culture","sports"};
+    private static int [] icons = {R.drawable.trending,R.drawable.animals,R.drawable.clothing,R.drawable.expression,R.drawable.food,
+            R.drawable.hands,R.drawable.objects,R.drawable.politics,R.drawable.popculture,R.drawable.sports};
     public static List<TabLayout.Tab> getTabs(TabLayout tabLayout){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         for (int i = 0; i<categories.length;i++){
-            tabs.add(tabLayout.newTab().setContentDescription(categories[i]).setIcon(icons[i])/*.setText(categories[i])*/);
+            tabs.add(tabLayout.newTab().setCustomView(R.layout.kb_tab).
+                    setContentDescription(categories[i]).setIcon(icons[i])/*.setText(categories[i])*/);
         }
         return tabs;
     }

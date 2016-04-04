@@ -21,12 +21,7 @@
 <!-- for the Search Manager. -->
 
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-        android:settingsActivity="com.example.android.softkeyboard.ImePreferences"
+        android:settingsActivity="com.makemoji.keyboard.ActivateActivity"
         android:supportsSwitchingToNextInputMethod="true"
 >
-    <subtype
-        android:label="@string/label_subtype_generic"
-        android:icon="@drawable/icon_en_us"
-        android:imeSubtypeLocale="en_US"
-        android:imeSubtypeMode="keyboard" />
 </input-method>
