@@ -105,12 +105,12 @@ public class Spanimator {
         if (hyperAnimation!=null)return (float)hyperAnimation.getAnimatedValue();
         else return HYPER_PULSE_MIN;
     }
-    static void onResume(){
+    public static void onResume(){
         mPaused=false;
        // Log.d("Spanimator","spanimator lifecycle resume");
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
     }
-    static void onPause(){
+   public static void onPause(){
         mPaused=true;
         //Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();

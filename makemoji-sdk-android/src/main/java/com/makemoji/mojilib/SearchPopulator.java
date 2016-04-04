@@ -14,12 +14,11 @@ import retrofit2.Response;
  * Created by Scott Baar on 1/25/2016.
  */
 public class SearchPopulator extends PagerPopulator<MojiModel> {
-    PopulatorObserver obs;
     MojiSQLHelper mojiSQLHelper;
     String currentQuery = "";
     @Override
-    protected void setup(PopulatorObserver observer) {
-        obs = observer;
+    public void setup(PopulatorObserver observer) {
+        super.setup(observer);
         mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context);
         Moji.mojiApi.getFlashtags().enqueue(new SmallCB<List<MojiModel>>() {
             @Override
@@ -34,7 +33,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
     }
 
     @Override
-    List<MojiModel> populatePage(int count, int offset) {
+    public List<MojiModel> populatePage(int count, int offset) {
         if (mojiModels.size()<offset)return new ArrayList<>();
         if (offset+count>mojiModels.size())count = mojiModels.size()-offset;
         return mojiModels.subList(offset,offset+count);
@@ -54,7 +53,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                     }
                     if (runQuery.equals(currentQuery)){
                         mojiModels = response.body();
-                        obs.onNewDataAvailable();
+                        if (obs!=null)obs.onNewDataAvailable();
 
                     }
                 }
@@ -70,7 +69,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                         public void run() {
                             if (runQuery.equals(currentQuery)){
                                 mojiModels = models;
-                                obs.onNewDataAvailable();
+                                if (obs!=null) obs.onNewDataAvailable();
                             }
                         }
                     });

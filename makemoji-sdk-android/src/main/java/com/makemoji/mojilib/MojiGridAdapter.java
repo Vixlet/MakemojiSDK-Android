@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import android.content.Context;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
@@ -22,18 +23,23 @@ import java.util.List;
 public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder>
 {
     List<MojiModel> mojiModels = new ArrayList<>();
-    MojiInputLayout mojiInputLayout;
     final int ROWS;
     int spanSize;
     Drawable phraseBg;
+    ClickAndStyler clickAndStyler;
+    public interface ClickAndStyler{
+        void addMojiModel(MojiModel model,BitmapDrawable d);
+        Context getContext();
+        int getPhraseBgColor();
+    }
 
-    public MojiGridAdapter (List<MojiModel> models, MojiInputLayout mojiInputLayout,int rows, int spanSize) {
+    public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,int rows, int spanSize) {
         mojiModels = models;
-        this.mojiInputLayout = mojiInputLayout;
+        this.clickAndStyler = clickAndStyler;
         ROWS = rows;
         this.spanSize = spanSize;
-        phraseBg = ContextCompat.getDrawable(mojiInputLayout.getContext(),R.drawable.mm_phrase_bg);
-        phraseBg.setColorFilter(mojiInputLayout.phraseBgColor, PorterDuff.Mode.SRC);
+        phraseBg = ContextCompat.getDrawable(clickAndStyler.getContext(),R.drawable.mm_phrase_bg);
+        phraseBg.setColorFilter(clickAndStyler.getPhraseBgColor(), PorterDuff.Mode.SRC);
     }
 
     public void setMojiModels(List<MojiModel> models){
@@ -76,7 +82,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
         public void onClick(View v) {
-            mojiInputLayout.addMojiModel(model, null);
+            clickAndStyler.addMojiModel(model, null);
                 }
             });
         }
@@ -86,7 +92,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 @Override
                 public void onClick(View v) {
                     for (MojiModel emoji : model.emoji)
-                        mojiInputLayout.addMojiModel(emoji,null);
+                        clickAndStyler.addMojiModel(emoji,null);
                 }
             });
             while (holder.mojiImageViews.size()<model.emoji.size()) {

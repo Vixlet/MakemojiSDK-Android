@@ -51,7 +51,7 @@ import java.lang.ref.WeakReference;
     public static int DEFAULT_INCOMING_IMG_WH = 20;
 
     //the text size in pixels, determined by BASE_TEXT_PT and screen density
-    static float BASE_TEXT_PX_SCALED;
+    public static float BASE_TEXT_PX_SCALED;
     private float mFontRatio;
 
     // to make mojis stand out from text, always multiply the size by this

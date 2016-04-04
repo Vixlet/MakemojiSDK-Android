@@ -47,17 +47,18 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
 
     }
     @Override
-    protected void setup(PopulatorObserver observer) {
+    public void setup(PopulatorObserver observer) {
+        super.setup(observer);
         observer.onNewDataAvailable();
     }
 
     @Override
-    List<MojiModel> populatePage(int count, int offset){
+    public List<MojiModel> populatePage(int count, int offset){
         if (getRecents().size()<offset)return new ArrayList<>();//return empty
         if (offset+count>getRecents().size())count = getRecents().size()-offset;
         return new ArrayList<>(getRecents().subList(offset,offset+count));
     }
-    int getTotalCount(){
+    public int getTotalCount(){
         return getRecents().size();
     };
 

@@ -2,22 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:background="@color/candidate_recommended"
+    android:background="@color/_mm_top_layout_bg"
 
     app:theme="@style/AppTheme"
     android:theme="@style/AppTheme"
     android:layout_height="wrap_content">
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        />
-    <android.support.design.widget.TabLayout
-        android:background="@color/_mm_horiz_rv_bg"
-        android:id="@+id/tabs"
+<include layout="@layout/kb_page"
+    />
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabMode="scrollable"
-        />
-
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:src="@drawable/keyboard"
+            android:id="@+id/kb_abc"
+            android:padding="2dp"
+            android:layout_height="match_parent" />
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:tabMode="scrollable"
+            />
+        <ImageView
+            android:id="@+id/kb_backspace_button"
+            android:padding="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/mm_backspace_grey600_24dp"
+            android:contentDescription="@string/_mm_backspace" />
+    </LinearLayout>
 </LinearLayout>

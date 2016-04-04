@@ -1,5 +1,6 @@
 package com.makemoji.sbaar.mojilist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -101,5 +102,18 @@ public class InputActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Handle intents coming from the makemoji keyboard to add them as inline emojis rather than just a picture.
+     * If the mojiinputlayout does not handle the intent, the handle it yourself by extracting the image for example.
+     * Make sure to have your activity launch mode be singleTop if possible! The incoming intent has to come with the NEW_TASK
+     * flag because it is not coming from an activity, but that can be overridden with launchMode="singleTop" in the manifest
+     * @param i intent
+     */
+    @Override
+    public void onNewIntent(Intent i){
+        super.onNewIntent(i);
+        boolean wasMMIntent = mojiInputLayout.handleIntent(i);
     }
 }

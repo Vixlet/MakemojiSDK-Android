@@ -67,7 +67,7 @@ public class Moji {
 
     //We use our own static import of Picasso to set our own caches, logging behavior, etc
     // and to not conflict with app-side picasso implementations
-    static Picasso picasso;
+    public static Picasso picasso;
 
     //our own html parser to create custom spans. keep one for each thread.
     private static Map<Long,SoftReference<Parser>> parsers =new HashMap<>();
@@ -76,8 +76,9 @@ public class Moji {
 
     static MojiApi mojiApi;
     //randomly seed some mojispans with links when in demo mode
-    static boolean demo = false;
     static Handler handler;
+    public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
+    public static final String EXTRA_MM = "com.makemoji.mojilib.EXTRA_MM";
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
@@ -274,8 +275,8 @@ public class Moji {
         if (largeHeap && SDK_INT >= HONEYCOMB) {
             memoryClass = ActivityManagerHoneycomb.getLargeMemoryClass(am);
         }
-        // Target ~5% of the available heap.
-        return 1024 * 1024 * memoryClass / 20;
+        // Target ~x% of the available heap.
+        return 1024 * 1024 * memoryClass / 12;
     }
     @TargetApi(HONEYCOMB)
     private static class ActivityManagerHoneycomb {

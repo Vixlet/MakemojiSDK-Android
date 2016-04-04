@@ -18,7 +18,7 @@ import retrofit2.Response;
  * Created by Scott Baar on 1/22/2016.
  */
 public class TrendingPopulator extends PagerPopulator<MojiModel> {
-    PopulatorObserver obs;
+
     MojiApi mojiApi;
     SharedPreferences sp;
     boolean cachedResponseServed;
@@ -29,7 +29,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
 
     @Override
     public void setup(PopulatorObserver o) {
-        this.obs = o;
+        super.setup(o);
         //look for cache
         new Thread(new Runnable() {
             @Override
@@ -42,7 +42,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
                             @Override
                             public void run() {
                                 mojiModels = cached;
-                                obs.onNewDataAvailable();
+                                if (obs!=null) obs.onNewDataAvailable();
                             }
                         });
                     }
@@ -66,7 +66,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
                 saveInBackground(networkModels);
                 if (!cachedResponseServed) {
                     mojiModels = networkModels;
-                    obs.onNewDataAvailable();
+                    if (obs!=null) obs.onNewDataAvailable();
                 }
 
             }

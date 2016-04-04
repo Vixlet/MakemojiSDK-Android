@@ -17,7 +17,6 @@ import retrofit2.Response;
  */
 public class CategoryPopulator extends PagerPopulator<MojiModel>  {
     Category category;
-    PopulatorObserver obs;
     MojiApi mojiApi;
     SharedPreferences sp;
     public CategoryPopulator(Category category){
@@ -29,10 +28,11 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
 
     @Override
     public void setup(PopulatorObserver o) {
-        this.obs = o;
+        super.setup(o);
         mojiModels = MojiModel.getList(category.name);
-        if (!mojiModels.isEmpty())
-            obs.onNewDataAvailable();
+        if (!mojiModels.isEmpty()) {
+            if (obs != null) obs.onNewDataAvailable();
+        }
         else
             mojiApi.getByCategory(category.name.replace(' ','_')).enqueue(new SmallCB<List<MojiModel>>() {
                 @Override
@@ -43,7 +43,7 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
                     }
                     mojiModels = response.body();
                     MojiModel.saveList(response.body(),category.name);
-                    obs.onNewDataAvailable();
+                    if (obs!=null) obs.onNewDataAvailable();
                 }
             });
     }

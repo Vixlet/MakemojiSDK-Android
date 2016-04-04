@@ -123,4 +123,5 @@ class MojiImageView extends ImageView  implements Spanimatable{
         setMeasuredDimension(forceDimen,forceDimen);
 
     }
+
 }

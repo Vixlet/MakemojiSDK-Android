@@ -1,6 +1,7 @@
 package com.makemoji.mojilib;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -34,6 +35,8 @@ import android.widget.LinearLayout;
 
 import com.makemoji.mojilib.model.MojiModel;
 
+import org.json.JSONObject;
+
 import java.util.Stack;
 
 /**
@@ -45,7 +48,7 @@ import java.util.Stack;
  *
  * Created by Scott Baar on 1/4/2016.
  */
-public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener{
+public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener, MojiGridAdapter.ClickAndStyler{
     ImageButton cameraImageButton;
     EditText editText;//active
     EditText myEditText;
@@ -528,7 +531,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.setText(ssb);
         editText.setSelection(Math.min(lastBang,ssb.length()));
     }
-    void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
+    @Override
+    public void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
         int selectionStart = editText.getSelectionStart();
         if (selectionStart==-1)selectionStart = editText.length();
@@ -559,6 +563,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
         Moji.setText(ssb,editText);
         editText.setSelection(selectionStart+3);
+    }
+
+    @Override
+    public int getPhraseBgColor() {
+        return phraseBgColor;
     }
 
     void onLeftClosed(){
@@ -639,5 +648,20 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 }
             }
         });
+    }
+    public boolean handleIntent(Intent i){
+        try {
+            if (i.hasExtra(Moji.EXTRA_JSON)) {
+                String s = i.getStringExtra(Moji.EXTRA_JSON);
+                JSONObject jo = new JSONObject(s);
+                MojiModel model = MojiModel.fromJson(jo);
+                if (model==null) return false;
+                addMojiModel(model,null);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 }
