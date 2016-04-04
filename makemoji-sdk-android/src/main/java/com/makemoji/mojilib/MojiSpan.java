@@ -150,36 +150,6 @@ if (mSource!=null && !mSource.isEmpty())
 
 
 
-    public Drawable getDrawable() {
-        Drawable drawable = null;
-
-        if (mDrawable != null) {
-            drawable = mDrawable;
-        } else  if (mContentUri != null) {
-            Bitmap bitmap = null;
-            try {
-                InputStream is = mContext.getContentResolver().openInputStream(
-                        mContentUri);
-                bitmap = BitmapFactory.decodeStream(is);
-                drawable = new BitmapDrawable(mContext.getResources(), bitmap);
-                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-                        drawable.getIntrinsicHeight());
-                is.close();
-            } catch (Exception e) {
-                Log.e("sms", "Failed to loaded content " + mContentUri, e);
-            }
-        } else {
-            try {
-                drawable = mContext.getResources().getDrawable(mResourceId);
-                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-                        drawable.getIntrinsicHeight());
-            } catch (Exception e) {
-                Log.e("sms", "Unable to find resource: " + mResourceId);
-            }
-        }
-
-        return drawable;
-    }
 
     /**
      * Returns the source string that was saved during construction.
@@ -302,7 +272,6 @@ if (mSource!=null && !mSource.isEmpty())
     }
     @Override
     public void onUnsubscribed(){
-        mDrawable = null;//get rid of hard reference to bitmap
     }
     public void onSubscribed(){
         if (mDrawableRef!=null && mDrawableRef.get()==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
