@@ -218,5 +218,8 @@ public class MojiEditText extends EditText {
         });
 
     }
+    protected void onSelectionChanged(int selStart, int selEnd) {
+       // Log.d("met","selection " + selStart + " " +(selStart %3));
+    }
 
 }

@@ -272,11 +272,14 @@ if (mSource!=null && !mSource.isEmpty())
     }
     @Override
     public void onUnsubscribed(){
+        mDrawable = null;
     }
     public void onSubscribed(){
-        if (mDrawableRef!=null && mDrawableRef.get()==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
+        if (mDrawableRef!= null)
+            mDrawable = mDrawableRef.get();
+        if (mDrawable==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
             Moji.picasso.load(mSource)
-                    //.resize(mWidth,mHeight)
+                    .resize(mWidth,mHeight)
                     .into(t);
     }
     public void setTextView(TextView tv){

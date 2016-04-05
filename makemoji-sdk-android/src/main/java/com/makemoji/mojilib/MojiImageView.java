@@ -38,6 +38,10 @@ class MojiImageView extends ImageView  implements Spanimatable{
         forceDimen = dimen;
 
     }
+    boolean pulseEnabled = true;
+    public void setPulseEnabled(boolean enable){
+        pulseEnabled = enable;
+    }
 //http://stackoverflow.com/questions/12166476/android-canvas-drawtext-set-font-size-from-width
     Bitmap makeBMFromString(int dimen,String s){
         Paint paint = new Paint();
@@ -81,7 +85,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                 //setScaleType(ScaleType.CENTER_INSIDE);
 
             }
-        if ((m.link_url==null || m.link_url.isEmpty())){
+        if (!pulseEnabled || (m.link_url==null || m.link_url.isEmpty())){
             Spanimator.unsubscribe(Spanimator.HYPER_PULSE,this);
             animate =false;
             setAlpha(255);

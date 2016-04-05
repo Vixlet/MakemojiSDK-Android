@@ -562,7 +562,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             editText.setMovementMethod(LinkMovementMethod.getInstance());
         }
         Moji.setText(ssb,editText);
-        editText.setSelection(selectionStart+3);
+        editText.setSelection(Math.min(selectionStart+3,editText.length()));
     }
 
     @Override
