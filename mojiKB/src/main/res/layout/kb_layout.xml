@@ -27,10 +27,14 @@
             android:layout_height="wrap_content"
             app:tabMode="scrollable"
             app:tabIndicatorColor="@android:color/transparent"
+            app:tabPaddingStart="-1dp"
+            app:tabPaddingEnd="-1dp"
+            app:tabMaxWidth="38dp"
             />
         <ImageView
             android:id="@+id/kb_backspace_button"
             android:padding="2dp"
+            android:layout_marginLeft="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/mm_backspace_grey600_24dp"

@@ -21,6 +21,7 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -300,13 +301,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     OnClickListener backspaceClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
-            int selectionStart = Math.max(editText.getSelectionStart()-1,0);
-            int selectionEnd = Math.min(selectionStart+1,editText.length());
-            if (selectionEnd==0)return;
-            ssb.delete(selectionStart,selectionEnd);
-            editText.setText(ssb);
-            editText.setSelection(Math.max(0, selectionStart - (ssb.length()-editText.getText().length())));
+            editText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DEL));
         }
     };
 

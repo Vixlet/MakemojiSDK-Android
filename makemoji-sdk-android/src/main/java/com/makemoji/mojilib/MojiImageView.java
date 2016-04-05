@@ -38,7 +38,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
         forceDimen = dimen;
 
     }
-    boolean pulseEnabled = true;
+    private boolean pulseEnabled = true;
     public void setPulseEnabled(boolean enable){
         pulseEnabled = enable;
     }

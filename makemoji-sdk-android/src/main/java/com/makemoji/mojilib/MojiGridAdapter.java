@@ -27,10 +27,14 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     int spanSize;
     Drawable phraseBg;
     ClickAndStyler clickAndStyler;
+    boolean enablePulse = true;
     public interface ClickAndStyler{
         void addMojiModel(MojiModel model,BitmapDrawable d);
         Context getContext();
         int getPhraseBgColor();
+    }
+    public void setEnablePulse(boolean enable){
+        enablePulse = enable;
     }
 
     public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,int rows, int spanSize) {
@@ -77,6 +81,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         final MojiModel model = mojiModels.get(position);
         Mojilytics.trackView(model.id);
         if (getItemViewType(position)==0) {
+            holder.imageView.setPulseEnabled(enablePulse);
             holder.imageView.forceDimen(holder.dimen);
             holder.imageView.setModel(model);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
@@ -96,8 +101,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 }
             });
             while (holder.mojiImageViews.size()<model.emoji.size()) {
-                View v = LayoutInflater.from(holder.itemView.getContext())
+                MojiImageView v = (MojiImageView)LayoutInflater.from(holder.itemView.getContext())
                         .inflate(R.layout.mm_rv_moji_item, ll, false);
+                v.setPulseEnabled(enablePulse);
                 ll.addView(v);
                 holder.mojiImageViews.add((MojiImageView)v);
             }

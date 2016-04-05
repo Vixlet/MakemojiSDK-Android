@@ -18,9 +18,11 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,7 +79,17 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         inputView.findViewById(R.id.kb_backspace_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCurrentInputConnection().deleteSurroundingText(1,0);
+                CharSequence selected = getCurrentInputConnection().getSelectedText(InputConnection.GET_TEXT_WITH_STYLES);
+                if (selected!=null){
+                    getCurrentInputConnection().commitText("",1);
+                    return;
+                }
+                CharSequence text = getCurrentInputConnection().getTextBeforeCursor(2, InputConnection.GET_TEXT_WITH_STYLES);
+                int deleteLength =1;
+                if (text.length()>1 && Character.isSurrogatePair(text.charAt(0),text.charAt(1)))
+                    deleteLength =2;
+                getCurrentInputConnection().deleteSurroundingText(deleteLength,0);
+                //getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DEL));
             }
         });
         inputView.findViewById(R.id.kb_abc).setOnClickListener(new View.OnClickListener() {
@@ -147,6 +159,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         mojisPerPage = Math.max(10, 8 * OneGridPage.ROWS);
         List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
         adapter = new MojiGridAdapter(models,this,OneGridPage.ROWS,size);
+        adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
         itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
         rv.addItemDecoration(itemDecoration);
