@@ -298,37 +298,11 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             deactiveButtons();
         }
     };
-    OnClickListener backspaceClick = new OnClickListener() {
+
+    Runnable backspaceRunnable = new Runnable() {
         @Override
-        public void onClick(View v) {
+        public void run() {
             editText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DEL));
-        }
-    };
-
-    OnTouchListener backspaceTouchListener = new OnTouchListener() {
-        boolean isPressed;
-        private Runnable backSpaceRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (isPressed){
-                    backspaceClick.onClick(null);
-                    postDelayed(this,120);
-                }
-            }
-        };
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    isPressed = true;
-                    postDelayed(backSpaceRunnable,200);
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    isPressed = false;
-
-            }
-            return false;
         }
     };
 

@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.makemoji.mojilib.BackSpaceDelegate;
 import com.makemoji.mojilib.CategoryPopulator;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
@@ -76,9 +77,9 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
         tabLayout.setOnTabSelectedListener(this);
 
-        inputView.findViewById(R.id.kb_backspace_button).setOnClickListener(new View.OnClickListener() {
+        Runnable backSpaceRunnable = new Runnable() {
             @Override
-            public void onClick(View v) {
+            public void run() {
                 CharSequence selected = getCurrentInputConnection().getSelectedText(InputConnection.GET_TEXT_WITH_STYLES);
                 if (selected!=null){
                     getCurrentInputConnection().commitText("",1);
@@ -89,9 +90,11 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
                 if (text.length()>1 && Character.isSurrogatePair(text.charAt(0),text.charAt(1)))
                     deleteLength =2;
                 getCurrentInputConnection().deleteSurroundingText(deleteLength,0);
-                //getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DEL));
+
             }
-        });
+        };
+
+        new BackSpaceDelegate(inputView.findViewById(R.id.kb_backspace_button),backSpaceRunnable);
         inputView.findViewById(R.id.kb_abc).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +123,12 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting){
         if (firstStart)
-            onTabSelected(tabLayout.getTabAt(0));
+            inputView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onTabSelected(tabLayout.getTabAt(0));
+                }
+            },10);
         firstStart=false;
 
     }

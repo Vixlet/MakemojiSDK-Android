@@ -62,9 +62,8 @@ public class MakeMojiPage implements PagerPopulator.PopulatorObserver{
             abc.setOnClickListener(mMojiInput.abcClick);
         }
         if (backSpace!=null) {
-            backSpace.setOnClickListener(mMojiInput.backspaceClick);
-            backSpace.setOnTouchListener(mMojiInput.backspaceTouchListener);
             backSpace.setImageResource(mMojiInput.backSpaceDrawableRes);
+            new BackSpaceDelegate(backSpace,mMojiInput.backspaceRunnable);
         }
         mIsSetup=true;
 
