@@ -74,9 +74,16 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
     }
 
 
-
+    //if this is not the sample app but is using the sample authority, don't allow it, or else it will stop other apps from installing.
+    public void assertAuthorityChanged(){
+        if (!"com.makemoji.sbaar.mojilist".equals(getContext().getApplicationInfo().packageName)
+                && "com.makemoji.keyboard.fileprovider".equals(getContext().getResources().getString(R.string._mm_provider_authority))){
+            throw new IllegalStateException("You must override _mm_provider_authority in strings.xml with a unique package name!! com.your.name.kbfileprovider ");
+        }
+    }
 
     @Override public View onCreateInputView() {
+        assertAuthorityChanged();
         inputView =  getLayoutInflater().inflate(
                 R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
@@ -217,7 +224,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
                         Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Uri uri = FileProvider.getUriForFile(getContext(),"com.makemoji.keyboard.fileprovider",cacheFile);
+                    Uri uri = FileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
                     PackageManager pm = getPackageManager();
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setPackage(packageName);
