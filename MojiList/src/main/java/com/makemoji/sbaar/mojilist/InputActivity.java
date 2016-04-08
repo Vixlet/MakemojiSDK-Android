@@ -100,6 +100,9 @@ public class InputActivity extends AppCompatActivity {
         else if (id == R.id.action_plain_conversion){
             plainTextConversion=!plainTextConversion;
         }
+        else if (id == R.id.action_kb_activate){
+            startActivity(new Intent(this,ActivateActivity.class));
+        }
 
         return super.onOptionsItemSelected(item);
     }

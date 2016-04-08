@@ -567,6 +567,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     public void setInputText(CharSequence cs){
         editText.setText(cs);
     }
+    public ImageButton getCameraImageButton(){
+        return cameraImageButton;
+    }
 
     boolean outsideEditText = false;
     public void attatchMojiEditText(@NonNull MojiEditText met){

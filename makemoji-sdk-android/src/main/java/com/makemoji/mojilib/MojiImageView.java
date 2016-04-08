@@ -45,9 +45,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
 //http://stackoverflow.com/questions/12166476/android-canvas-drawtext-set-font-size-from-width
     Bitmap makeBMFromString(int dimen,String s){
         Paint paint = new Paint();
-        int adJusteddimen=dimen - 2*(getPaddingTop()+getPaddingBottom());
-        //paint.setStyle(Paint.Style.FILL);
-       // paint.setTextAlign(Paint.Align.LEFT);
+        int adJusteddimen=dimen - 1*(getPaddingTop()+getPaddingBottom());
         Bitmap image = Bitmap.createBitmap(dimen,dimen, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
 
@@ -61,12 +59,11 @@ class MojiImageView extends ImageView  implements Spanimatable{
         // Calculate the desired size as a proportion of our testTextSize.
         float desiredTextSize = testTextSize * adJusteddimen / Math.max(bounds.height(),bounds.width());
         // Set the paint for that size.
-        //paint.setTextSize(Math.min(desiredTextSize,testTextSize*2f));
         paint.setTextSize(desiredTextSize);
         paint.getTextBounds(s, 0, s.length(), bounds);
 
         //Log.d(VIEW_LOG_TAG,model.name + " " + model.character + " " +bounds.top + " "+ bounds.bottom + " "+ paint.getTextSize());
-        canvas.drawText(s,-bounds.left, -bounds.top +getPaddingBottom(),paint);
+        canvas.drawText(s,-bounds.left + (dimen-bounds.width())/2, -bounds.top +getPaddingBottom()/2,paint);
         return image;
     }
     public void setModel(MojiModel m){

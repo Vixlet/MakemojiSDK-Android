@@ -33,6 +33,13 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name="com.makemoji.sbaar.mojilist.ActivateActivity"
+            android:label="MakeMoji Keyboard">
+            <intent-filter>
+                <action android:name="android.intent.action.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

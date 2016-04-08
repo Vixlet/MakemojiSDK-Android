@@ -1,4 +1,4 @@
-package com.makemoji.keyboard;
+package com.makemoji.sbaar.mojilist;
 
 import android.content.Intent;
 import android.provider.Settings;

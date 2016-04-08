@@ -18,4 +18,9 @@
         android:orderInCategory="100"
         android:title="Plain Text and Back"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_kb_activate"
+        android:orderInCategory="100"
+        android:title="Activate Keyboard"
+        app:showAsAction="never" />
 </menu>

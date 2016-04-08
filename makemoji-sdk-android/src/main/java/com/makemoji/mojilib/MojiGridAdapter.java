@@ -1,6 +1,7 @@
 package com.makemoji.mojilib;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
@@ -104,6 +105,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 MojiImageView v = (MojiImageView)LayoutInflater.from(holder.itemView.getContext())
                         .inflate(R.layout.mm_rv_moji_item, ll, false);
                 v.setPulseEnabled(enablePulse);
+                //v.setPadding(0,(int)(2*Moji.density),(int)(-5*Moji.density),(int)(2*Moji.density));
                 ll.addView(v);
                 holder.mojiImageViews.add((MojiImageView)v);
             }
@@ -115,6 +117,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                         mojiImageView.forceDimen(holder.dimen);
                         mojiImageView.setModel(sequence);
                         mojiImageView.setVisibility(View.VISIBLE);
+                        //mojiImageView.setBackgroundColor(i%2==1? Color.RED:Color.BLUE);
                     }
                     else mojiImageView.setVisibility(View.GONE);
                 }

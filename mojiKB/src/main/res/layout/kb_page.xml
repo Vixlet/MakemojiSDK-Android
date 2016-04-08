@@ -25,6 +25,7 @@
             android:paddingLeft="0dp"
             android:paddingRight="15dp"
             android:id="@+id/share_kb_tv"
+            android:visibility="invisible"
             android:textColor="@color/_mm_default_send_text_color"
             android:layout_height="wrap_content" />
     </LinearLayout>

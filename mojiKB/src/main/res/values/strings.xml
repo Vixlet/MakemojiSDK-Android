@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">MakeMoji Keyboard</string>
 
-    <string name="ime_name">MakeMoji Keyboard</string>
+    <string name="_mm_kb_label">MakeMoji Keyboard (Your App)</string>
+    <string name="_mm_kb_subtype_label">From Sample App</string>
+    <string name="_mm_kb_settings_activity">com.makemoji.keyboard.ActivateActivity</string>
 
     <!-- Symbols that are commonly considered word separators in this language -->
     <string name="word_separators">\u0020.,;:!?\n()[]*&amp;@{}/&lt;&gt;_+=|&quot;</string>
@@ -12,7 +13,7 @@
     <string name="label_send_key">Send</string>
 
     <!-- Labels for subtype -->
-    <string name="label_subtype_generic">%s MakeMoji Keyboard</string>
+    <string name="label_subtype_generic">2 MakeMoji Keyboard</string>
     <string name="label_subtype_en_GB">English (GB)</string>
     <string name="label_subtype_en_US">MakeMoji Keyboard</string>
 

@@ -132,6 +132,7 @@ public class MojiModel {
             models = fromJSONArray(new JSONArray(sp.getString(name,"[]")));
         }catch (Exception e){
             models = new ArrayList<>();
+            e.printStackTrace();
         }
         return models;
     }

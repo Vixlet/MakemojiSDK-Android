@@ -33,7 +33,6 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
         if (!mojiModels.isEmpty()) {
             if (obs != null) obs.onNewDataAvailable();
         }
-        else
             mojiApi.getByCategory(category.name.replace(' ','_')).enqueue(new SmallCB<List<MojiModel>>() {
                 @Override
                 public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {

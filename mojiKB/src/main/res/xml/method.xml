@@ -21,7 +21,7 @@
 <!-- for the Search Manager. -->
 
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-        android:settingsActivity="com.makemoji.keyboard.ActivateActivity"
+        android:settingsActivity="@string/_mm_kb_settings_activity"
         android:supportsSwitchingToNextInputMethod="true"
 >
 </input-method>

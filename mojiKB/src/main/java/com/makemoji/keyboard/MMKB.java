@@ -13,6 +13,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.inputmethodservice.InputMethodService;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,7 +25,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.InputMethodSubtype;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,10 +50,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
- * Created by DouglasW on 3/29/2016.
+ * Created by Scott Baar on 3/29/2016.
  */
 public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
         PagerPopulator.PopulatorObserver{
@@ -63,6 +68,12 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
     int mojisPerPage;
     MojiGridAdapter adapter;
     TextView heading, shareText;
+    static CharSequence shareMessage;
+    public static void setShareMessage( CharSequence message) {
+        shareMessage = message;
+    }
+
+
 
 
     @Override public View onCreateInputView() {
@@ -73,6 +84,9 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.ROWS, LinearLayoutManager.HORIZONTAL, false));
         heading = (TextView) inputView.findViewById(R.id.kb_page_heading);
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
+        if (shareMessage!=null){
+            shareText.setVisibility(View.VISIBLE);
+        }
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout);
         for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
         tabLayout.setOnTabSelectedListener(this);
@@ -106,9 +120,10 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         inputView.findViewById(R.id.share_kb_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCurrentInputConnection().setComposingText(" Check out the MakeMoji Keyboard " +
-                        "http://play.google.com/store/apps/details?id="+BuildConfig.APPLICATION_ID+ " ",1);
-                getCurrentInputConnection().finishComposingText();
+                if (shareMessage!=null) {
+                    getCurrentInputConnection().setComposingText(shareMessage, 1);
+                    getCurrentInputConnection().finishComposingText();
+                }
             }
         });
         return inputView;
@@ -212,6 +227,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
                     i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     i.putExtra(Moji.EXTRA_JSON, MojiModel.toJson(model).toString());
                     i.setType("image/*");
+                    List<ResolveInfo> bcs = pm.queryBroadcastReceivers(i,0);
                     List<ResolveInfo> ris = pm.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
                     if (ris.isEmpty()) {
                         Toast.makeText(getContext(), "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG).show();
@@ -223,6 +239,14 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
                     i.setPackage(ris.get(0).activityInfo.packageName);
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivity(i);
+
+                   /* Doesn't work
+                   Intent i2 = new Intent(getContext(),BlankActivity.class);
+                    i2.putExtra("uri",uri);
+                    i2.putExtra("package",ris.get(0).activityInfo.packageName);
+                    i2.putExtra(Moji.EXTRA_JSON,MojiModel.toJson(model).toString());
+                    i2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i2);*/
 
                 }
             }
