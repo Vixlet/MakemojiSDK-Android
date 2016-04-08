@@ -4,8 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MojiList.iml" filepath="$PROJECT_DIR$/MojiList.iml" />
       <module fileurl="file://$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" filepath="$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" />
+      <module fileurl="file://$PROJECT_DIR$/makemoji-3pk-android/makemoji-3pk-android.iml" filepath="$PROJECT_DIR$/makemoji-3pk-android/makemoji-3pk-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/makemoji-sdk-android/makemoji-sdk-android.iml" filepath="$PROJECT_DIR$/makemoji-sdk-android/makemoji-sdk-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mojiKB/mojiKB.iml" filepath="$PROJECT_DIR$/mojiKB/mojiKB.iml" />
     </modules>
   </component>
 </project>

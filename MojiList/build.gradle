@@ -39,7 +39,7 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
     //this will compile from source, creating an aar at mojilib/build/outputs/aar
     compile project(':makemoji-sdk-android')
-    compile project(':mojiKB')
+    compile project(':makemoji-3pk-android')
     //compile 'com.makemoji:makemoji-sdk-android:0.9.5'
 }
 repositories {
