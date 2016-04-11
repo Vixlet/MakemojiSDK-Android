@@ -53,7 +53,6 @@ public class InputActivity extends AppCompatActivity {
                     MojiMessage message3 = new MojiMessage(htmlFromPlain);
                     mAdapter.add(message2);
                     mAdapter.add(message3);
-                    mAdapter.add(mojiMessage);
                 }
                 return true;
             }

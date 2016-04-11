@@ -88,7 +88,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public @Nullable MojiModel get(int id){
         SQLiteDatabase db = this.getReadableDatabase();
         MojiModel mm = null;
-        String raw = "SELECT * FROM "+TABLE_MM + " WHERE "+COL_ID_INT + " = "+id;
+        String raw = "SELECT * FROM "+TABLE_MM + " WHERE "+COL_ID_INT + " = "+id +" AND "+ COL_CHARACTER +" IS NULL";
         Cursor c = db.rawQuery(raw,null);
         try{
             c.moveToFirst();
