@@ -9,6 +9,14 @@
     android:layout_height="wrap_content">
 <include layout="@layout/kb_page"
     />
+    <com.makemoji.keyboard.LatinKeyboardView
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:visibility="gone"
+        android:background="@android:color/white"
+        android:keyBackground="@drawable/mm_key_bg"
+        android:keyTextColor="@android:color/black"
+        android:id="@+id/_mm_kb_latin"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

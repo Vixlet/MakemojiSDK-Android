@@ -8,7 +8,7 @@
         android:allowBackup="true"
         android:theme="@style/AppTheme">
         <service
-            android:name=".MMKB"
+            android:name=".SoftKeyboard"
             android:label="@string/_mm_kb_label"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>

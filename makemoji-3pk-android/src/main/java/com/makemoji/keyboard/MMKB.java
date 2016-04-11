@@ -69,6 +69,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
     MojiGridAdapter adapter;
     TextView heading, shareText;
     static CharSequence shareMessage;
+    LatinKeyboardView mInputView;
     public static void setShareMessage( CharSequence message) {
         shareMessage = message;
     }
@@ -91,6 +92,7 @@ public class MMKB extends InputMethodService implements TabLayout.OnTabSelectedL
         rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.ROWS, LinearLayoutManager.HORIZONTAL, false));
         heading = (TextView) inputView.findViewById(R.id.kb_page_heading);
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
+        mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
         if (shareMessage!=null){
             shareText.setVisibility(View.VISIBLE);
         }
