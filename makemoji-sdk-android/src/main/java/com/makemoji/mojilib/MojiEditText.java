@@ -44,7 +44,7 @@ public class MojiEditText extends EditText {
     private void init(){
 
         //If any mojispans span less than three characters, remove them because a backspace has happened.
-        setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_FLAG_NO_FULLSCREEN);
         addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

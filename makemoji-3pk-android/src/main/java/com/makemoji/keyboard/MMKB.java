@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -344,6 +345,7 @@ public class MMKB extends InputMethodService
     }
 
     boolean firstStart =true;
+    int currentTab = 0;
     @Override public void onStartInputView(EditorInfo attribute, boolean restarting) {
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
@@ -351,15 +353,19 @@ public class MMKB extends InputMethodService
             inputView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    onTabSelected(tabLayout.getTabAt(0));
+                    tabLayout.getTabAt(currentTab).select();
                 }
-            },10);
+            },20);
         firstStart=false;
 
         setLatinKeyboard(mCurKeyboard);
         mInputView.closing();
   //      final InputMethodSubtype subtype = mInputMethodManager.getCurrentInputMethodSubtype();
 //        mInputView.setSubtypeOnSpaceKey(subtype);
+    }
+    @Override public void onConfigurationChanged(Configuration newConfig){
+        super.onConfigurationChanged(newConfig);
+        firstStart=true;
     }
     @Override
     public void onCurrentInputMethodSubtypeChanged(InputMethodSubtype subtype) {
@@ -815,6 +821,7 @@ public class MMKB extends InputMethodService
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
+        currentTab = tab.getPosition();
         heading.setText(tab.getContentDescription());
         if (populator!=null)populator.teardown();
         if ("keyboard".equals(tab.getContentDescription())){
@@ -842,7 +849,7 @@ public class MMKB extends InputMethodService
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
+        onTabSelected(tab);
     }
 
 
