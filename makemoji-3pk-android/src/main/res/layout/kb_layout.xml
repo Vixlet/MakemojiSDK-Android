@@ -4,8 +4,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:background="@color/_mm_top_layout_bg"
 
-    app:theme="@style/AppTheme"
-    android:theme="@style/AppTheme"
+    app:theme="@style/KBAppTheme"
+    android:theme="@style/KBAppTheme"
     android:layout_height="wrap_content">
 <include layout="@layout/kb_page"
     />
@@ -13,9 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="210dp"
         android:visibility="gone"
+        android:keyPreviewLayout="@layout/kb_preview_layout"
         android:background="@android:color/white"
         android:keyBackground="@drawable/mm_key_bg"
-        android:keyTextColor="@android:color/black"
+        android:keyTextColor="@color/_mm_black_87"
+        android:shadowRadius="0.0"
         android:id="@+id/_mm_kb_latin"/>
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,9 +26,11 @@
         android:orientation="horizontal">
         <ImageView
             android:layout_width="wrap_content"
-            android:src="@drawable/keyboard"
+            android:src="@drawable/mm_globe"
             android:id="@+id/kb_abc"
-            android:padding="2dp"
+            android:padding="1dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:layout_height="match_parent" />
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"

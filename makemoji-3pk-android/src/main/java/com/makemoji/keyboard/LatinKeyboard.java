@@ -87,18 +87,18 @@ public class LatinKeyboard extends Keyboard {
         if (visible) {
             // The language switch key should be visible. Restore the size of the mode change key
             // and language switch key using the saved layout.
-            mModeChangeKey.width = mSavedModeChangeKey.width;
-            mModeChangeKey.x = mSavedModeChangeKey.x;
-            mLanguageSwitchKey.width = mSavedLanguageSwitchKey.width;
-            mLanguageSwitchKey.icon = mSavedLanguageSwitchKey.icon;
-            mLanguageSwitchKey.iconPreview = mSavedLanguageSwitchKey.iconPreview;
+           // mModeChangeKey.width = mSavedModeChangeKey.width;
+         //   mModeChangeKey.x = mSavedModeChangeKey.x;
+           // mLanguageSwitchKey.width = mSavedLanguageSwitchKey.width;
+         //   mLanguageSwitchKey.icon = mSavedLanguageSwitchKey.icon;
+         //   mLanguageSwitchKey.iconPreview = mSavedLanguageSwitchKey.iconPreview;
         } else {
             // The language switch key should be hidden. Change the width of the mode change key
             // to fill the space of the language key so that the user will not see any strange gap.
-            mModeChangeKey.width = mSavedModeChangeKey.width + mSavedLanguageSwitchKey.width;
-            mLanguageSwitchKey.width = 0;
-            mLanguageSwitchKey.icon = null;
-            mLanguageSwitchKey.iconPreview = null;
+         //   mModeChangeKey.width = mSavedModeChangeKey.width + mSavedLanguageSwitchKey.width;
+       //     mLanguageSwitchKey.width = 0;
+       //     mLanguageSwitchKey.icon = null;
+      //      mLanguageSwitchKey.iconPreview = null;
         }
     }
 
@@ -113,27 +113,27 @@ public class LatinKeyboard extends Keyboard {
 
         switch (options&(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_FLAG_NO_ENTER_ACTION)) {
             case EditorInfo.IME_ACTION_GO:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_go_key);
+             //   mEnterKey.iconPreview = null;
+            //    mEnterKey.icon = null;
+              //  mEnterKey.label = res.getText(R.string.label_go_key);
                 break;
             case EditorInfo.IME_ACTION_NEXT:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_next_key);
+             //   mEnterKey.iconPreview = null;
+              //  mEnterKey.icon = null;
+               // mEnterKey.label = res.getText(R.string.label_next_key);
                 break;
             case EditorInfo.IME_ACTION_SEARCH:
-                mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_search);
-                mEnterKey.label = null;
+                //mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_search);
+                ///mEnterKey.label = null;
                 break;
             case EditorInfo.IME_ACTION_SEND:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_send_key);
+               // mEnterKey.iconPreview = null;
+                //mEnterKey.icon = null;
+               // mEnterKey.label = res.getText(R.string.label_send_key);
                 break;
             default:
-                mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
-                mEnterKey.label = null;
+               // mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
+              //  mEnterKey.label = null;
                 break;
         }
     }

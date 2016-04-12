@@ -10,7 +10,7 @@
         android:layout_height="36dp"
         android:id="@android:id/icon"
         android:background="@drawable/kb_tab_bg"
-        tools:src="@drawable/trending"
+        tools:src="@drawable/mm_trending"
         android:scaleType="centerInside"
         android:layout_gravity="center"
         >

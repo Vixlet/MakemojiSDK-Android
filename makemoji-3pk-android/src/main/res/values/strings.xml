@@ -1,6 +1,7 @@
 <resources>
 
     <string name="_mm_kb_label">MakeMoji Keyboard (Your App)</string>
+    <string name="_mm_kb_share_message">your app link here</string>
     <string name="_mm_provider_authority">com.makemoji.keyboard.fileprovider</string>
     <string name="_mm_kb_subtype_label">From Sample App</string>
     <string name="_mm_kb_settings_activity">com.makemoji.keyboard.ActivateActivity</string>

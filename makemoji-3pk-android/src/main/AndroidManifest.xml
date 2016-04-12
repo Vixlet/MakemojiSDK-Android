@@ -4,11 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application
-        android:allowBackup="true"
-        android:theme="@style/AppTheme">
+    <application>
         <service
-            android:name=".SoftKeyboard"
+            android:name=".MMKB"
             android:label="@string/_mm_kb_label"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -29,7 +27,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/mm_file_paths" />
         </provider>
 
     </application>

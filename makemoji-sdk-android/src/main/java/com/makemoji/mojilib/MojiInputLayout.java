@@ -302,6 +302,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     Runnable backspaceRunnable = new Runnable() {
         @Override
         public void run() {
+            int selection = editText.getSelectionStart();
+            CharSequence text = editText.getText();
+            if (selection>1){
+                if (isVariation(text.charAt(1))) {
+                    editText.getText().delete(selection - 2, selection);
+                    return;
+                }
+            }
             editText.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DEL));
         }
     };
@@ -505,6 +513,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
         int selectionStart = editText.getSelectionStart();
         if (selectionStart==-1)selectionStart = editText.length();
+
         if (model.character!= null && !model.character.isEmpty()){
             ssb.insert(selectionStart,model.character);
             editText.setText(ssb);
@@ -635,5 +644,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             e.printStackTrace();
         }
         return false;
+    }
+    public static boolean isVariation(char c){
+        return (c >65023 && c<65040);
     }
 }
