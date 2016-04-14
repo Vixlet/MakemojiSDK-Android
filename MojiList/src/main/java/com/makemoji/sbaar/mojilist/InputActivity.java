@@ -92,6 +92,7 @@ public class InputActivity extends AppCompatActivity {
             return true;
         }
         else if (id ==R.id.action_detach) {
+            mojiInputLayout.manualSaveInputToRecentsAndBackend();//send text for analytics, add emojis to recent.
             mojiInputLayout.detachMojiEditText();
             outsideMojiEdit.setVisibility(View.GONE);
             return true;

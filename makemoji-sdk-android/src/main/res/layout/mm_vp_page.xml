@@ -34,6 +34,7 @@
             android:layout_gravity="left"
             android:text="ABC"
             android:layout_height="wrap_content" />
+        <!--
         <com.viewpagerindicator.CirclePageIndicator
             app:fillColor="@color/_mm_left_button_cf"
             app:pageColor="@color/_mm_gradient_bottom"
@@ -43,6 +44,7 @@
             android:layout_weight="1"
             android:id="@+id/_mm_vp_indicator"
             />
+            -->
         <ImageView
             android:id="@+id/_mm_backspace_button"
             android:padding="6dp"

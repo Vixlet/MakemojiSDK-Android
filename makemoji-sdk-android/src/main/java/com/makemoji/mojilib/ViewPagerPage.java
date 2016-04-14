@@ -11,7 +11,7 @@ import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.makemoji.mojilib.model.MojiModel;
-import com.viewpagerindicator.CirclePageIndicator;
+//import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
     int count;
     VPAdapter vpAdapter;
     int mojisPerPage = 10;
-    CirclePageIndicator circlePageIndicator;
+    //CirclePageIndicator circlePageIndicator;
     public static final int ROWS = 5;
 
     public ViewPagerPage (String title,MojiInputLayout mojiInputLayout,PagerPopulator p){
@@ -35,7 +35,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         mPopulator = p;
         vp = (ViewPager) mView.findViewById(R.id._mm_moji_pager);
         vp.setOffscreenPageLimit(7);
-        circlePageIndicator = (CirclePageIndicator) mView.findViewById(R.id._mm_vp_indicator);
+       // circlePageIndicator = (CirclePageIndicator) mView.findViewById(R.id._mm_vp_indicator);
      //   VPAdapter vpAdapter = new VPAdapter();
       //  vp.setAdapter(vpAdapter);
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
@@ -63,7 +63,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
         mojisPerPage =Math.max(10,8 * ROWS);
         vpAdapter = new VPAdapter();
         vp.setAdapter(vpAdapter);
-        circlePageIndicator.setViewPager(vp);
+        //circlePageIndicator.setViewPager(vp);
         //vpAdapter.notifyDataSetChanged();
 
 

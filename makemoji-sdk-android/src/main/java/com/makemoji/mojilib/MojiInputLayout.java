@@ -586,12 +586,20 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
         horizontalLayout.setVisibility(View.GONE);
         outsideEditText = true;
+        met.addTextChangedListener(editTextWatcher);
+        myEditText.removeTextChangedListener(editTextWatcher);
+        editText.setSelection(editText.getText().length());
+        editTextWatcher.afterTextChanged(editText.getText());
     }
     public void detachMojiEditText(){
+        editText.removeTextChangedListener(editTextWatcher);
         editText = myEditText;
         horizontalLayout.setVisibility(View.VISIBLE);
         editText.requestFocus();
         outsideEditText = false;
+        editText.addTextChangedListener(editTextWatcher);
+        editText.setSelection(editText.getText().length());//set selection to end
+        editTextWatcher.afterTextChanged(editText.getText());
     }
 
     /**
@@ -616,19 +624,27 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             public void onClick(View v) {
                 if (sendClickListener!=null){
                     SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
-                    MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
-                    for (int i = 0; i< spans.length; i++){
-                        MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
-                        model.link_url = spans[i].getLink();
-                        RecentPopulator.addRecent(model);
-                    }
                     String html = Moji.toHtml(ssb);
-                    Moji.mojiApi.sendPressed(html);
+                    onSaveInputToRecentAndsBackend(ssb,html);
                     if (sendClickListener.onClick(html,ssb))
                         editText.setText("");
                 }
             }
         });
+    }
+    protected void onSaveInputToRecentAndsBackend(Spanned spanned, String html){
+        MojiSpan [] spans = spanned.getSpans(0,spanned.length(),MojiSpan.class);
+        for (int i = 0; i< spans.length; i++){
+            MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
+            model.link_url = spans[i].getLink();
+            RecentPopulator.addRecent(model);
+        }
+        Moji.mojiApi.sendPressed(html);
+    }
+    public void manualSaveInputToRecentsAndBackend(){
+        SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        String html = Moji.toHtml(ssb);
+        onSaveInputToRecentAndsBackend(ssb,html);
     }
     public boolean handleIntent(Intent i){
         try {
