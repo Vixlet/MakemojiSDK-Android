@@ -1,5 +1,8 @@
 package com.makemoji.mojilib.model;
 
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
+
 import com.makemoji.mojilib.Moji;
 
 import org.json.JSONArray;
@@ -14,6 +17,7 @@ import java.util.List;
 public class Category {
     public final String name;
     public final String image_url;
+    public @DrawableRes int drawableRes;
 
 
     public Category(String name, String image_url) {

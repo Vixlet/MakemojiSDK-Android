@@ -60,7 +60,7 @@ import java.util.List;
 
 public class MMKB extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
-        PagerPopulator.PopulatorObserver {
+        PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener {
     static final boolean DEBUG = false;
 
     /**
@@ -165,9 +165,9 @@ public class MMKB extends InputMethodService
         if (shareMessage!=null && shareMessage.length()>0){
             shareText.setVisibility(View.VISIBLE);
         }
-        List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout);
-        for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
-        tabLayout.setOnTabSelectedListener(this);
+        List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this);
+        onNewTabs(tabs);
+
 
         Runnable backSpaceRunnable = new Runnable() {
             @Override
@@ -965,4 +965,14 @@ public class MMKB extends InputMethodService
         return getResources().getColor(R.color._mm_default_phrase_bg_color);
     }
 
+    @Override
+    public void onNewTabs(List<TabLayout.Tab> tabs) {
+        int selectedPosition = tabLayout.getSelectedTabPosition();
+        tabLayout.removeAllTabs();
+        for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
+        tabLayout.setOnTabSelectedListener(this);
+        if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
+            tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
+        }
+    }
 }
