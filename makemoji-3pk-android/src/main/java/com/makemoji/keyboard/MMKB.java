@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -151,8 +152,9 @@ public class MMKB extends InputMethodService
      */
     @Override public View onCreateInputView() {
         assertAuthorityChanged();
-        inputView =  getLayoutInflater().inflate(
-                R.layout.kb_layout, null);
+        inputView =  getLayoutInflater().
+                cloneInContext(new ContextThemeWrapper(getContext(),R.style.KBAppTheme)).
+                inflate(R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
         rv = (RecyclerView) inputView.findViewById(R.id.kb_page_grid);
         rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.ROWS, LinearLayoutManager.HORIZONTAL, false));
@@ -199,6 +201,7 @@ public class MMKB extends InputMethodService
             @Override
             public void onClick(View v) {
                 if (shareMessage!=null) {
+                    getCurrentInputConnection().finishComposingText();
                     getCurrentInputConnection().setComposingText(shareMessage, 1);
                     getCurrentInputConnection().finishComposingText();
                 }
@@ -952,6 +955,7 @@ public class MMKB extends InputMethodService
         t = getTarget(model);
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         if (model.character!=null && !model.character.isEmpty()){
+            getCurrentInputConnection().finishComposingText();
             getCurrentInputConnection().setComposingText(model.character, 1);
             getCurrentInputConnection().finishComposingText();
             return;

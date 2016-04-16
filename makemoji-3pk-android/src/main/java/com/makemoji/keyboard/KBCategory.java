@@ -69,7 +69,7 @@ public class KBCategory {
     private static List<TabLayout.Tab> createTabs(TabLayout tabLayout,List<Category> categories){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         for (Category c : categories) {
-            if ("phrases".equalsIgnoreCase(c.name))
+            if ("phrases".equalsIgnoreCase(c.name))//currently unicode is good, multiple makemojis does not work.
                 continue;
             if (c.drawableRes!=0){
                 tabs.add(tabLayout.newTab().setCustomView(R.layout.kb_tab).
