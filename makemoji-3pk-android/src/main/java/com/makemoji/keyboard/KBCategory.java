@@ -69,6 +69,8 @@ public class KBCategory {
     private static List<TabLayout.Tab> createTabs(TabLayout tabLayout,List<Category> categories){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         for (Category c : categories) {
+            if ("phrases".equalsIgnoreCase(c.name))
+                continue;
             if (c.drawableRes!=0){
                 tabs.add(tabLayout.newTab().setCustomView(R.layout.kb_tab).
                         setContentDescription(c.name).setIcon(c.drawableRes));

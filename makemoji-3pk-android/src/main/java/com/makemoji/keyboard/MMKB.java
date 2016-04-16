@@ -951,7 +951,12 @@ public class MMKB extends InputMethodService
     public void addMojiModel(MojiModel model, BitmapDrawable d) {
         t = getTarget(model);
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
-        Moji.picasso.load(model.image_url).resize(size,size).into(t);
+        if (model.character!=null && !model.character.isEmpty()){
+            getCurrentInputConnection().setComposingText(model.character, 1);
+            getCurrentInputConnection().finishComposingText();
+            return;
+        }
+        if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).resize(size,size).into(t);
     }
 
 
