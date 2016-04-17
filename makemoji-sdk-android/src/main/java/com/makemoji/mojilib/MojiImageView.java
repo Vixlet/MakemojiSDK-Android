@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -34,8 +36,14 @@ class MojiImageView extends ImageView  implements Spanimatable{
     }
 
    private int forceDimen = -1;
+    boolean sizeImagesToSpanSize = true;
     public void forceDimen(int dimen){
         forceDimen = dimen;
+
+    }
+    //use MojiSpan size, or intrinisc ImageView Size
+    public void sizeImagesToSpanSize(boolean enable){
+        sizeImagesToSpanSize = enable;
 
     }
     private boolean pulseEnabled = true;
@@ -74,9 +82,14 @@ class MojiImageView extends ImageView  implements Spanimatable{
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
             if (!model.image_url.isEmpty()) {
+                if (sizeImagesToSpanSize)//resize if re using bitmap loaded for moji spans.
                     Moji.picasso.load(m.image_url)
                             .resize(size, size)
                             .placeholder(d).into(this);
+                else
+                    Moji.picasso.load(m.image_url)
+                            .placeholder(d).into(this);
+
             } else {
                 setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));
                 //setScaleType(ScaleType.CENTER_INSIDE);

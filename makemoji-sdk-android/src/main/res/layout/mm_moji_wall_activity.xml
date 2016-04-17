@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@id/_mm_page_container" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <fragment
-        android:name="com.makemoji.mojilib.wall.MojiWallFragment"
-        android:id="@+id/mm_moji_wall_frag"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
 
-</LinearLayout>
+
+</FrameLayout>

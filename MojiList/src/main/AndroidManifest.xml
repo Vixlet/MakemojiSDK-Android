@@ -18,8 +18,7 @@
         </activity>
         <activity
             android:name="com.makemoji.mojilib.wall.MojiWallActivity"
-            android:label="Emoji Wall Activity"
-            android:theme="@style/AppTheme.NoActionBar.DarkStatusBar">
+            android:label="Emoji Wall Activity">
         </activity>
         <activity
             android:name="com.makemoji.sbaar.mojilist.InputActivity"

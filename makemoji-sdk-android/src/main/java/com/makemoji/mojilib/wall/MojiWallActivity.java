@@ -18,10 +18,15 @@ import org.json.JSONObject;
  */
 public class MojiWallActivity extends AppCompatActivity implements IMojiSelected{
     boolean selected =false;
+    public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
+        setTheme(getIntent().getIntExtra(EXTRA_THEME,R.style.MojiWallDefaultStyle));
         setContentView(R.layout.mm_moji_wall_activity);
+        getSupportFragmentManager().beginTransaction().
+                add(R.id._mm_page_container, MojiWallFragment.newInstance(R.style.MojiWallDefaultStyle),"mojiWall")
+                .commitAllowingStateLoss();
     }
     @Override
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {

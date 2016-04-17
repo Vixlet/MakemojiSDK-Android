@@ -3,8 +3,6 @@ package com.makemoji.sbaar.mojilist;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,7 +21,6 @@ import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.model.MojiModel;
 import com.makemoji.mojilib.wall.MojiWallActivity;
-import com.makemoji.mojilib.wall.MojiWallDialog;
 
 import org.json.JSONObject;
 
@@ -114,9 +110,6 @@ public class InputActivity extends AppCompatActivity implements IMojiSelected{
         else if (id == R.id.action_emoji_wall_activity){
             Intent intent = new Intent(this, MojiWallActivity.class);
             startActivityForResult(intent,IMojiSelected.REQUEST_MOJI_MODEL);
-        }
-        else if (id == R.id.action_emoji_wall_dialog){
-            MojiWallDialog.createDialog(this).show();
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,17 +1,25 @@
 package com.makemoji.mojilib.wall;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +52,14 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     MojiWallAdapter pagerAdapter;
     IMojiSelected mojiSelected;
     List<Category> categories =new ArrayList<>();
+    @LayoutRes int  tabRes;
     public static MojiWallFragment newInstance() {
+        return newInstance(R.style.MojiWallDefaultStyle);
+    }
+    public static MojiWallFragment newInstance(@StyleRes int theme) {
 
         Bundle args = new Bundle();
+        args.putInt("theme",theme);
 
         MojiWallFragment fragment = new MojiWallFragment();
         fragment.setArguments(args);
@@ -56,7 +69,14 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.mm_wall_frag,container);
+
+
+        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(),getArguments().getInt("theme"));
+       TypedValue value = new TypedValue();
+        getActivity().getTheme().resolveAttribute(R.attr._mm_wall_tab_layout,value,true);
+        tabRes = value.resourceId;
+        inflater = inflater.cloneInContext(themeWrapper);
+        view = inflater.inflate(R.layout.mm_wall_frag,container,false);
         tabLayout =(TabLayout) view.findViewById(R.id.tabs);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
@@ -89,7 +109,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
                         it.remove();
                 }
-                List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,R.layout.mm_wall_tab);
+                List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,tabRes);
                 onNewTabs(tabs);
 
             }
@@ -129,7 +149,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         throw new RuntimeException("activity must implement IMojiSelected to use MojiWallFragment");
         mojiSelected = (IMojiSelected)getActivity();
     }
-    public static class MojiWallAdapter extends FragmentPagerAdapter {
+    public static class MojiWallAdapter extends FragmentStatePagerAdapter {
          List<Category> categories;
         public MojiWallAdapter(FragmentManager fm,List<Category> categories) {
             super(fm);
@@ -201,14 +221,16 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            int size = (int)(parentWidth-(6*4*Moji.density))/10;
+            int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),5,
                     size);
+            mojiGridAdapter.setImagesSizedtoSpan(false);
             if (itemDecoration!=null) {
                 rv.removeItemDecoration(itemDecoration);
                 itemDecoration = null;
             }
-            itemDecoration = new SpacesItemDecoration((int)(15*Moji.density),(int)(4*Moji.density));
+            int hspace =(parentWidth-(size*5))/10;
+            itemDecoration = new SpacesItemDecoration((int)(15*Moji.density),hspace);
             rv.addItemDecoration(itemDecoration);
             rv.setAdapter(mojiGridAdapter);
         }

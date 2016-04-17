@@ -29,6 +29,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     Drawable phraseBg;
     ClickAndStyler clickAndStyler;
     boolean enablePulse = true;
+    boolean imaagesSizedToSpan = true;
     public interface ClickAndStyler{
         void addMojiModel(MojiModel model,BitmapDrawable d);
         Context getContext();
@@ -51,6 +52,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         mojiModels = new ArrayList<>(models);
         notifyDataSetChanged();
 
+    }
+    public void setImagesSizedtoSpan(boolean enable){
+        imaagesSizedToSpan = enable;
     }
     @Override
     public int getItemCount() {
@@ -84,6 +88,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         if (getItemViewType(position)==0) {
             holder.imageView.setPulseEnabled(enablePulse);
             holder.imageView.forceDimen(holder.dimen);
+            holder.imageView.sizeImagesToSpanSize(imaagesSizedToSpan);
             holder.imageView.setModel(model);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -27,4 +27,13 @@
         <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
         <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
     </style>
+    <style name="MojiWallDefaultStyle" parent="Theme.AppCompat.Dialog">
+        <item name="_mm_wall_tab_layout">@layout/mm_wall_tab</item>
+        <item name="_mm_wall_header_layout">@layout/mm_wall_header</item>
+        <item name="_mm_wall_tabs_bg">@android:color/black</item>
+        <item name="_mm_wall_pager_bg">@color/_mm_grey_900</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
