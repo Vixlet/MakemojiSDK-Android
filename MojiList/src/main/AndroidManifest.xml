@@ -17,6 +17,11 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
+            android:name="com.makemoji.mojilib.wall.MojiWallActivity"
+            android:label="Emoji Wall Activity"
+            android:theme="@style/AppTheme.NoActionBar.DarkStatusBar">
+        </activity>
+        <activity
             android:name="com.makemoji.sbaar.mojilist.InputActivity"
             android:label="@string/title_activity_input"
             android:launchMode="singleTask"

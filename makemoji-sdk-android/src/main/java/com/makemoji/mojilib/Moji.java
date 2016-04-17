@@ -72,7 +72,7 @@ public class Moji {
     //our own html parser to create custom spans. keep one for each thread.
     private static Map<Long,SoftReference<Parser>> parsers =new HashMap<>();
     //screen density
-    static float density;
+    public static float density;
 
     public static MojiApi mojiApi;
     //randomly seed some mojispans with links when in demo mode

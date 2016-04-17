@@ -4,6 +4,7 @@ import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -41,5 +42,8 @@ public interface MojiApi {
 
     @POST("emoji/viewTrack")
     Call<Void> trackViews( @Body RequestBody array);
+
+    @GET("emoji/emojiwall")
+    Call<Map<String,List<MojiModel>>> getEmojiWallData();
 
 }

@@ -1,0 +1,218 @@
+package com.makemoji.mojilib.wall;
+
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.makemoji.mojilib.IMojiSelected;
+import com.makemoji.mojilib.KBCategory;
+import com.makemoji.mojilib.Moji;
+import com.makemoji.mojilib.MojiGridAdapter;
+import com.makemoji.mojilib.R;
+import com.makemoji.mojilib.SmallCB;
+import com.makemoji.mojilib.SpacesItemDecoration;
+import com.makemoji.mojilib.model.Category;
+import com.makemoji.mojilib.model.MojiModel;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
+import retrofit2.Response;
+
+/**
+ * Created by DouglasW on 4/16/2016.
+ */
+public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListener,MojiGridAdapter.ClickAndStyler {
+    View view;
+    TabLayout tabLayout;
+    ViewPager pager;
+    MojiWallAdapter pagerAdapter;
+    IMojiSelected mojiSelected;
+    List<Category> categories =new ArrayList<>();
+    public static MojiWallFragment newInstance() {
+
+        Bundle args = new Bundle();
+
+        MojiWallFragment fragment = new MojiWallFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.mm_wall_frag,container);
+        tabLayout =(TabLayout) view.findViewById(R.id.tabs);
+        pager = (ViewPager) view.findViewById(R.id.pager);
+        pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
+        pager.setAdapter(pagerAdapter);
+        tabLayout.setupWithViewPager(pager);
+
+        Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
+            @Override
+            public void done(Response<Map<String, List<MojiModel>>> response, @Nullable Throwable t) {
+                if (t!=null){
+                    t.printStackTrace();
+                    return;
+                }
+                categories = new ArrayList<>();
+                for (Map.Entry<String,List<MojiModel>> entry :response.body().entrySet()){
+                    Category c = new Category(entry.getKey(),null);
+                    c.models = entry.getValue();
+                    categories.add(c);
+                }
+                categories = KBCategory.mergeCategoriesDrawable(categories);
+                List<Category> cached = Category.getCategories();
+                for (Category cat : categories)//find icon url
+                    if (cat.drawableRes==0 && cat.image_url==null)
+                        for (Category old :cached)
+                            if (cat.name.equalsIgnoreCase(old.name))
+                                cat.image_url=old.image_url;
+                ListIterator<Category> it = categories.listIterator();
+                while (it.hasNext()){
+                    Category c = it.next();
+                    if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
+                        it.remove();
+                }
+                List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,R.layout.mm_wall_tab);
+                onNewTabs(tabs);
+
+            }
+        });
+
+        return view;
+    }
+
+    @Override
+    public void onNewTabs(List<TabLayout.Tab> tabs) {
+        int selectedPosition = tabLayout.getSelectedTabPosition();
+        tabLayout.removeAllTabs();
+        for (TabLayout.Tab tab: tabs) {
+            tabLayout.addTab(tab);
+        }
+        if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
+            tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
+        }
+        pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
+        pager.setAdapter(pagerAdapter);
+    }
+
+    @Override
+    public void addMojiModel(MojiModel model, BitmapDrawable d) {
+        if (mojiSelected!=null) mojiSelected.mojiSelected(model,d);
+    }
+
+    @Override
+    public int getPhraseBgColor() {
+        return getResources().getColor(R.color._mm_default_phrase_bg_color);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (!(getActivity() instanceof IMojiSelected) )
+        throw new RuntimeException("activity must implement IMojiSelected to use MojiWallFragment");
+        mojiSelected = (IMojiSelected)getActivity();
+    }
+    public static class MojiWallAdapter extends FragmentPagerAdapter {
+         List<Category> categories;
+        public MojiWallAdapter(FragmentManager fm,List<Category> categories) {
+            super(fm);
+            this.categories = categories;
+
+        }
+
+        @Override
+        public int getCount() {
+            return categories.size();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return MojiWallPage.newInstance(categories.get(position).name,categories.get(position).models);
+        }
+    }
+
+    public static class MojiWallPage extends Fragment {
+        String category;
+        int iconRes;
+        String iconUrl;
+        public List<MojiModel> models = new ArrayList<>();
+        RecyclerView rv;
+        MojiGridAdapter mojiGridAdapter;
+        int parentWidth;
+
+        /**
+         * Create a new instance of CountingFragment, providing "num"
+         * as an argument.
+         */
+        static MojiWallPage newInstance(String category,List<MojiModel> models) {
+            MojiWallPage f = new MojiWallPage();
+            RecyclerView.ItemDecoration decoration;
+
+            // Supply num input as an argument.
+            Bundle args = new Bundle();
+            args.putString("category", category);
+            f.setArguments(args);
+            f.models = models;
+
+            return f;
+        }
+
+        /**
+         * When creating, retrieve this instance's number from its arguments.
+         */
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            category = getArguments() != null ? getArguments().getString("category") : "";
+        }
+
+        /**
+         * The Fragment's UI is just a simple text view showing its
+         * instance number.
+         */
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            parentWidth = container.getWidth();
+            View v = inflater.inflate(R.layout.mm_wall_page, container, false);
+            rv = (RecyclerView) v;
+            rv.setLayoutManager(new GridLayoutManager(getContext(),5,LinearLayoutManager.VERTICAL,false));
+            return v;
+        }
+
+        RecyclerView.ItemDecoration itemDecoration;
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            int size = (int)(parentWidth-(6*4*Moji.density))/10;
+            mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),5,
+                    size);
+            if (itemDecoration!=null) {
+                rv.removeItemDecoration(itemDecoration);
+                itemDecoration = null;
+            }
+            itemDecoration = new SpacesItemDecoration((int)(15*Moji.density),(int)(4*Moji.density));
+            rv.addItemDecoration(itemDecoration);
+            rv.setAdapter(mojiGridAdapter);
+        }
+
+    }
+
+}

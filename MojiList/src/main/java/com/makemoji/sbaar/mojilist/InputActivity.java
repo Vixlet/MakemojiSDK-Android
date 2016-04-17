@@ -1,9 +1,11 @@
 package com.makemoji.sbaar.mojilist;
 
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
@@ -16,13 +18,19 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.makemoji.mojilib.HyperMojiListener;
+import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
+import com.makemoji.mojilib.model.MojiModel;
+import com.makemoji.mojilib.wall.MojiWallActivity;
+import com.makemoji.mojilib.wall.MojiWallDialog;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class InputActivity extends AppCompatActivity {
+public class InputActivity extends AppCompatActivity implements IMojiSelected{
     MojiEditText outsideMojiEdit;
     MojiInputLayout mojiInputLayout;
     boolean plainTextConversion = false;
@@ -103,6 +111,13 @@ public class InputActivity extends AppCompatActivity {
         else if (id == R.id.action_kb_activate){
             startActivity(new Intent(this,ActivateActivity.class));
         }
+        else if (id == R.id.action_emoji_wall_activity){
+            Intent intent = new Intent(this, MojiWallActivity.class);
+            startActivityForResult(intent,IMojiSelected.REQUEST_MOJI_MODEL);
+        }
+        else if (id == R.id.action_emoji_wall_dialog){
+            MojiWallDialog.createDialog(this).show();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -118,5 +133,34 @@ public class InputActivity extends AppCompatActivity {
     public void onNewIntent(Intent i){
         super.onNewIntent(i);
         boolean wasMMIntent = mojiInputLayout.handleIntent(i);
+    }
+
+
+    //get the result from emoji wall activity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        //mojiInputLayout.handleIntent(data);
+        //OR
+        if (requestCode == IMojiSelected.REQUEST_MOJI_MODEL && resultCode== RESULT_OK){
+            try{
+                String json = data.getStringExtra(Moji.EXTRA_JSON);
+                MojiModel model = MojiModel.fromJson(new JSONObject(json));
+                mojiInputLayout.addMojiModel(model,null);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
+        mojiInputLayout.addMojiModel(model,null);
+    }
+
+    @Override
+    public void mojiSelectionCanceled() {
+        Toast.makeText(this,"Emoji Wall Dialog canceled",Toast.LENGTH_SHORT).show();
     }
 }

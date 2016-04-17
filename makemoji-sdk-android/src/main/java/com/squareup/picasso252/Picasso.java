@@ -282,7 +282,7 @@ public class Picasso {
       return new RequestCreator(this, null, 0);
     }
     if (path.trim().length() == 0) {
-      throw new IllegalArgumentException("Path must not be empty.");
+     // throw new IllegalArgumentException("Path must not be empty.");
     }
     return load(Uri.parse(path));
   }

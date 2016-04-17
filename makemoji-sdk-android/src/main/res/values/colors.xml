@@ -10,4 +10,6 @@
     <color name="_mm_default_phrase_bg_color">#dfdfdf</color>
     <color name="_mm_gradient_bottom">#c3c3c3</color>
     <color name="_mm_black_87">#de000000</color>
+    
+    <color name="_mm_grey_900">#212121</color>
 </resources>

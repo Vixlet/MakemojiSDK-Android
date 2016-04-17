@@ -16,8 +16,9 @@ import java.util.List;
  */
 public class Category {
     public final String name;
-    public final String image_url;
+    public String image_url;
     public @DrawableRes int drawableRes;
+    public List<MojiModel> models;
 
 
     public Category(String name, String image_url) {
@@ -50,5 +51,9 @@ public class Category {
             e.printStackTrace();
         }
         return categories;
+    }
+    @Override
+    public String toString(){
+        return "" + name + " " + image_url + " " + drawableRes;
     }
 }

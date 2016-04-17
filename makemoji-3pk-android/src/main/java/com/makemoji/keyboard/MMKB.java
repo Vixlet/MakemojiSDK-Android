@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import com.makemoji.mojilib.BackSpaceDelegate;
 import com.makemoji.mojilib.CategoryPopulator;
+import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.MojiInputLayout;
@@ -167,7 +168,7 @@ public class MMKB extends InputMethodService
         if (shareMessage!=null && shareMessage.length()>0){
             shareText.setVisibility(View.VISIBLE);
         }
-        List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this);
+        List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this,R.layout.kb_tab);
         onNewTabs(tabs);
 
 

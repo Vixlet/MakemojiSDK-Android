@@ -1,5 +1,6 @@
-package com.makemoji.keyboard;
+package com.makemoji.mojilib;
 
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.widget.ImageView;
@@ -35,7 +36,7 @@ public class KBCategory {
 
     }
 
-    public static List<TabLayout.Tab> getTabs(final TabLayout tabLayout, final KBTAbListener kbtAbListener){
+    public static List<TabLayout.Tab> getTabs(final TabLayout tabLayout, final KBTAbListener kbtAbListener, @LayoutRes final int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         List<Category> cachedCategories = Category.getCategories();
         Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
@@ -46,40 +47,40 @@ public class KBCategory {
                     return;
                 }
                 Category.saveCategories(response.body());
-                kbtAbListener.onNewTabs(returnTabs(tabLayout,response.body()));
+                kbtAbListener.onNewTabs(returnTabs(tabLayout,response.body(),layoutRes));
 
             }
         });
         if (cachedCategories.isEmpty()) {
             for (int i = 0; i < defaultCategories.length; i++) {
-                tabs.add(tabLayout.newTab().setCustomView(R.layout.kb_tab).
+                tabs.add(tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(defaultCategories[i]).setIcon(icons[i]));
             }
             return tabs;
         }
         else {
-            return returnTabs(tabLayout,cachedCategories);
+            return returnTabs(tabLayout,cachedCategories,layoutRes);
         }
     }
-    private static List<TabLayout.Tab> returnTabs(TabLayout tabLayout, List<Category> categories){
-        return addTrendingAndKB(createTabs(tabLayout,mergeCategoriesDrawable(categories)),tabLayout);
+    private static List<TabLayout.Tab> returnTabs(TabLayout tabLayout, List<Category> categories, @LayoutRes int layoutRes){
+        return addTrendingAndKB(createTabs(tabLayout,mergeCategoriesDrawable(categories),layoutRes),tabLayout,layoutRes);
 
     }
 
-    private static List<TabLayout.Tab> createTabs(TabLayout tabLayout,List<Category> categories){
+    public static List<TabLayout.Tab> createTabs(TabLayout tabLayout,List<Category> categories,@LayoutRes int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         for (Category c : categories) {
             if ("phrases".equalsIgnoreCase(c.name))//currently unicode is good, multiple makemojis does not work.
                 continue;
             if (c.drawableRes!=0){
-                tabs.add(tabLayout.newTab().setCustomView(R.layout.kb_tab).
+                tabs.add(tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(c.drawableRes));
             }
             else if (c.image_url!=null){
-                TabLayout.Tab tab = tabLayout.newTab().setCustomView(R.layout.kb_tab).
+                TabLayout.Tab tab = tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
-                Moji.picasso.load(c.image_url).into(iv);
+               if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(c.image_url).into(iv);
                 tabs.add(tab);
 
             }
@@ -87,18 +88,21 @@ public class KBCategory {
         return tabs;
 
     }
-    private static List<Category> mergeCategoriesDrawable(List<Category> oldCategories){
+    public static List<Category> mergeCategoriesDrawable(List<Category> oldCategories){
         for (Category c : oldCategories){
             if (defaults.containsKey(c.name.toLowerCase())){
                 c.drawableRes = defaults.get(c.name.toLowerCase());
             }
+            else if ("osemoji".equalsIgnoreCase(c.name)){
+                c.drawableRes=R.drawable.mm_globe;
+            }
         }
         return oldCategories;
     }
-    private static List<TabLayout.Tab> addTrendingAndKB(List<TabLayout.Tab> tabs, TabLayout tabLayout){
-        tabs.add(0,tabLayout.newTab().setCustomView(R.layout.kb_tab).
+    private static List<TabLayout.Tab> addTrendingAndKB(List<TabLayout.Tab> tabs, TabLayout tabLayout,@LayoutRes int layoutRes){
+        tabs.add(0,tabLayout.newTab().setCustomView(layoutRes).
                 setContentDescription(defaultCategories[0]).setIcon(icons[0]));
-        tabs.add(tabs.size(),tabLayout.newTab().setCustomView(R.layout.kb_tab).
+        tabs.add(tabs.size(),tabLayout.newTab().setCustomView(layoutRes).
                 setContentDescription(defaultCategories[defaultCategories.length-1]).setIcon(icons[defaultCategories.length-1]));
 
         return tabs;
