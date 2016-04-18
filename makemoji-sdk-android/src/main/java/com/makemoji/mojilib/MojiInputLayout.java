@@ -21,6 +21,7 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -73,6 +74,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
     @DrawableRes int backSpaceDrawableRes;
+    final static String TAG = "MojiInputLayout";
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -650,6 +652,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         try {
             if (i.hasExtra(Moji.EXTRA_JSON)) {
                 String s = i.getStringExtra(Moji.EXTRA_JSON);
+                if (!getContext().getPackageName().equals(i.getStringExtra(Moji.EXTRA_PACKAGE_ORIGIN))) {
+                    Log.e(TAG,"origin package != dest package");
+                    return false;
+                }
                 JSONObject jo = new JSONObject(s);
                 MojiModel model = MojiModel.fromJson(jo);
                 if (model==null) return false;

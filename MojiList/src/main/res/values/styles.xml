@@ -20,4 +20,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="MojiWallDefaultStyle.Light">
+        <item name="_mm_wall_tab_layout">@layout/mm_wall_tab</item>
+        <item name="_mm_wall_header_layout">@layout/mm_wall_header</item>
+        <item name="_mm_wall_tabs_bg">@android:color/white</item>
+        <item name="_mm_wall_pager_bg">@color/_mm_light_grey</item>
+    </style>
+
 </resources>

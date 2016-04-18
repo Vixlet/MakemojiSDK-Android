@@ -54,12 +54,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     List<Category> categories =new ArrayList<>();
     @LayoutRes int  tabRes;
     public static MojiWallFragment newInstance() {
-        return newInstance(R.style.MojiWallDefaultStyle);
-    }
-    public static MojiWallFragment newInstance(@StyleRes int theme) {
 
         Bundle args = new Bundle();
-        args.putInt("theme",theme);
 
         MojiWallFragment fragment = new MojiWallFragment();
         fragment.setArguments(args);
@@ -70,13 +66,15 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-
-        ContextThemeWrapper themeWrapper = new ContextThemeWrapper(getActivity(),getArguments().getInt("theme"));
        TypedValue value = new TypedValue();
         getActivity().getTheme().resolveAttribute(R.attr._mm_wall_tab_layout,value,true);
         tabRes = value.resourceId;
-        inflater = inflater.cloneInContext(themeWrapper);
+        getActivity().getTheme().resolveAttribute(R.attr._mm_wall_header_layout,value,true);
+        int headerRes = value.resourceId;
         view = inflater.inflate(R.layout.mm_wall_frag,container,false);
+        View header =inflater.inflate(headerRes,(ViewGroup)view,false);
+        ((ViewGroup) view).addView(header,0);
+
         tabLayout =(TabLayout) view.findViewById(R.id.tabs);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
@@ -221,6 +219,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
+            parentWidth = ((View) rv.getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),5,
                     size);
@@ -233,6 +232,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             itemDecoration = new SpacesItemDecoration((int)(15*Moji.density),hspace);
             rv.addItemDecoration(itemDecoration);
             rv.setAdapter(mojiGridAdapter);
+            Log.d("wall","size: "+ size + " hspace:"+ hspace);
         }
 
     }

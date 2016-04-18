@@ -909,6 +909,7 @@ public class MMKB extends InputMethodService
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setPackage(packageName);
                     i.putExtra(Moji.EXTRA_MM, true);
+                    i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN, getContext().getPackageName());
                     i.putExtra(Intent.EXTRA_STREAM,uri);
                     i.setData(uri);
                     i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

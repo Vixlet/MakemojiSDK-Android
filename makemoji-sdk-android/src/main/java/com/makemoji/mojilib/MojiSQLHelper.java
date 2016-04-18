@@ -85,7 +85,6 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     }
 
     //ignores unicode emojis atm
-    @WorkerThread
     public @Nullable MojiModel get(int id){
         SQLiteDatabase db = this.getReadableDatabase();
         MojiModel mm = null;

@@ -79,6 +79,7 @@ public class Moji {
     static Handler handler;
     public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
     public static final String EXTRA_MM = "com.makemoji.mojilib.EXTRA_MM";
+    public static final String EXTRA_PACKAGE_ORIGIN = "com.makemoji.mojilib.PACKAGE_ORIGIN";
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.

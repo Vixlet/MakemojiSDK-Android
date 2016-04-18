@@ -22,10 +22,10 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
-        setTheme(getIntent().getIntExtra(EXTRA_THEME,R.style.MojiWallDefaultStyle));
+        setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.MojiWallDefaultStyle));
         setContentView(R.layout.mm_moji_wall_activity);
         getSupportFragmentManager().beginTransaction().
-                add(R.id._mm_page_container, MojiWallFragment.newInstance(R.style.MojiWallDefaultStyle),"mojiWall")
+                add(R.id._mm_page_container, MojiWallFragment.newInstance(),"mojiWall")
                 .commitAllowingStateLoss();
     }
     @Override
