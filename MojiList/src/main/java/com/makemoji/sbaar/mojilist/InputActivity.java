@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class InputActivity extends AppCompatActivity implements IMojiSelected{
+public class InputActivity extends AppCompatActivity{
     MojiEditText outsideMojiEdit;
     MojiInputLayout mojiInputLayout;
     boolean plainTextConversion = false;
@@ -148,13 +148,4 @@ public class InputActivity extends AppCompatActivity implements IMojiSelected{
         }
     }
 
-    @Override
-    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
-        mojiInputLayout.addMojiModel(model,null);
-    }
-
-    @Override
-    public void mojiSelectionCanceled() {
-        Toast.makeText(this,"Emoji Wall Dialog canceled",Toast.LENGTH_SHORT).show();
-    }
 }

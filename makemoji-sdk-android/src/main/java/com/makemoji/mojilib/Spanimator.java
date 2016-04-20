@@ -117,4 +117,7 @@ public class Spanimator {
         System.gc();
 
     }
+    public static boolean isGifRunning(){
+        return !mPaused;
+    }
 }

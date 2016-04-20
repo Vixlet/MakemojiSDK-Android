@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.makemoji.mojilib.gif.GifImageView;
 import com.makemoji.mojilib.model.MojiModel;
 
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
 
 
     @Override public int getItemViewType(int position){
+        if (mojiModels.get(position).gif==1)return 2;
         return mojiModels.get(position).phrase==1?1:0;
     }
     @Override
@@ -71,6 +73,10 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         if (viewType==0)
         v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.mm_rv_moji_item, parent, false);
+        else if (viewType==2){
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.mm_gif_iv,parent,false);
+        }
         else {
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.mm_rv_phrase_item, parent, false);
@@ -96,6 +102,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             clickAndStyler.addMojiModel(model, null);
                 }
             });
+        }
+        else if (getItemViewType(position)==2){
+            holder.gifImageView.getFromUrl(model.image_url);
         }
         else {
             LinearLayout ll = (LinearLayout) holder.itemView;
@@ -138,10 +147,12 @@ class Holder extends RecyclerView.ViewHolder {
     MojiImageView imageView;
     int dimen;
     List<MojiImageView> mojiImageViews = new ArrayList<>();
+    GifImageView gifImageView;
 
     public Holder(View v, ViewGroup parent) {
         super(v);
         if (v instanceof MojiImageView)imageView = (MojiImageView) v;
+        if (v instanceof GifImageView) gifImageView = (GifImageView) v;
         dimen = spanSize;
 
 

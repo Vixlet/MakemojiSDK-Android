@@ -75,6 +75,7 @@ public class Moji {
     public static float density;
 
     public static MojiApi mojiApi;
+    public static OkHttpClient okHttpClient;
     //randomly seed some mojispans with links when in demo mode
     static Handler handler;
     public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
@@ -126,7 +127,7 @@ public class Moji {
             sp.edit().putString("id",id).apply();
         }
         final String deviceId = id;
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+        okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
 

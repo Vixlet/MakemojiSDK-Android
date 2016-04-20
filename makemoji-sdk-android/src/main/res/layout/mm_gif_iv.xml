@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.makemoji.mojilib.gif.GifImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:src="@drawable/mm_placeholder"
+    android:layout_height="match_parent">
+
+</com.makemoji.mojilib.gif.GifImageView>

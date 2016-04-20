@@ -35,6 +35,7 @@ public class MojiModel {
     public int shares;
     public int remoji;
     public int likes;
+    public int gif;
     public String character;
 
     @SerializedName("native")
