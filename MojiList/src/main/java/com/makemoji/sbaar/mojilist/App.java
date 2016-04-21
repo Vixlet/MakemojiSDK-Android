@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.makemoji.keyboard.MMKB;
 import com.makemoji.mojilib.Moji;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by Scott Baar on 12/14/2015.
@@ -16,6 +17,6 @@ public class App extends Application {
         super.onCreate();
         context=this;
         Moji.initialize(this,"940ced93abf2ca4175a4a865b38f1009d8848a58");
-        //LeakCanary.install(this);
+        LeakCanary.install(this);
     }
 }

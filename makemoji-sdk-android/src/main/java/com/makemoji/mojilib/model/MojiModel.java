@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.WorkerThread;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.makemoji.mojilib.Moji;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * Created by Scott Baar on 1/9/2016.
  */
 public class MojiModel {
-    static Gson gson = new Gson();
+    public static Gson gson = new Gson();//new GsonBuilder().enableComplexMapKeySerialization().create();
     public int id;
     public String user_id;
     public String origin_id;

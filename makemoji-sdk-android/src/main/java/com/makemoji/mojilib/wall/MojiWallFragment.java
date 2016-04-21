@@ -1,5 +1,6 @@
 package com.makemoji.mojilib.wall;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
@@ -34,6 +37,7 @@ import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,6 +85,18 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         pager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(pager);
 
+        final SharedPreferences sp = getContext().getSharedPreferences("emojiWall",0);
+        try {
+            String s = sp.getString("data", null);
+            Map<String, List<MojiModel>> data =
+                    MojiModel.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
+                    }.getType());
+            if (data != null)
+                handleData(data);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
             @Override
             public void done(Response<Map<String, List<MojiModel>>> response, @Nullable Throwable t) {
@@ -88,32 +104,36 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     t.printStackTrace();
                     return;
                 }
-                categories = new ArrayList<>();
-                for (Map.Entry<String,List<MojiModel>> entry :response.body().entrySet()){
-                    Category c = new Category(entry.getKey(),null);
-                    c.models = entry.getValue();
-                    categories.add(c);
-                }
-                categories = KBCategory.mergeCategoriesDrawable(categories);
-                List<Category> cached = Category.getCategories();
-                for (Category cat : categories)//find icon url
-                    if (cat.drawableRes==0 && cat.image_url==null)
-                        for (Category old :cached)
-                            if (cat.name.equalsIgnoreCase(old.name))
-                                cat.image_url=old.image_url;
-                ListIterator<Category> it = categories.listIterator();
-                while (it.hasNext()){
-                    Category c = it.next();
-                    if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
-                        it.remove();
-                }
-                List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,tabRes);
-                onNewTabs(tabs);
+                sp.edit().putString("data",MojiModel.gson.toJson(response.body())).apply();
+                handleData(response.body());
 
             }
         });
 
         return view;
+    }
+    public synchronized void handleData(Map<String, List<MojiModel>> data){
+        categories = new ArrayList<>();
+        for (Map.Entry<String,List<MojiModel>> entry :data.entrySet()){
+            Category c = new Category(entry.getKey(),null);
+            c.models = entry.getValue();
+            categories.add(c);
+        }
+        categories = KBCategory.mergeCategoriesDrawable(categories);
+        List<Category> cached = Category.getCategories();
+        for (Category cat : categories)//find icon url
+            if (cat.drawableRes==0 && cat.image_url==null)
+                for (Category old :cached)
+                    if (cat.name.equalsIgnoreCase(old.name))
+                        cat.image_url=old.image_url;
+        ListIterator<Category> it = categories.listIterator();
+        while (it.hasNext()){
+            Category c = it.next();
+            if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
+                it.remove();
+        }
+        List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,tabRes);
+        onNewTabs(tabs);
     }
 
     @Override
@@ -219,7 +239,11 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            parentWidth = ((View) rv.getParent()).getWidth();
+            rv.post(new Runnable() {
+                @Override
+                public void run() {
+
+            parentWidth = ((View) rv.getParent().getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),5,
                     size);
@@ -233,6 +257,9 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             rv.addItemDecoration(itemDecoration);
             rv.setAdapter(mojiGridAdapter);
             Log.d("wall","size: "+ size + " hspace:"+ hspace);
+
+                }
+            });
         }
 
     }
