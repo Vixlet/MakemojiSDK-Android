@@ -150,7 +150,6 @@ public class GifSpan extends MojiSpan implements GifConsumer {
             transY -= paint.getFontMetricsInt().descent;
         }
 
-        transY = 0;
         canvas.translate(x, transY);
         d.draw(canvas);
         //if (bitmap!=null)canvas.drawBitmap(bitmap,0,0,paint);
