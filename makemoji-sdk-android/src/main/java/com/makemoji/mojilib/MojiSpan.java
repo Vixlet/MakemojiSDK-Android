@@ -16,6 +16,7 @@ import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
@@ -35,14 +36,14 @@ import java.lang.ref.WeakReference;
  */
     public class MojiSpan extends ReplacementSpan implements Spanimatable {
 
-    private Drawable mDrawable;
-    private Uri mContentUri;
-    private int mResourceId;
-    private Context mContext;
-    private String mSource;
-    private int mWidth;
-    private int mHeight;
-    private int mFontSize;
+    protected Drawable mDrawable;
+    protected Uri mContentUri;
+    protected int mResourceId;
+    protected Context mContext;
+    protected String mSource;
+    protected int mWidth;
+    protected int mHeight;
+    protected int mFontSize;
 
     // the baseline "normal" font size in sp.
     static final int BASE_TEXT_PT = 16;
@@ -52,7 +53,7 @@ import java.lang.ref.WeakReference;
 
     //the text size in pixels, determined by BASE_TEXT_PT and screen density
     public static float BASE_TEXT_PX_SCALED;
-    private float mFontRatio;
+    protected float mFontRatio;
 
     // to make mojis stand out from text, always multiply the size by this
     public static float BASE_SIZE_MULT = 1.0f;
@@ -61,16 +62,26 @@ import java.lang.ref.WeakReference;
     private float currentAnimationScale = 1f;
 
 
-    private SoftReference<Drawable> mDrawableRef;
-    private WeakReference<TextView> mViewRef;
-    private String mLink = "";
+    protected SoftReference<Drawable> mDrawableRef;
+    protected WeakReference<TextView> mViewRef;
+    protected String mLink = "";
     boolean shouldAnimate;
-    Drawable mPlaceHolder;
+    protected Drawable mPlaceHolder;
     private static final String TAG = "MojiSpan";
     private static boolean LOG = false;
-    String name;
+    protected String name;
     int id = -1;
 
+    public MojiSpan() {
+    }
+
+    public static MojiSpan createMojiSpan
+            (@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView){
+        if (source!=null && source.toLowerCase().endsWith(".gif")){
+            return new GifSpan(d,source,w,h,fontSize,simple,link,refreshView);
+        }
+        else return new MojiSpan(d,source,w,h,fontSize,simple,link,refreshView);
+    }
 
     /**
      *
@@ -120,7 +131,7 @@ if (mSource!=null && !mSource.isEmpty())
     public static MojiSpan fromModel(MojiModel model, @Nullable TextView tv, @Nullable BitmapDrawable bitmapDrawable){
         Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_placeholder);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        MojiSpan span = new MojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
+        MojiSpan span = createMojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
         span.name = model.name;
         span.id = model.id;
         return span;

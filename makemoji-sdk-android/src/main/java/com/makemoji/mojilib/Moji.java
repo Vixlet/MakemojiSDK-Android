@@ -77,7 +77,7 @@ public class Moji {
     public static MojiApi mojiApi;
     public static OkHttpClient okHttpClient;
     //randomly seed some mojispans with links when in demo mode
-    static Handler handler;
+    public static Handler handler;
     public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
     public static final String EXTRA_MM = "com.makemoji.mojilib.EXTRA_MM";
     public static final String EXTRA_PACKAGE_ORIGIN = "com.makemoji.mojilib.PACKAGE_ORIGIN";
@@ -443,6 +443,7 @@ public class Moji {
      * Only invalidate once a frame.
      * @param tv
      */
+    @UiThread
     public static void invalidateTextView(TextView tv){
         if (tv ==null)return;
 

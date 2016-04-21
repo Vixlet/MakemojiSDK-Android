@@ -347,7 +347,7 @@ class SpanBuilder implements ContentHandler {
             if (addSpaces) text.append(" \uFFFC ");
             else text.append("\uFFFC");
 
-            final MojiSpan mojiSpan =new MojiSpan(d, src, width,height,parsedAttributes.fontSizePt,simple,link,refreshView);
+            final MojiSpan mojiSpan = MojiSpan.createMojiSpan(d,src,width,height,parsedAttributes.fontSizePt,simple,link,refreshView);
             mojiSpan.name = name;
             mojiSpan.id = idInt;
 

@@ -105,6 +105,12 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         }
         else if (getItemViewType(position)==2){
             holder.gifImageView.getFromUrl(model.image_url);
+            holder.gifImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickAndStyler.addMojiModel(model, null);
+                }
+            });
         }
         else {
             LinearLayout ll = (LinearLayout) holder.itemView;

@@ -7,11 +7,9 @@ package com.makemoji.mojilib.gif;
         import android.os.Handler;
         import android.os.Looper;
         import android.util.AttributeSet;
-        import android.util.Log;
         import android.widget.ImageView;
 
         import com.makemoji.mojilib.Moji;
-        import com.makemoji.mojilib.Spanimator;
 
         import java.io.IOException;
 
@@ -41,17 +39,16 @@ public class GifImageView extends ImageView implements GifConsumer {
     public void setBytes(String url,final byte[] bytes) {
         clear();
         options.inBitmap = tmpBitmap;
-    producer = GifProducer.getProducer(this,bytes,url);
+    producer = GifProducer.getProducerAndSub(this,bytes,url);
 
     }
 
     @Override
-    public void onFrameAvailable(Bitmap b) {
-        tmpBitmap = Bitmap.createBitmap(b);
+    public void onFrameAvailable(final Bitmap b) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                setImageBitmap(tmpBitmap);
+                setImageBitmap(b);
             }
         });
     }

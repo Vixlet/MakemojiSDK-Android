@@ -24,12 +24,13 @@ import java.util.Map;
 public class GifProducer implements Runnable{
     private static String TAG = "GifProducer";
     static Map<String,GifProducer> producerMap = Collections.synchronizedMap(new HashMap<String,GifProducer>());
-    public static synchronized GifProducer getProducer(GifConsumer consumer, byte[] bytes, String url){
+    public static synchronized GifProducer getProducerAndSub(GifConsumer consumer, @Nullable byte[] bytes, String url){
         GifProducer producer = producerMap.get(url);
         if (producer!=null){
             producer.subscribe(consumer);
             return producer;
         }
+        if (bytes==null)return null;
         producer = new GifProducer(consumer,bytes,url);
         producerMap.put(url,producer);
         return producer;
@@ -37,7 +38,7 @@ public class GifProducer implements Runnable{
     private static void removeProducer(GifProducer producer){
         producerMap.remove(producer.url);
     }
-    List<GifConsumer> consumers = Collections.synchronizedList(new ArrayList<GifConsumer>());
+    final List<GifConsumer> consumers = Collections.synchronizedList(new ArrayList<GifConsumer>());
     GifDecoder gifDecoder;
     Thread animationThread;
     Bitmap tmpBitmap;
@@ -60,6 +61,12 @@ public class GifProducer implements Runnable{
         }
 
         start();
+    }
+    public int getHeight(){
+        return gifDecoder==null?0:gifDecoder.getHeight();
+    }
+    public int getWidth(){
+        return gifDecoder==null?0:gifDecoder.getWidth();
     }
     void start(){
         if (animationThread==null && canStart()){
@@ -100,7 +107,7 @@ public class GifProducer implements Runnable{
                 long frameDecodeTime = 0;
                 try {
                     long before = System.nanoTime();
-                    tmpBitmap = gifDecoder.getNextFrame();
+                    tmpBitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
                     frameDecodeTime = (System.nanoTime() - before) / 1000000;
                     synchronized (consumers) {
                         for (GifConsumer c : consumers) {
@@ -144,6 +151,8 @@ public class GifProducer implements Runnable{
     public void subscribe(GifConsumer consumer){
         consumers.add(consumer);
         start();
+        if (tmpBitmap!=null)
+            consumer.onFrameAvailable(tmpBitmap);
     }
     public void unsubscribe(GifConsumer consumer){
         consumers.remove(consumer);
