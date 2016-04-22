@@ -84,6 +84,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         tabLayout =(TabLayout) view.findViewById(R.id.tabs);
         pager = (ViewPager) view.findViewById(R.id.pager);
         pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
+        pager.setOffscreenPageLimit(2);
         pager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(pager);
 
@@ -121,11 +122,15 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     }
     public synchronized void handleData(Map<String, List<MojiModel>> data){
         categories = new ArrayList<>();
-        data.put("recent", RecentPopulator.getRecents());
         for (Map.Entry<String,List<MojiModel>> entry :data.entrySet()){
             Category c = new Category(entry.getKey(),null);
             c.models = entry.getValue();
             categories.add(c);
+            if ("trending".equalsIgnoreCase(c.name)) {
+                Category recent = new Category("recent",null);
+                recent.models = RecentPopulator.getRecents();
+                categories.add(recent);
+            }
         }
         categories = KBCategory.mergeCategoriesDrawable(categories,showRecent,showOs);
         List<Category> cached = Category.getCategories();

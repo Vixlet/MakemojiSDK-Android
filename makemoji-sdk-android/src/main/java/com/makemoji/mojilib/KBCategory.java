@@ -108,6 +108,7 @@ public class KBCategory {
             }
             if ("recent".equalsIgnoreCase(c.name)){
                 c.drawableRes=R.drawable.mm_recent;
+                if (!keepRecent)iterator.remove();
             }
         }
         return oldCategories;

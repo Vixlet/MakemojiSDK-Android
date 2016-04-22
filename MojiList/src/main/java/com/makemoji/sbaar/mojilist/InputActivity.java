@@ -110,8 +110,8 @@ public class InputActivity extends AppCompatActivity{
         else if (id == R.id.action_emoji_wall_activity){
             Intent intent = new Intent(this, MojiWallActivity.class);
             //intent.putExtra(MojiWallActivity.EXTRA_THEME,R.style.MojiWallDefaultStyle_Light); //to theme it
-            intent.putExtra(MojiWallActivity.EXTRA_SHOWRECENT,false);
-            intent.putExtra(MojiWallActivity.EXTRA_SHOWUNICODE,false);
+            intent.putExtra(MojiWallActivity.EXTRA_SHOWRECENT,true);
+            intent.putExtra(MojiWallActivity.EXTRA_SHOWUNICODE,true);
             startActivityForResult(intent,IMojiSelected.REQUEST_MOJI_MODEL);
         }
 
