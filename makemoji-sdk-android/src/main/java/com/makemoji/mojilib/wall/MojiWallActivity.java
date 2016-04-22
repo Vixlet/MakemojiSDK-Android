@@ -14,18 +14,21 @@ import com.makemoji.mojilib.model.MojiModel;
 import org.json.JSONObject;
 
 /**
- * Created by DouglasW on 4/16/2016.
+ * Created by Scott Baar on 4/16/2016.
  */
 public class MojiWallActivity extends AppCompatActivity implements IMojiSelected{
     boolean selected =false;
     public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
+    public static final String EXTRA_SHOWRECENT = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWRECENT";
+    public static final String EXTRA_SHOWOS = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWOS";
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.MojiWallDefaultStyle));
         setContentView(R.layout.mm_moji_wall_activity);
         getSupportFragmentManager().beginTransaction().
-                add(R.id._mm_page_container, MojiWallFragment.newInstance(),"mojiWall")
+                add(R.id._mm_page_container, MojiWallFragment.newInstance(getIntent().getBooleanExtra(EXTRA_SHOWRECENT,false),
+                        getIntent().getBooleanExtra(EXTRA_SHOWOS,false)),"mojiWall")
                 .commitAllowingStateLoss();
     }
     @Override

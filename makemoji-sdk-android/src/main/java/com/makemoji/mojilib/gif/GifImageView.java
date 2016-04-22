@@ -7,6 +7,7 @@ package com.makemoji.mojilib.gif;
         import android.os.Handler;
         import android.os.Looper;
         import android.util.AttributeSet;
+        import android.view.View;
         import android.widget.ImageView;
 
         import com.makemoji.mojilib.Moji;
@@ -35,27 +36,41 @@ public class GifImageView extends ImageView implements GifConsumer {
     }
 
     GifProducer producer;
-    BitmapFactory.Options options = new BitmapFactory.Options();
     public void setBytes(String url,final byte[] bytes) {
         clear();
-        options.inBitmap = tmpBitmap;
-    producer = GifProducer.getProducerAndSub(this,bytes,url);
+        producer = GifProducer.getProducerAndSub(this,bytes,url);
 
     }
 
     @Override
     public void onFrameAvailable(final Bitmap b) {
-        handler.post(new Runnable() {
+        Runnable r = new Runnable() {
             @Override
             public void run() {
+
                 setImageBitmap(b);
             }
-        });
+        };
+        handler.post(r);
     }
 
     @Override
-    public void stopped() {
+    public void onStopped() {
+        Runnable stop = new Runnable() {
+            @Override
+            public void run() {
 
+                if (producer!=null) producer.unsubscribe(GifImageView.this);
+                producer=null;
+            }
+        };
+        Moji.handler.post(stop);
+
+    }
+    @Override
+    public void onStarted(GifProducer producer){
+        this.producer=producer;
+        producer.subscribe(this);
     }
 
     @Override
@@ -69,7 +84,10 @@ public class GifImageView extends ImageView implements GifConsumer {
             producer=null;
         }
     }
+
     public void getFromUrl(final String url){
+        producer = GifProducer.getProducerAndSub(this,null,url);
+        if (producer!=null)return;
         Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

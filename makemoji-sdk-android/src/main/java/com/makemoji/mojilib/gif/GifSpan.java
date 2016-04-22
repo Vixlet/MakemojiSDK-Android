@@ -62,7 +62,7 @@ public class GifSpan extends MojiSpan implements GifConsumer {
 
 
     }
-    private void load(){
+    private synchronized void load(){
         producer = GifProducer.getProducerAndSub(this,null,mSource);
         if (producer!=null){
             mWidth = producer.getWidth();
@@ -109,8 +109,19 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     }
 
     @Override
-    public void stopped() {
-        producer = null;
+    public void onStopped() {
+        Moji.handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (producer!=null)producer.unsubscribe(GifSpan.this);
+                producer = null;
+            }
+        });
+    }
+    @Override
+    public void onStarted(GifProducer producer){
+        this.producer=producer;
+        producer.subscribe(this);
     }
     @Override
     public int getSize(Paint paint, CharSequence text,
@@ -155,5 +166,16 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         //if (bitmap!=null)canvas.drawBitmap(bitmap,0,0,paint);
         // d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
         canvas.restore();
+    }
+
+    @Override
+    public void onUnsubscribed() {
+        if (producer!=null)producer.unsubscribe(this);
+        producer =null;
+    }
+
+    @Override
+    public void onSubscribed() {
+        load();
     }
 }

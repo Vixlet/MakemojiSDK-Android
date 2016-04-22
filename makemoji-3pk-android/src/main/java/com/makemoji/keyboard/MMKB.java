@@ -158,7 +158,7 @@ public class MMKB extends InputMethodService
                 inflate(R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
         rv = (RecyclerView) inputView.findViewById(R.id.kb_page_grid);
-        rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.ROWS, LinearLayoutManager.HORIZONTAL, false));
+        rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.DEFAULT_ROWS, LinearLayoutManager.HORIZONTAL, false));
         heading = (TextView) inputView.findViewById(R.id.kb_page_heading);
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
@@ -861,14 +861,14 @@ public class MMKB extends InputMethodService
     public void onNewDataAvailable() {
 
         int h = rv.getHeight();
-        int size = h / OneGridPage.ROWS;
-        int vSpace = (h - (size * OneGridPage.ROWS)) / OneGridPage.ROWS;
+        int size = h / OneGridPage.DEFAULT_ROWS;
+        int vSpace = (h - (size * OneGridPage.DEFAULT_ROWS)) / OneGridPage.DEFAULT_ROWS;
         int hSpace = (rv.getWidth() - (size * 8)) / 16;
 
 
-        mojisPerPage = Math.max(10, 8 * OneGridPage.ROWS);
+        mojisPerPage = Math.max(10, 8 * OneGridPage.DEFAULT_ROWS);
         List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
-        adapter = new MojiGridAdapter(models,this,OneGridPage.ROWS,size);
+        adapter = new MojiGridAdapter(models,this,OneGridPage.DEFAULT_ROWS,size);
         adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
         itemDecoration = new SpacesItemDecoration(vSpace, hSpace);

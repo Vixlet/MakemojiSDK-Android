@@ -13,6 +13,7 @@ import com.makemoji.mojilib.model.Category;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import retrofit2.Response;
@@ -63,7 +64,7 @@ public class KBCategory {
         }
     }
     private static List<TabLayout.Tab> returnTabs(TabLayout tabLayout, List<Category> categories, @LayoutRes int layoutRes){
-        return addTrendingAndKB(createTabs(tabLayout,mergeCategoriesDrawable(categories),layoutRes),tabLayout,layoutRes);
+        return addTrendingAndKB(createTabs(tabLayout,mergeCategoriesDrawable(categories,true,true),layoutRes),tabLayout,layoutRes);
 
     }
 
@@ -88,13 +89,19 @@ public class KBCategory {
         return tabs;
 
     }
-    public static List<Category> mergeCategoriesDrawable(List<Category> oldCategories){
-        for (Category c : oldCategories){
+    public static List<Category> mergeCategoriesDrawable(List<Category> oldCategories,boolean keepOs,boolean keepRecent){
+        ListIterator<Category> iterator = oldCategories.listIterator();
+        while (iterator.hasNext()){
+            Category c = iterator.next();
             if (defaults.containsKey(c.name.toLowerCase())){
                 c.drawableRes = defaults.get(c.name.toLowerCase());
             }
-            else if ("osemoji".equalsIgnoreCase(c.name)){
+            if ("osemoji".equalsIgnoreCase(c.name)){
                 c.drawableRes=R.drawable.mm_globe;
+                if (!keepOs) iterator.remove();
+            }
+            if ("recent".equalsIgnoreCase(c.name)){
+                c.drawableRes=R.drawable.mm_recent;
             }
         }
         return oldCategories;

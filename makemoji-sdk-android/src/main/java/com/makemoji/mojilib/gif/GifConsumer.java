@@ -7,5 +7,6 @@ import android.graphics.Bitmap;
  */
 public interface GifConsumer {
     void onFrameAvailable(Bitmap b);
-    void stopped();
+    void onStopped();
+    void onStarted(GifProducer producer);
 }

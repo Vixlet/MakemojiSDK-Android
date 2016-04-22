@@ -41,7 +41,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:id="@+id/_mm_edit_text"/>
     </LinearLayout>
 

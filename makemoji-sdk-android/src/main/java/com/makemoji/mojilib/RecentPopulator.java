@@ -19,7 +19,7 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
     private static List<MojiModel> recents;
     static SharedPreferences sp;
     private static int RECENT_SIZE = 150;
-    private static List<MojiModel> getRecents(){
+    public static List<MojiModel> getRecents(){
         if (recents!=null)return recents;
         sp = Moji.context.getSharedPreferences("_mm_recent",0);
         try{
@@ -33,6 +33,7 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
     }
     @UiThread
     public static void addRecent(MojiModel model){
+        if (model.gif==1)return;//no gifs
         List<MojiModel> list = getRecents();
         if (!list.contains(model))list.add(0,model);
         else{//move to front

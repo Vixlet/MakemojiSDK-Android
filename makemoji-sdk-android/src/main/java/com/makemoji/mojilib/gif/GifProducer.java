@@ -10,6 +10,7 @@ import android.util.Log;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.Spanimator;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class GifProducer implements Runnable{
     static Handler handler = new Handler(Looper.getMainLooper());
     private long framesDisplayDuration = -1L;
     String url;
+    final static Object syncObject = new Object();//wait while activity is paused
 
     private GifProducer(GifConsumer consumer,byte[] bytes,String url) {
         this.url = url;
@@ -75,8 +77,16 @@ public class GifProducer implements Runnable{
         }
     }
 
+    public static void onStop(){
+    }
+    public static void onStart(){
+        synchronized (syncObject){
+            syncObject.notifyAll();
+        }
+
+    }
     public boolean animating(){
-        return (!consumers.isEmpty()) && Spanimator.isGifRunning();
+        return Spanimator.isGifRunning();
     }
     private boolean canStart() {
         return animating() && gifDecoder != null && animationThread == null;
@@ -140,10 +150,32 @@ public class GifProducer implements Runnable{
                     // it can be InterruptedException or IllegalArgumentException
                 }
             }
-        } while (animating());
+            if (!animating())
+                try {
+                    WeakReference<List<GifConsumer>> weakConsumers;
+                    synchronized (consumers) {
+                         weakConsumers = new WeakReference<List<GifConsumer>>(new ArrayList<>(consumers));
+                        for (GifConsumer c : consumers)
+                            c.onStopped();
+                        consumers.clear();
+                    }
+
+                    synchronized (syncObject) {
+                        //Log.d(TAG,"waiting");
+                        syncObject.wait();//wait until activity resumes
+                       // Log.d(TAG,"resuming");
+                    }
+                    List<GifConsumer> oldConsumers = weakConsumers.get();//get consumers that are still in memory and resub them.
+                    if (oldConsumers!=null)
+                        for (GifConsumer c:oldConsumers)
+                            c.onStarted(this);
+                }catch (InterruptedException e){
+                    break;
+                }
+        } while (!consumers.isEmpty());
         synchronized (consumers) {
             for (GifConsumer c : consumers) {
-                c.stopped();
+                c.onStopped();
             }
         }
         removeProducer(this);

@@ -18,9 +18,11 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     TextView heading;
     int count;
     int mojisPerPage = 10;
-    public static final int ROWS = 5;
+    public int ROWS = DEFAULT_ROWS;
+    public static final int DEFAULT_ROWS = 5;
     RecyclerView rv;
     RecyclerView.ItemDecoration itemDecoration;
+    boolean gifs;
 
     private int oldH;
     public OneGridPage(String title, MojiInputLayout mojiInputLayout, PagerPopulator p) {
@@ -30,8 +32,13 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         heading.setTextColor(mMojiInput.getHeaderTextColor());
         heading.setText(title);
         rv = (RecyclerView) mView.findViewById(R.id._mm_page_grid);
+        if ("gifs".equalsIgnoreCase(title)) {
+            gifs=true;
+            ROWS = 2;
+        }
         rv.setLayoutManager(new GridLayoutManager(mojiInputLayout.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
         mPopulator.setup(this);
+
         mView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -59,8 +66,10 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         count = mPopulator.getTotalCount();
         MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, ROWS, size);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
-        itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
-        rv.addItemDecoration(itemDecoration);
+        if (!gifs){
+            itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
+            rv.addItemDecoration(itemDecoration);
+        }
         rv.setAdapter(adapter);
 
     }

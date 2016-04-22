@@ -7,6 +7,8 @@ import android.support.annotation.IntDef;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import com.makemoji.mojilib.gif.GifProducer;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Map;
@@ -109,12 +111,13 @@ public class Spanimator {
         mPaused=false;
        // Log.d("Spanimator","spanimator lifecycle resume");
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
+        GifProducer.onStart();
     }
    public static void onPause(){
         mPaused=true;
         //Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
-        System.gc();
+       GifProducer.onStop();
 
     }
     public static boolean isGifRunning(){

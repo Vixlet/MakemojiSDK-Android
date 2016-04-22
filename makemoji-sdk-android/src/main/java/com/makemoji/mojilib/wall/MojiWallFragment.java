@@ -32,6 +32,7 @@ import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.R;
+import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.SmallCB;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.model.Category;
@@ -57,16 +58,17 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     IMojiSelected mojiSelected;
     List<Category> categories =new ArrayList<>();
     @LayoutRes int  tabRes;
-    public static MojiWallFragment newInstance() {
+    public static MojiWallFragment newInstance(boolean showRecent, boolean showOs) {
 
         Bundle args = new Bundle();
-
+        args.putBoolean("recent",showRecent);
+        args.putBoolean("os",showOs);
         MojiWallFragment fragment = new MojiWallFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Nullable
+    boolean showRecent,showOs;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -84,6 +86,10 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
         pager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(pager);
+
+
+        showRecent = getArguments().getBoolean("recent");
+        showOs = getArguments().getBoolean("os");
 
         final SharedPreferences sp = getContext().getSharedPreferences("emojiWall",0);
         try {
@@ -105,6 +111,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     return;
                 }
                 sp.edit().putString("data",MojiModel.gson.toJson(response.body())).apply();
+                if (response.body().size()==categories.size())
+                    return;
                 handleData(response.body());
 
             }
@@ -114,12 +122,13 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     }
     public synchronized void handleData(Map<String, List<MojiModel>> data){
         categories = new ArrayList<>();
+        data.put("recent", RecentPopulator.getRecents());
         for (Map.Entry<String,List<MojiModel>> entry :data.entrySet()){
             Category c = new Category(entry.getKey(),null);
             c.models = entry.getValue();
             categories.add(c);
         }
-        categories = KBCategory.mergeCategoriesDrawable(categories);
+        categories = KBCategory.mergeCategoriesDrawable(categories,showRecent,showOs);
         List<Category> cached = Category.getCategories();
         for (Category cat : categories)//find icon url
             if (cat.drawableRes==0 && cat.image_url==null)
@@ -253,8 +262,10 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                 itemDecoration = null;
             }
             int hspace =(parentWidth-(size*5))/10;
-            itemDecoration = new SpacesItemDecoration((int)(15*Moji.density),hspace);
-            rv.addItemDecoration(itemDecoration);
+                if (!"gifs".equalsIgnoreCase(category)) {
+                    itemDecoration = new SpacesItemDecoration((int) (15 * Moji.density), hspace);
+                    rv.addItemDecoration(itemDecoration);
+                }
             rv.setAdapter(mojiGridAdapter);
             Log.d("wall","size: "+ size + " hspace:"+ hspace);
 
