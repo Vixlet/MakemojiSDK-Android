@@ -106,14 +106,25 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         }
         Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
             @Override
-            public void done(Response<Map<String, List<MojiModel>>> response, @Nullable Throwable t) {
+            public void done(final Response<Map<String, List<MojiModel>>> wallResponse, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
                     return;
                 }
-                sp.edit().putString("data",MojiModel.gson.toJson(response.body())).apply();
-                if (categories.isEmpty())//lazily update only if new data
-                    handleData(response.body());
+                sp.edit().putString("data",MojiModel.gson.toJson(wallResponse.body())).apply();
+                Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
+                    @Override
+                    public void done(Response<List<Category>> response, @Nullable Throwable t) {
+                        if (t!=null) {
+                            t.printStackTrace();
+                            return;
+                        }
+                        Category.saveCategories(response.body());
+
+                        if (categories.isEmpty())//lazily update only if new data
+                            handleData(wallResponse.body());
+                    }
+                });
 
             }
         });
