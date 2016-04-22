@@ -20,7 +20,7 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     boolean selected =false;
     public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
     public static final String EXTRA_SHOWRECENT = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWRECENT";
-    public static final String EXTRA_SHOWOS = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWOS";
+    public static final String EXTRA_SHOWUNICODE = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWUNICODE";
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -28,7 +28,7 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
         setContentView(R.layout.mm_moji_wall_activity);
         getSupportFragmentManager().beginTransaction().
                 add(R.id._mm_page_container, MojiWallFragment.newInstance(getIntent().getBooleanExtra(EXTRA_SHOWRECENT,false),
-                        getIntent().getBooleanExtra(EXTRA_SHOWOS,false)),"mojiWall")
+                        getIntent().getBooleanExtra(EXTRA_SHOWUNICODE,false)),"mojiWall")
                 .commitAllowingStateLoss();
     }
     @Override

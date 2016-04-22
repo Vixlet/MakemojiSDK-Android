@@ -111,9 +111,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     return;
                 }
                 sp.edit().putString("data",MojiModel.gson.toJson(response.body())).apply();
-                if (response.body().size()==categories.size())
-                    return;
-                handleData(response.body());
+                if (categories.isEmpty())//lazily update only if new data
+                    handleData(response.body());
 
             }
         });
@@ -254,7 +253,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
 
             parentWidth = ((View) rv.getParent().getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
-            mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),5,
+            mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),true,
                     size);
             mojiGridAdapter.setImagesSizedtoSpan(false);
             if (itemDecoration!=null) {

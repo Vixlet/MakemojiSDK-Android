@@ -7,6 +7,7 @@ package com.makemoji.mojilib.gif;
         import android.os.Handler;
         import android.os.Looper;
         import android.util.AttributeSet;
+        import android.util.Log;
         import android.view.View;
         import android.widget.ImageView;
 
@@ -78,6 +79,19 @@ public class GifImageView extends ImageView implements GifConsumer {
         super.onDetachedFromWindow();
         clear();
     }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        load();
+    }
+    @Override
+    protected void onWindowVisibilityChanged (int visibility){
+       // Log.d("GIF"," "+ visibility);
+        if (visibility==View.VISIBLE)load();
+        if (visibility==View.GONE) clear();
+    }
+
     public void clear(){
         if (producer!=null){
             producer.unsubscribe(this);
@@ -85,7 +99,13 @@ public class GifImageView extends ImageView implements GifConsumer {
         }
     }
 
-    public void getFromUrl(final String url){
+    String url;
+    public void getFromUrl(final String url) {
+        this.url = url;
+        load();
+    }
+    public void load(){
+        if (url==null) return;
         producer = GifProducer.getProducerAndSub(this,null,url);
         if (producer!=null)return;
         Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {

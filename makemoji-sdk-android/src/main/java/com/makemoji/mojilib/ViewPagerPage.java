@@ -90,7 +90,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
             int vSpace = (container.getHeight() - (size*ROWS))/ROWS;
             int hSpace = (container.getWidth() - (size*8))/16;
 
-            MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>(),mMojiInput,ROWS,size);
+            MojiGridAdapter gridAdapter = new MojiGridAdapter(new ArrayList<MojiModel>(),mMojiInput,false,size);
             gridAdapter.setMojiModels(mPopulator.populatePage(mojisPerPage,position*mojisPerPage));
             GridLayoutManager glm = new GridLayoutManager(mMojiInput.getContext(),ROWS,GridLayoutManager.HORIZONTAL,false){
                 @Override

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiSpan;
+import com.makemoji.mojilib.Spanimator;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -170,8 +171,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
 
     @Override
     public void onUnsubscribed() {
-        if (producer!=null)producer.unsubscribe(this);
-        producer =null;
+       // if (producer!=null)producer.unsubscribe(this);
+        //producer =null;
     }
 
     @Override

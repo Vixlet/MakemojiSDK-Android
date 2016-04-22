@@ -868,7 +868,7 @@ public class MMKB extends InputMethodService
 
         mojisPerPage = Math.max(10, 8 * OneGridPage.DEFAULT_ROWS);
         List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
-        adapter = new MojiGridAdapter(models,this,OneGridPage.DEFAULT_ROWS,size);
+        adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
         itemDecoration = new SpacesItemDecoration(vSpace, hSpace);

@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.makemoji.mojilib.Moji;
@@ -76,6 +77,11 @@ public class KBCategory {
             if (c.drawableRes!=0){
                 tabs.add(tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(c.drawableRes));
+                if ("recent".equals(c.name)){
+                    View v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
+                    if ((v!=null) && v instanceof ImageView)
+                        ((ImageView) v).setColorFilter(Moji.resources.getColor(R.color._mm_left_button_cf));
+                }
             }
             else if (c.image_url!=null){
                 TabLayout.Tab tab = tabLayout.newTab().setCustomView(layoutRes).

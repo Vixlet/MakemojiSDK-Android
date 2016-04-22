@@ -64,7 +64,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
 
         mojisPerPage = Math.max(10, 8 * ROWS);
         count = mPopulator.getTotalCount();
-        MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, ROWS, size);
+        MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, false, size);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
         if (!gifs){
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);

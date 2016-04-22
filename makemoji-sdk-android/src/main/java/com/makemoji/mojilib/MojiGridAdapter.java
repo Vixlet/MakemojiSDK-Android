@@ -25,7 +25,7 @@ import java.util.List;
 public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder>
 {
     List<MojiModel> mojiModels = new ArrayList<>();
-    final int ROWS;
+    boolean vertical;
     int spanSize;
     Drawable phraseBg;
     ClickAndStyler clickAndStyler;
@@ -40,11 +40,11 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
         enablePulse = enable;
     }
 
-    public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,int rows, int spanSize) {
+    public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,boolean vertical, int spanSize) {
         mojiModels = models;
         this.clickAndStyler = clickAndStyler;
-        ROWS = rows;
         this.spanSize = spanSize;
+        this.vertical =vertical;
         phraseBg = ContextCompat.getDrawable(clickAndStyler.getContext(),R.drawable.mm_phrase_bg);
         phraseBg.setColorFilter(clickAndStyler.getPhraseBgColor(), PorterDuff.Mode.SRC);
     }
@@ -75,7 +75,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 .inflate(R.layout.mm_rv_moji_item, parent, false);
         else if (viewType==2){
             v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.mm_gif_iv,parent,false);
+                    .inflate(vertical?R.layout.mm_gif_iv_vertical:R.layout.mm_gif_iv,parent,false);
         }
         else {
             v = LayoutInflater.from(parent.getContext())

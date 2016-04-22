@@ -48,6 +48,7 @@ public class MojiModel {
     public MojiModel(String name, String image_url){
         this.name = name;
         this.image_url = image_url;
+        if (image_url!=null && image_url.toLowerCase().endsWith(".gif"))gif=1;
     }
 
     @Override
