@@ -60,6 +60,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MMKB extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
         PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener {
@@ -843,7 +848,9 @@ public class MMKB extends InputMethodService
             populator = new TrendingPopulator();
         else
             populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));
+
         populator.setup(this);
+        gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
     }
 
     @Override
@@ -857,6 +864,7 @@ public class MMKB extends InputMethodService
     }
 
 
+    boolean gifs;
     @Override
     public void onNewDataAvailable() {
 
@@ -871,14 +879,83 @@ public class MMKB extends InputMethodService
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
-        itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
-        rv.addItemDecoration(itemDecoration);
+        if (gifs) {
+            itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
+            rv.addItemDecoration(itemDecoration);
+        }
+        ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?2:OneGridPage.DEFAULT_ROWS);
         rv.setAdapter(adapter);
 
         Spanimator.onResume();
 
     }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Spanimator.onPause();
+    }
 
+    public void share(MojiModel model, File cacheFile){
+        Uri uri = FileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
+        PackageManager pm = getPackageManager();
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setPackage(packageName);
+        i.putExtra(Moji.EXTRA_MM, true);
+        i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN, getContext().getPackageName());
+        i.putExtra(Intent.EXTRA_STREAM,uri);
+        i.setData(uri);
+        i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        i.putExtra(Moji.EXTRA_JSON, MojiModel.toJson(model).toString());
+        i.setType("image/*");
+        List<ResolveInfo> bcs = pm.queryBroadcastReceivers(i,0);
+        List<ResolveInfo> ris = pm.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if (ris.isEmpty()) {
+            Toast.makeText(getContext(), "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG).show();
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("MakeMoji emoji", model.image_url);
+            clipboard.setPrimaryClip(clip);
+            return;
+        }
+        i.setPackage(ris.get(0).activityInfo.packageName);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(i);
+
+    }
+    public void getGif(final MojiModel model){
+        Moji.okHttpClient.newCall(new Request.Builder().url(model.image_url).build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                FileOutputStream out = null;
+                File path = new File(getFilesDir(),"images");
+                path.mkdir();
+                File cacheFile = new File(path,"share.png");
+                try {
+                    out = new FileOutputStream(cacheFile.getPath());
+                    out.write(response.body().bytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                    return;
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    share(model,cacheFile);
+            }
+        }
+    });
+    }
     public Target getTarget(final MojiModel model) {
         return new Target() {
             @Override
@@ -904,30 +981,7 @@ public class MMKB extends InputMethodService
                         Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Uri uri = FileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
-                    PackageManager pm = getPackageManager();
-                    Intent i = new Intent(Intent.ACTION_SEND);
-                    i.setPackage(packageName);
-                    i.putExtra(Moji.EXTRA_MM, true);
-                    i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN, getContext().getPackageName());
-                    i.putExtra(Intent.EXTRA_STREAM,uri);
-                    i.setData(uri);
-                    i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    i.putExtra(Moji.EXTRA_JSON, MojiModel.toJson(model).toString());
-                    i.setType("image/*");
-                    List<ResolveInfo> bcs = pm.queryBroadcastReceivers(i,0);
-                    List<ResolveInfo> ris = pm.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
-                    if (ris.isEmpty()) {
-                        Toast.makeText(getContext(), "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG).show();
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("MakeMoji emoji", model.image_url);
-                        clipboard.setPrimaryClip(clip);
-                        return;
-                    }
-                    i.setPackage(ris.get(0).activityInfo.packageName);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(i);
-
+                    share(model,cacheFile);
                    /* Doesn't work
                    Intent i2 = new Intent(getContext(),BlankActivity.class);
                     i2.putExtra("uri",uri);
@@ -962,7 +1016,9 @@ public class MMKB extends InputMethodService
             getCurrentInputConnection().finishComposingText();
             return;
         }
-        if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).resize(size,size).into(t);
+        if (model.image_url!=null && model.image_url.toLowerCase().endsWith(".gif"))
+            getGif(model);
+        else if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).resize(size,size).into(t);
     }
 
 
