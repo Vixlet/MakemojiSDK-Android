@@ -9,6 +9,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.inputmethodservice.InputMethodService;
@@ -34,6 +38,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -193,9 +198,14 @@ public class MMKB extends InputMethodService
 
             }
         };
+        ImageView backspace = (ImageView) inputView.findViewById(R.id.kb_backspace_button);
+        int iconColor = getResources().getColor(R.color.mmKBIconColor);
+        iconColor = Color.argb(255,Color.red(iconColor),Color.green(iconColor),Color.blue(iconColor));
+        backspace.setColorFilter(iconColor, PorterDuff.Mode.SRC_ATOP);
+        new BackSpaceDelegate(backspace,backSpaceRunnable);
 
-        new BackSpaceDelegate(inputView.findViewById(R.id.kb_backspace_button),backSpaceRunnable);
-        inputView.findViewById(R.id.kb_abc).setOnClickListener(new View.OnClickListener() {
+        ImageView abc = (ImageView) inputView.findViewById(R.id.kb_abc);
+        abc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 InputMethodManager imm = (InputMethodManager)
@@ -203,6 +213,7 @@ public class MMKB extends InputMethodService
                 imm.showInputMethodPicker();
             }
         });
+        abc.setColorFilter(iconColor, PorterDuff.Mode.SRC_ATOP);
         inputView.findViewById(R.id.share_kb_tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -879,10 +890,10 @@ public class MMKB extends InputMethodService
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
-        if (gifs) {
+      //  if (gifs) {
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
             rv.addItemDecoration(itemDecoration);
-        }
+     //   }
         ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?2:OneGridPage.DEFAULT_ROWS);
         rv.setAdapter(adapter);
 
@@ -896,7 +907,7 @@ public class MMKB extends InputMethodService
     }
 
     public void share(MojiModel model, File cacheFile){
-        Uri uri = FileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
+        Uri uri = MMFileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
         PackageManager pm = getPackageManager();
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setPackage(packageName);

@@ -26,16 +26,17 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
 
     private int oldH;
     public OneGridPage(String title, MojiInputLayout mojiInputLayout, PagerPopulator p) {
-        super(R.layout.mm_one_grid_page, mojiInputLayout);
-        mPopulator = p;
-        heading = (TextView) mView.findViewById(R.id._mm_page_heading);
-        heading.setTextColor(mMojiInput.getHeaderTextColor());
-        heading.setText(title);
-        rv = (RecyclerView) mView.findViewById(R.id._mm_page_grid);
+        super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mojiInputLayout);
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
             ROWS = 2;
         }
+        mPopulator = p;
+        heading = (TextView) mView.findViewById(R.id._mm_page_heading);
+        if (!gifs)heading.setTextColor(mMojiInput.getHeaderTextColor());
+        heading.setText(title);
+        rv = (RecyclerView) mView.findViewById(R.id._mm_page_grid);
+
         rv.setLayoutManager(new GridLayoutManager(mojiInputLayout.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
         mPopulator.setup(this);
 
@@ -57,8 +58,8 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     public void onNewDataAvailable() {
         if (mView.getHeight()==0 || mPopulator.getTotalCount()==0)return;
         int h = rv.getHeight();
-        int size = h / ROWS;
-        int vSpace = (h - (size * ROWS)) / ROWS;
+        int size = h / DEFAULT_ROWS;
+        int vSpace = (h - (size * DEFAULT_ROWS)) / DEFAULT_ROWS;
         int hSpace = (mView.getWidth() - (size * 8)) / 16;
 
 
@@ -66,10 +67,10 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         count = mPopulator.getTotalCount();
         MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, false, size);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
-        if (!gifs){
+       // if (!gifs){
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
             rv.addItemDecoration(itemDecoration);
-        }
+        //}
         rv.setAdapter(adapter);
 
     }

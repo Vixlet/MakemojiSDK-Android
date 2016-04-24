@@ -12,6 +12,7 @@ package com.makemoji.mojilib.gif;
         import android.widget.ImageView;
 
         import com.makemoji.mojilib.Moji;
+        import com.makemoji.mojilib.R;
 
         import java.io.IOException;
 
@@ -101,6 +102,10 @@ public class GifImageView extends ImageView implements GifConsumer {
 
     String url;
     public void getFromUrl(final String url) {
+        if (url!=null && !url.equals(this.url)){
+            clear();
+            setImageResource(R.drawable.mm_placeholder);
+        }
         this.url = url;
         load();
     }

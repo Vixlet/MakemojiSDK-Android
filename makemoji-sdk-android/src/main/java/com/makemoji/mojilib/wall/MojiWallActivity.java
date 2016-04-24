@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.R;
+import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.model.MojiModel;
 
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
         Intent intent = new Intent();
         JSONObject jo = MojiModel.toJson(model);
+        RecentPopulator.addRecent(model);
         if (jo!=null) {
             intent.putExtra(Moji.EXTRA_JSON, jo.toString());
             setResult(RESULT_OK, intent);

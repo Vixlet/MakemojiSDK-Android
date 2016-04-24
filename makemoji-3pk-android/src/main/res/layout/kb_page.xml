@@ -12,6 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:text="Categories"
+            android:textColor="@color/mmKBPageTitleColor"
             style="@style/MakeMojiHeaderTextAppearance"
             android:id="@+id/kb_page_heading"
             android:layout_height="wrap_content" />

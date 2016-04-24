@@ -92,18 +92,23 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         showRecent = getArguments().getBoolean("recent");
         showOs = getArguments().getBoolean("os");
 
+        int cachedSize =0;
         final SharedPreferences sp = getContext().getSharedPreferences("emojiWall",0);
         try {
             String s = sp.getString("data", null);
             Map<String, List<MojiModel>> data =
                     MojiModel.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
                     }.getType());
-            if (data != null)
-                handleData(data);
+            List<Category> cats = Category.getCategories();
+            if (data != null && cats!=null) {
+                cachedSize = data.size();
+                handleData(data,cats);
+            }
         }
         catch (Exception e){
             e.printStackTrace();
         }
+        final int cacheSize = cachedSize;
         Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
             @Override
             public void done(final Response<Map<String, List<MojiModel>>> wallResponse, @Nullable Throwable t) {
@@ -121,8 +126,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                         }
                         Category.saveCategories(response.body());
 
-                        if (categories.isEmpty())//lazily update only if new data
-                            handleData(wallResponse.body());
+                        if (cacheSize!=wallResponse.body().size())//lazily update only if new data
+                            handleData(wallResponse.body(),response.body());
                     }
                 });
 
@@ -131,19 +136,26 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
 
         return view;
     }
-    public synchronized void handleData(Map<String, List<MojiModel>> data){
+    public synchronized void handleData(Map<String, List<MojiModel>> data,List<Category> cats){
         categories = new ArrayList<>();
-        for (Map.Entry<String,List<MojiModel>> entry :data.entrySet()){
-            Category c = new Category(entry.getKey(),null);
-            c.models = entry.getValue();
-            categories.add(c);
-            if ("trending".equalsIgnoreCase(c.name)) {
-                Category recent = new Category("recent",null);
-                recent.models = RecentPopulator.getRecents();
-                categories.add(recent);
+        for (Category cat: cats){
+           List<MojiModel> list = data.get(cat.name);
+            if (list !=null){
+                cat.models = list;
+                categories.add(cat);
             }
         }
-        categories = KBCategory.mergeCategoriesDrawable(categories,showRecent,showOs);
+        if (data.containsKey("Trending")){
+            Category c = new Category("Trending",null);
+            c.drawableRes = R.drawable.mm_trending;
+            c.models = data.get("Trending");
+            categories.add(0,c);
+            Category recent = new Category("recent",null);
+            recent.models = RecentPopulator.getRecents();
+            categories.add(1,recent);
+        }
+
+        categories = KBCategory.mergeCategoriesDrawable(categories,showOs,showRecent);
         List<Category> cached = Category.getCategories();
         for (Category cat : categories)//find icon url
             if (cat.drawableRes==0 && cat.image_url==null)
@@ -267,7 +279,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                 @Override
                 public void run() {
 
-            parentWidth = ((View) rv.getParent().getParent()).getWidth();
+            parentWidth = ((View) rv.getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),true,
                     size);
@@ -277,10 +289,10 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                 itemDecoration = null;
             }
             int hspace =(parentWidth-(size*5))/10;
-                if (!"gifs".equalsIgnoreCase(category)) {
-                    itemDecoration = new SpacesItemDecoration((int) (15 * Moji.density), hspace);
+                //if (!"gifs".equalsIgnoreCase(category)) {
+                    itemDecoration = new SpacesItemDecoration((int) (10 * Moji.density), hspace);
                     rv.addItemDecoration(itemDecoration);
-                }
+              //  }
             rv.setAdapter(mojiGridAdapter);
             Log.d("wall","size: "+ size + " hspace:"+ hspace);
 

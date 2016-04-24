@@ -21,7 +21,7 @@
 
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name=".MMFileProvider"
             android:authorities="@string/_mm_provider_authority"
             android:exported="false"
             android:grantUriPermissions="true">

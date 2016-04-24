@@ -8,4 +8,6 @@
     <color name="candidate_recommended">#FFE35900</color>
     <color name="candidate_other">#ff808080</color>
     <color name="candidate_background">#bbffffff</color>
+    <color name="mmKBPageTitleColor">@color/_mm_header_text_color</color>
+    <color name="mmKBIconColor">@color/_mm_grey_600</color>
 </resources>
