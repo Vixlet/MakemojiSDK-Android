@@ -157,6 +157,8 @@ public class Moji {
     }
 
     public static void setUserId(String id){
+        SharedPreferences sp = context.getSharedPreferences("_mm_id",0);
+        sp.edit().putString("id",id).apply();
         userId=id;
     }
 

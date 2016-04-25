@@ -279,7 +279,9 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                 @Override
                 public void run() {
 
-            parentWidth = ((View) rv.getParent()).getWidth();
+           if (rv.getParent()==null) parentWidth = (int)(300 *Moji.density);
+                    else
+               parentWidth = ((View) rv.getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),true,
                     size);
