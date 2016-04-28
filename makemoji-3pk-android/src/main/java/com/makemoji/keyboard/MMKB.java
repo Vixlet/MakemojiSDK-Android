@@ -197,6 +197,7 @@ public class MMKB extends InputMethodService
                 int deleteLength =1;
                 if (text.length()>1 && (Character.isSurrogatePair(text.charAt(0),text.charAt(1))|| MojiInputLayout.isVariation(text.charAt(1))))
                     deleteLength =2;
+                getCurrentInputConnection().finishComposingText();
                 getCurrentInputConnection().deleteSurroundingText(deleteLength,0);
 
             }
