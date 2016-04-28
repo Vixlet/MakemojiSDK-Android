@@ -49,7 +49,6 @@ import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.MojiSpan;
-import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
@@ -117,6 +116,7 @@ public class MMKB extends InputMethodService
     TextView heading, shareText;
     View pageFrame;
     static CharSequence shareMessage;
+    int rows, cols, gifRows;
 
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -126,6 +126,9 @@ public class MMKB extends InputMethodService
         super.onCreate();
         mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         mWordSeparators = getResources().getString(R.string.word_separators);
+        rows = Moji.context.getResources().getInteger(R.integer.mm_3pk_rows);
+        gifRows = Moji.context.getResources().getInteger(R.integer.mm_3pk_gif_rows);
+        cols = Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
     }
 
     /**
@@ -168,7 +171,7 @@ public class MMKB extends InputMethodService
                 inflate(R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
         rv = (RecyclerView) inputView.findViewById(R.id.kb_page_grid);
-        rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), OneGridPage.DEFAULT_ROWS, LinearLayoutManager.HORIZONTAL, false));
+        rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), rows, LinearLayoutManager.HORIZONTAL, false));
         heading = (TextView) inputView.findViewById(R.id.kb_page_heading);
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
@@ -878,14 +881,13 @@ public class MMKB extends InputMethodService
     boolean gifs;
     @Override
     public void onNewDataAvailable() {
-
         int h = rv.getHeight();
-        int size = h / OneGridPage.DEFAULT_ROWS;
-        int vSpace = (h - (size * OneGridPage.DEFAULT_ROWS)) / OneGridPage.DEFAULT_ROWS;
-        int hSpace = (rv.getWidth() - (size * 8)) / 16;
+        int size = h / rows;
+        int vSpace = (h - (size * rows)) / rows;
+        int hSpace = (rv.getWidth() - (size * cols)) / (cols *2);
 
 
-        mojisPerPage = Math.max(10, 8 * OneGridPage.DEFAULT_ROWS);
+        mojisPerPage = Math.max(rows*2, cols * rows);
         List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setEnablePulse(false);
@@ -894,7 +896,7 @@ public class MMKB extends InputMethodService
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
             rv.addItemDecoration(itemDecoration);
      //   }
-        ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?2:OneGridPage.DEFAULT_ROWS);
+        ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?gifRows:rows);
         rv.setAdapter(adapter);
 
         Spanimator.onResume();

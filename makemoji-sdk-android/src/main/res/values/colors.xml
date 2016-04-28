@@ -13,4 +13,7 @@
 
     <color name="_mm_grey_900">#212121</color>
     <color name="_mm_grey_600">#616161</color>
+
+    <color name="mmKBPageTitleColor">@color/_mm_header_text_color</color>
+    <color name="mmKBIconColor">@color/_mm_grey_600</color>
 </resources>

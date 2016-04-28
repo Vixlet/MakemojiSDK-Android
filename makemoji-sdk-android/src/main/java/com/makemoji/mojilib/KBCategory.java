@@ -113,11 +113,19 @@ public class KBCategory {
         }
         return oldCategories;
     }
-    private static List<TabLayout.Tab> addTrendingAndKB(List<TabLayout.Tab> tabs, TabLayout tabLayout,@LayoutRes int layoutRes){
+    @SuppressWarnings("ConstantConditions")
+    private static List<TabLayout.Tab> addTrendingAndKB(List<TabLayout.Tab> tabs, TabLayout tabLayout, @LayoutRes int layoutRes){
         tabs.add(0,tabLayout.newTab().setCustomView(layoutRes).
                 setContentDescription(defaultCategories[0]).setIcon(icons[0]));
         tabs.add(tabs.size(),tabLayout.newTab().setCustomView(layoutRes).
                 setContentDescription(defaultCategories[defaultCategories.length-1]).setIcon(icons[defaultCategories.length-1]));
+
+        View v = tabs.get(0).getCustomView().findViewWithTag("iv");
+        if ((v!=null) && v instanceof ImageView)
+            ((ImageView) v).setColorFilter(tabLayout.getContext().getResources().getColor(R.color.mmKBIconColor));
+         v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
+        if ((v!=null) && v instanceof ImageView)
+            ((ImageView) v).setColorFilter(tabLayout.getContext().getResources().getColor(R.color.mmKBIconColor));
 
         return tabs;
     }
