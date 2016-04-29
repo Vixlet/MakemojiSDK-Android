@@ -891,6 +891,7 @@ public class MMKB extends InputMethodService
         mojisPerPage = Math.max(rows*2, cols * rows);
         List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
         adapter = new MojiGridAdapter(models,this,false,size);
+        adapter.setImagesSizedtoSpan(getContext().getResources().getBoolean(R.bool.mmUseSpanSizeFor3pkImages));
         adapter.setEnablePulse(false);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
       //  if (gifs) {
@@ -1023,7 +1024,6 @@ public class MMKB extends InputMethodService
     @Override
     public void addMojiModel(MojiModel model, BitmapDrawable d) {
         t = getTarget(model);
-        int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         if (model.character!=null && !model.character.isEmpty()){
             getCurrentInputConnection().finishComposingText();
             getCurrentInputConnection().setComposingText(model.character, 1);
@@ -1032,7 +1032,7 @@ public class MMKB extends InputMethodService
         }
         if (model.image_url!=null && model.image_url.toLowerCase().endsWith(".gif"))
             getGif(model);
-        else if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).resize(size,size).into(t);
+        else if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).into(t);
     }
 
 
