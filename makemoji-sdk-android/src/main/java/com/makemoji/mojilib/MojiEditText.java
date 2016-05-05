@@ -76,7 +76,7 @@ public class MojiEditText extends EditText {
                 if (ssb.length()>builder.length()){//mojis have been deleted
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
                     setText(builder);
-                    setSelection(Math.max(0,selection));
+                    setSelection(Math.max(0,Math.min(selection,getText().length())));
                 }
                 }
             });
@@ -150,7 +150,7 @@ public class MojiEditText extends EditText {
                             pa.spanned,
                             original.subSequence(max,original.length())));
             setText(newText);
-            setSelection(Math.min(min+pa.spanned.length(),newText.length()));
+            setSelection(Math.min(min+pa.spanned.length(),getText().length()));
             Moji.subSpanimatable(newText,this);
             stopActionMode();
             return true;
