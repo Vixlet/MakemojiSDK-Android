@@ -3,12 +3,16 @@ package com.makemoji.mojilib;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -37,8 +41,9 @@ public interface MojiApi {
     @GET("emoji/index/trendingflashtags")
     Call<List<MojiModel>> getTrendingFlashtags();
 
+    @FormUrlEncoded
     @POST("messages/create")
-    Call<Integer> sendPressed(@Body String htmlMessage);
+    Call<JSONObject> sendPressed(@Field("message") String htmlMessage);
 
     @POST("emoji/viewTrack")
     Call<Void> trackViews( @Body RequestBody array);

@@ -39,7 +39,11 @@ import com.makemoji.mojilib.model.MojiModel;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
+
+import retrofit2.Response;
 
 /**
  * To switch between emoji pages that paginate or that are one cotinuous list, change new OneGridPage(...) to ViewPagerPage
@@ -627,26 +631,59 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 if (sendClickListener!=null){
                     SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
                     String html = Moji.toHtml(ssb);
-                    onSaveInputToRecentAndsBackend(ssb,html);
+                    onSaveInputToRecentAndsBackend(ssb);
                     if (sendClickListener.onClick(html,ssb))
                         editText.setText("");
                 }
             }
         });
     }
-    protected void onSaveInputToRecentAndsBackend(Spanned spanned, String html){
-        MojiSpan [] spans = spanned.getSpans(0,spanned.length(),MojiSpan.class);
-        for (int i = 0; i< spans.length; i++){
-            MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
-            model.link_url = spans[i].getLink();
-            RecentPopulator.addRecent(model);
-        }
-        Moji.mojiApi.sendPressed(html);
+    protected void onSaveInputToRecentAndsBackend(final CharSequence cs){
+        final SpannableStringBuilder ssb = new SpannableStringBuilder(cs);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
+                for (int i = 0; i< spans.length; i++){
+                    MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
+                    model.id = spans[i].id;
+                    model.link_url = spans[i].getLink();
+                    RecentPopulator.addRecent(model);
+                }
+                List<Integer> removals = new ArrayList<>();
+                for (int i = ssb.length()-1;i>=0;i--){
+                    if (!keepCharForAnalytics(ssb.charAt(i))) {
+                        //Log.d(TAG,"removed "+ssb.charAt(i) );
+                        removals.add(i);
+                    }
+                }
+                for (Integer i : removals){
+                    ssb.replace(i,i+1,"");
+                }
+                String html = Moji.toHtml(ssb);
+                Moji.mojiApi.sendPressed(html).enqueue(new SmallCB<JSONObject>() {
+                    @Override
+                    public void done(Response<JSONObject> response, @Nullable Throwable t) {
+                        if (t!=null){
+                            t.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }).start();
+
+
+    }
+    public static boolean keepCharForAnalytics(char c){
+        int type = Character.getType(c);
+        if (c==MojiEditText.replacementChar||
+                Character.isHighSurrogate(c)||Character.isLowSurrogate(c)||
+                type == 28 ||type==25 ||type==27 || type ==6 )return true;//symbol, math,modifier,mark nonspacing
+        return false;
+
     }
     public void manualSaveInputToRecentsAndBackend(){
-        SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
-        String html = Moji.toHtml(ssb);
-        onSaveInputToRecentAndsBackend(ssb,html);
+        onSaveInputToRecentAndsBackend(editText.getText());
     }
     public boolean handleIntent(Intent i){
         try {

@@ -41,7 +41,7 @@ public class GifProducer implements Runnable{
     private static void removeProducer(GifProducer producer){
         producerMap.remove(producer.url);
     }
-    final List<SoftReference<GifConsumer>> consumers = Collections.synchronizedList(new ArrayList<SoftReference<GifConsumer>>());
+    final List<WeakReference<GifConsumer>> consumers = Collections.synchronizedList(new ArrayList<WeakReference<GifConsumer>>());
     GifDecoder gifDecoder;
     Thread animationThread;
     Bitmap tmpBitmap;
@@ -53,7 +53,7 @@ public class GifProducer implements Runnable{
 
     private GifProducer(GifConsumer consumer,byte[] bytes,String url) {
         this.url = url;
-        consumers.add(new SoftReference<>(consumer));
+        consumers.add(new WeakReference<>(consumer));
         gifDecoder = new GifDecoder();
         try {
             gifDecoder.read(bytes);
@@ -123,7 +123,7 @@ public class GifProducer implements Runnable{
                     tmpBitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
                     frameDecodeTime = (System.nanoTime() - before) / 1000000;
                     synchronized (consumers) {
-                        for (SoftReference<GifConsumer> sr : consumers) {
+                        for (WeakReference<GifConsumer> sr : consumers) {
                             GifConsumer c = sr.get();
                             if (c!=null)c.onFrameAvailable(tmpBitmap);
                         }
@@ -165,14 +165,14 @@ public class GifProducer implements Runnable{
                     e.printStackTrace();
                 }
             }
-            ListIterator<SoftReference<GifConsumer>> iterator = consumers.listIterator();
+            ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
             while (iterator.hasNext()) {
                 GifConsumer c = iterator.next().get();
                 if (c==null) iterator.remove();
             }
         } while (!consumers.isEmpty());
         synchronized (consumers) {
-            ListIterator<SoftReference<GifConsumer>> iterator = consumers.listIterator();
+            ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
              while (iterator.hasNext()) {
                 GifConsumer c = iterator.next().get();
                 if (c!=null)c.onStopped();
@@ -183,13 +183,13 @@ public class GifProducer implements Runnable{
         removeProducer(this);
     }
     public void subscribe(GifConsumer consumer){
-        consumers.add(new SoftReference<>(consumer));
+        consumers.add(new WeakReference<>(consumer));
         start();
         if (tmpBitmap!=null)
             consumer.onFrameAvailable(tmpBitmap);
     }
     public void unsubscribe(GifConsumer consumer){
-        ListIterator<SoftReference<GifConsumer>> iterator = consumers.listIterator();
+        ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
         while (iterator.hasNext()) {
             if (consumer.equals(iterator.next().get()))
                 iterator.remove();
