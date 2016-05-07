@@ -285,6 +285,17 @@ if (mSource!=null && !mSource.isEmpty())
     public void onUnsubscribed(int actHash){
         mDrawable = null;
     }
+
+    @Override
+    public void onKbStart() {
+
+    }
+
+    @Override
+    public void onKbStop() {
+
+    }
+
     @Override
     public void onSubscribed(int actHash){
         if (mDrawableRef!= null)

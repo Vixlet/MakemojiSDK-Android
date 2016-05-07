@@ -128,6 +128,17 @@ class MojiImageView extends ImageView  implements Spanimatable{
         currentAnimationScale = 1f;
 
     }
+
+    @Override
+    public void onKbStart() {
+
+    }
+
+    @Override
+    public void onKbStop() {
+
+    }
+
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         if (forceDimen==-1){

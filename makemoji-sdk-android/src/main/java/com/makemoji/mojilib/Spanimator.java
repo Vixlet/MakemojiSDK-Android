@@ -32,7 +32,7 @@ public class Spanimator {
     private static final Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
     private static ValueAnimator hyperAnimation;
     private static Handler mainHandler = new Handler(Looper.getMainLooper());
-    private static boolean mPaused =false;
+    private static boolean mPaused =false, kbPaused;
 
 
     @Retention(RetentionPolicy.SOURCE)
@@ -147,8 +147,35 @@ public class Spanimator {
        GifProducer.onStop();
 
     }
+    public static void onKbStart(){
+        kbPaused=false;
+
+        synchronized (subscribers) {
+            for (Spanimatable spanimatable : subscribers.keySet()) {
+                if (spanimatable != null) {
+                    spanimatable.onKbStart();
+                }
+            }
+        }
+
+        GifProducer.onStart();
+    }
+
+    public static void onKbStop(){
+        kbPaused=true;
+
+        synchronized (subscribers) {
+            for (Spanimatable spanimatable : subscribers.keySet()) {
+                if (spanimatable != null) {
+                    spanimatable.onKbStop();
+                }
+            }
+        }
+
+        GifProducer.onStop();
+    }
     public static boolean isGifRunning(){
-        return !mPaused;
+        return !mPaused || !kbPaused;
     }
     public static int actHash;
 }

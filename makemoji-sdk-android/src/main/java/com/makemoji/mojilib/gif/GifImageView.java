@@ -85,10 +85,14 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
         if (visibility==View.GONE) clear();
     }
 
-    public void clear(){
+    public synchronized void clear(){
         if (producer!=null){
             producer.unsubscribe(this);
             producer=null;
+        }
+        if (call!=null){
+            call.cancel();
+            call = null;
         }
     }
 
@@ -101,18 +105,23 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
         this.url = url;
         load();
     }
+
+    Call call;
     public void load(){
         if (url==null) return;
         producer = GifProducer.getProducerAndSub(this,null,url);
         if (producer!=null)return;
-        Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
+        call =Moji.okHttpClient.newCall(new Request.Builder().url(url).build());
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                call = null;
                 e.printStackTrace();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                call = null;
                 setBytes(url,response.body().bytes());
             }
         });
@@ -130,8 +139,10 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     }
 
     public int hostActHash= 0;
+    public boolean useKbLifecycle;
     @Override
     public void onSubscribed(int actHash) {
+        if (useKbLifecycle)return;
         if (hostActHash==0) hostActHash = actHash;
         if (actHash==hostActHash)
             load();
@@ -140,8 +151,19 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
     @Override
     public void onUnsubscribed(int actHash) {
+        if (useKbLifecycle)return;
         if (actHash==hostActHash)
             clear();
 
+    }
+
+    @Override
+    public void onKbStart() {
+        if (useKbLifecycle)load();
+    }
+
+    @Override
+    public void onKbStop() {
+       if (useKbLifecycle) clear();
     }
 }

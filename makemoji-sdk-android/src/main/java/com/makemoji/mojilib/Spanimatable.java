@@ -26,4 +26,7 @@ public interface Spanimatable {
      */
     void onUnsubscribed(int actHash);
 
+    void onKbStart();
+    void onKbStop();
+
 }

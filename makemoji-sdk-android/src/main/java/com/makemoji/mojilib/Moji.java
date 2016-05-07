@@ -465,6 +465,14 @@ public class Moji {
         tv.setTag(R.id._makemoji_last_invalidated_id,now);
 
     }
+    public static void toast(final CharSequence cs, final int duration){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context,cs,duration).show();
+            }
+        });
+    }
 
 
 }

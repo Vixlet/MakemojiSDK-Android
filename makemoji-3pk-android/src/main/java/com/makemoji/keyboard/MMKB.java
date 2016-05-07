@@ -366,7 +366,7 @@ public class MMKB extends InputMethodService
         if (mInputView != null) {
             mInputView.closing();
         }
-        Spanimator.onPause(3);
+        Spanimator.onKbStop();
     }
 
     boolean firstStart =true;
@@ -387,7 +387,7 @@ public class MMKB extends InputMethodService
         mInputView.closing();
   //      final InputMethodSubtype subtype = mInputMethodManager.getCurrentInputMethodSubtype();
 //        mInputView.setSubtypeOnSpaceKey(subtype);
-        Spanimator.onResume(3);
+        Spanimator.onKbStart();
     }
     @Override public void onConfigurationChanged(Configuration newConfig){
         super.onConfigurationChanged(newConfig);
@@ -895,7 +895,7 @@ public class MMKB extends InputMethodService
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setImagesSizedtoSpan(getContext().getResources().getBoolean(R.bool.mmUseSpanSizeFor3pkImages));
         adapter.setEnablePulse(false);
-        adapter.forceActHash(3);
+        adapter.useKbLifecycle();
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
       //  if (gifs) {
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
@@ -909,7 +909,7 @@ public class MMKB extends InputMethodService
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Spanimator.onPause(3);
+        Spanimator.onKbStop();
     }
 
     public void share(MojiModel model, File cacheFile){
@@ -927,7 +927,7 @@ public class MMKB extends InputMethodService
         List<ResolveInfo> bcs = pm.queryBroadcastReceivers(i,0);
         List<ResolveInfo> ris = pm.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
         if (ris.isEmpty()) {
-            Toast.makeText(getContext(), "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG).show();
+            Moji.toast( "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG);
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("MakeMoji emoji", model.image_url);
             clipboard.setPrimaryClip(clip);
@@ -957,7 +957,7 @@ public class MMKB extends InputMethodService
                     out.write(response.body().bytes());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                    Moji.toast( "Load failed", Toast.LENGTH_SHORT);
                     return;
                 } finally {
                     try {
@@ -966,7 +966,7 @@ public class MMKB extends InputMethodService
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                        Moji.toast( "Load failed", Toast.LENGTH_SHORT);
                         return;
                     }
                     share(model,cacheFile);
@@ -987,7 +987,7 @@ public class MMKB extends InputMethodService
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                    Moji.toast( "Load failed", Toast.LENGTH_SHORT);
                     return;
                 } finally {
                     try {
@@ -996,7 +996,7 @@ public class MMKB extends InputMethodService
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                        Moji.toast( "Load failed", Toast.LENGTH_SHORT);
                         return;
                     }
                     share(model,cacheFile);
@@ -1014,7 +1014,7 @@ public class MMKB extends InputMethodService
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
 
-                Toast.makeText(getContext(), "Load failed", Toast.LENGTH_SHORT).show();
+                Moji.toast( "Load failed", Toast.LENGTH_SHORT);
             }
 
             @Override
