@@ -39,6 +39,7 @@
         </activity>
         <activity
             android:name="com.makemoji.sbaar.mojilist.ActivateActivity"
+            android:windowSoftInputMode="stateUnchanged"
             android:label="MakeMoji Keyboard">
             <intent-filter>
                 <action android:name="android.intent.action.LAUNCHER" />

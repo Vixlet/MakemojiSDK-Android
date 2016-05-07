@@ -172,9 +172,11 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     }
 
     @Override
-    public void onUnsubscribed() {
-        if (producer!=null)producer.unsubscribe(this);
-        producer =null;
+    public void onUnsubscribed(int actHash) {
+        if (actHash==hostActHash) {
+            if (producer != null) producer.unsubscribe(this);
+            producer = null;
+        }
     }
 
     int hostActHash = 0;
@@ -186,6 +188,5 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     }
     @Override
     public void onPaused(){
-        onUnsubscribed();
     }
 }

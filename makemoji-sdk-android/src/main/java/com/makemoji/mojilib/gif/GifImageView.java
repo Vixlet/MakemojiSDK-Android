@@ -129,7 +129,7 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
     }
 
-    int hostActHash= 0;
+    public int hostActHash= 0;
     @Override
     public void onSubscribed(int actHash) {
         if (hostActHash==0) hostActHash = actHash;
@@ -139,8 +139,9 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     }
 
     @Override
-    public void onUnsubscribed() {
-        clear();
+    public void onUnsubscribed(int actHash) {
+        if (actHash==hostActHash)
+            clear();
 
     }
 }

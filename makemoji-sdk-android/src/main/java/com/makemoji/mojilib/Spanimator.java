@@ -57,7 +57,7 @@ public class Spanimator {
      */
     public static synchronized void unsubscribe(@Spanimation int spanimation, Spanimatable spanimatable ){
         subscribers.remove(spanimatable);
-        spanimatable.onUnsubscribed();
+        spanimatable.onUnsubscribed(actHash);
         if (subscribers.isEmpty() && hyperAnimation!=null){
             hyperAnimation.end();
             hyperAnimation=null;
@@ -140,7 +140,7 @@ public class Spanimator {
        synchronized (subscribers) {
            for (Spanimatable spanimatable : subscribers.keySet()) {
                if (spanimatable != null) {
-                   spanimatable.onUnsubscribed();
+                   spanimatable.onUnsubscribed(actHash);
                }
            }
        }

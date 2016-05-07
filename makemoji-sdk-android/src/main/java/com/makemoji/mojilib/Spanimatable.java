@@ -24,6 +24,6 @@ public interface Spanimatable {
     /**
      * called when the spanimatable is unsubscribed from
      */
-    void onUnsubscribed();
+    void onUnsubscribed(int actHash);
 
 }

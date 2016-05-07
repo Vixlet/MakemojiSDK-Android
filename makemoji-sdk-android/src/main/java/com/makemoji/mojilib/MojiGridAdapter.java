@@ -31,6 +31,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     ClickAndStyler clickAndStyler;
     boolean enablePulse = true;
     boolean imaagesSizedToSpan = true;
+    int actHash;
     public interface ClickAndStyler{
         void addMojiModel(MojiModel model,BitmapDrawable d);
         Context getContext();
@@ -38,6 +39,11 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     }
     public void setEnablePulse(boolean enable){
         enablePulse = enable;
+    }
+    //force gif image views to have the mmkb hash and NOT the open activity's.
+    public void forceActHash(int hash){
+        actHash=hash;
+
     }
 
     public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,boolean vertical, int spanSize) {
@@ -158,7 +164,10 @@ class Holder extends RecyclerView.ViewHolder {
     public Holder(View v, ViewGroup parent) {
         super(v);
         if (v instanceof MojiImageView)imageView = (MojiImageView) v;
-        if (v instanceof GifImageView) gifImageView = (GifImageView) v;
+        if (v instanceof GifImageView) {
+            gifImageView = (GifImageView) v;
+            if (actHash!=0) gifImageView.hostActHash = actHash;
+        }
         dimen = spanSize;
 
 

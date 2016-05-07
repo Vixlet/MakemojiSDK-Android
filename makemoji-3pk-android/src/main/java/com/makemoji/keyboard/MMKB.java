@@ -366,6 +366,7 @@ public class MMKB extends InputMethodService
         if (mInputView != null) {
             mInputView.closing();
         }
+        Spanimator.onPause(3);
     }
 
     boolean firstStart =true;
@@ -386,6 +387,7 @@ public class MMKB extends InputMethodService
         mInputView.closing();
   //      final InputMethodSubtype subtype = mInputMethodManager.getCurrentInputMethodSubtype();
 //        mInputView.setSubtypeOnSpaceKey(subtype);
+        Spanimator.onResume(3);
     }
     @Override public void onConfigurationChanged(Configuration newConfig){
         super.onConfigurationChanged(newConfig);
@@ -893,6 +895,7 @@ public class MMKB extends InputMethodService
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setImagesSizedtoSpan(getContext().getResources().getBoolean(R.bool.mmUseSpanSizeFor3pkImages));
         adapter.setEnablePulse(false);
+        adapter.forceActHash(3);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
       //  if (gifs) {
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
@@ -901,13 +904,12 @@ public class MMKB extends InputMethodService
         ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?gifRows:rows);
         rv.setAdapter(adapter);
 
-        Spanimator.onResume(hashCode());
 
     }
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Spanimator.onPause(hashCode());
+        Spanimator.onPause(3);
     }
 
     public void share(MojiModel model, File cacheFile){

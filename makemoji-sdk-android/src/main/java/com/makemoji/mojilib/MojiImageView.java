@@ -124,7 +124,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
     }
 
     @Override
-    public void onUnsubscribed() {
+    public void onUnsubscribed(int actHash) {
         currentAnimationScale = 1f;
 
     }

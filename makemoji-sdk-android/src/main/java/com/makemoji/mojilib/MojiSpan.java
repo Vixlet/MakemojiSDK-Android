@@ -282,7 +282,7 @@ if (mSource!=null && !mSource.isEmpty())
 
     }
     @Override
-    public void onUnsubscribed(){
+    public void onUnsubscribed(int actHash){
         mDrawable = null;
     }
     @Override
