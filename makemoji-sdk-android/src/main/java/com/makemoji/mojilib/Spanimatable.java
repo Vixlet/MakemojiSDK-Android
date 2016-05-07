@@ -14,15 +14,16 @@ public interface Spanimatable {
      * @param max the max value of the animation
      */
     void onAnimationUpdate(@Spanimation int spanimation, float progress, float min, float max );
-    void onAnimationPause();
+    void onPaused();
 
     /**
      * called when the spanimatable is subscribed to
      */
-    void onSubscribed();
+    void onSubscribed(int actHash);
 
     /**
      * called when the spanimatable is unsubscribed from
      */
     void onUnsubscribed();
+
 }

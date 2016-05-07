@@ -13,6 +13,8 @@ package com.makemoji.mojilib.gif;
 
         import com.makemoji.mojilib.Moji;
         import com.makemoji.mojilib.R;
+        import com.makemoji.mojilib.Spanimatable;
+        import com.makemoji.mojilib.Spanimator;
 
         import java.io.IOException;
 
@@ -21,7 +23,7 @@ package com.makemoji.mojilib.gif;
         import okhttp3.Request;
         import okhttp3.Response;
 
-public class GifImageView extends ImageView implements GifConsumer {
+public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
     private static final String TAG = "GifDecoderView";
     private GifDecoder gifDecoder;
@@ -40,6 +42,7 @@ public class GifImageView extends ImageView implements GifConsumer {
     GifProducer producer;
     public void setBytes(String url,final byte[] bytes) {
         clear();
+        Spanimator.subscribe(Spanimator.HYPER_PULSE,this);
         producer = GifProducer.getProducerAndSub(this,bytes,url);
 
     }
@@ -75,17 +78,6 @@ public class GifImageView extends ImageView implements GifConsumer {
         producer.subscribe(this);
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        clear();
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        load();
-    }
     @Override
     protected void onWindowVisibilityChanged (int visibility){
        // Log.d("GIF"," "+ visibility);
@@ -126,4 +118,29 @@ public class GifImageView extends ImageView implements GifConsumer {
         });
     }
 
+    @Override
+    public void onAnimationUpdate(@Spanimator.Spanimation int spanimation, float progress, float min, float max) {
+
+    }
+
+    @Override
+    public void onPaused() {
+        clear();
+
+    }
+
+    int hostActHash= 0;
+    @Override
+    public void onSubscribed(int actHash) {
+        if (hostActHash==0) hostActHash = actHash;
+        if (actHash==hostActHash)
+            load();
+
+    }
+
+    @Override
+    public void onUnsubscribed() {
+        clear();
+
+    }
 }

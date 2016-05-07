@@ -278,14 +278,15 @@ if (mSource!=null && !mSource.isEmpty())
     }
 
     @Override
-    public void onAnimationPause() {
+    public void onPaused() {
 
     }
     @Override
     public void onUnsubscribed(){
         mDrawable = null;
     }
-    public void onSubscribed(){
+    @Override
+    public void onSubscribed(int actHash){
         if (mDrawableRef!= null)
             mDrawable = mDrawableRef.get();
         if (mDrawable==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.

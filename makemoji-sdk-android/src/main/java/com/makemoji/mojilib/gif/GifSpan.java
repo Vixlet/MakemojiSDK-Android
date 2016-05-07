@@ -79,8 +79,10 @@ public class GifSpan extends MojiSpan implements GifConsumer {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
-                mWidth = producer.getWidth();
-                mHeight = producer.getHeight();
+                if (producer!=null){
+                    mWidth = producer.getWidth();
+                    mHeight = producer.getHeight();
+                }
             }
         });
     }
@@ -171,12 +173,19 @@ public class GifSpan extends MojiSpan implements GifConsumer {
 
     @Override
     public void onUnsubscribed() {
-       // if (producer!=null)producer.unsubscribe(this);
-        //producer =null;
+        if (producer!=null)producer.unsubscribe(this);
+        producer =null;
     }
 
+    int hostActHash = 0;
     @Override
-    public void onSubscribed() {
-        load();
+    public void onSubscribed(int actHash) {
+        if (hostActHash==0) hostActHash=actHash;
+        if (hostActHash==actHash)//we're resuming the activity associated with this span.
+            load();
+    }
+    @Override
+    public void onPaused(){
+        onUnsubscribed();
     }
 }

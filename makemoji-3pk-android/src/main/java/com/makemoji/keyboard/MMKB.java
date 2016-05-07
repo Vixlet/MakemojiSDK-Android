@@ -901,13 +901,13 @@ public class MMKB extends InputMethodService
         ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?gifRows:rows);
         rv.setAdapter(adapter);
 
-        Spanimator.onResume();
+        Spanimator.onResume(hashCode());
 
     }
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Spanimator.onPause();
+        Spanimator.onPause(hashCode());
     }
 
     public void share(MojiModel model, File cacheFile){

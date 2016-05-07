@@ -114,12 +114,12 @@ class MojiImageView extends ImageView  implements Spanimatable{
     }
 
     @Override
-    public void onAnimationPause() {
+    public void onPaused() {
 
     }
 
     @Override
-    public void onSubscribed() {
+    public void onSubscribed(int actHash) {
 
     }
 

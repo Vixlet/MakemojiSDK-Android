@@ -104,11 +104,11 @@ public class Moji {
             public void onActivityStarted(Activity activity) {}
             @Override
             public void onActivityResumed(Activity activity) {
-                Spanimator.onResume();
+                Spanimator.onResume(activity.hashCode());
             }
             @Override
             public void onActivityPaused(Activity activity) {
-                Spanimator.onPause();
+                Spanimator.onPause(activity.hashCode());
             }
             @Override
             public void onActivityStopped(Activity activity) {}

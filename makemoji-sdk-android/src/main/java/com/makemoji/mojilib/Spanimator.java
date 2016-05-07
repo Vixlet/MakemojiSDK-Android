@@ -11,6 +11,7 @@ import com.makemoji.mojilib.gif.GifProducer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -28,7 +29,7 @@ public class Spanimator {
     public static final float HYPER_PULSE_MIN = .15f;
 
 
-    private static Map<Spanimatable,Boolean> subscribers = new WeakHashMap<>();
+    private static final Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
     private static ValueAnimator hyperAnimation;
     private static Handler mainHandler = new Handler(Looper.getMainLooper());
     private static boolean mPaused =false;
@@ -45,7 +46,7 @@ public class Spanimator {
      */
     public static synchronized void subscribe(@Spanimation int spanimation, Spanimatable spanimatable){
         subscribers.put(spanimatable,true);
-        spanimatable.onSubscribed();
+        spanimatable.onSubscribed(actHash);
         setupStartAnimation(spanimation);
     }
 
@@ -65,7 +66,13 @@ public class Spanimator {
     private static synchronized void setupStartAnimation(@Spanimation int spanimation){
         if (mPaused)return;
         if (hyperAnimation!=null) {
-            if (!hyperAnimation.isRunning())hyperAnimation.start();
+            if (!hyperAnimation.isRunning())
+                Moji.handler.post(new Runnable() {//sometimes the old thread dies on a rotate
+                    @Override
+                    public void run() {
+                        hyperAnimation.start();
+                    }
+                });
             return;
         }
         int duration = Moji.resources.getInteger(R.integer._makemoji_pulse_duration);
@@ -80,16 +87,18 @@ public class Spanimator {
                 float progress = (float) animation.getAnimatedValue();
                 Set<Spanimatable> set = subscribers.keySet();
                 //Log.d("Spanimator","spanimator subscruber size "+ set.size());
-                if (set.size()==0 && animation.getAnimatedFraction()!=0f)
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (hyperAnimation!=null)hyperAnimation.end();
+                synchronized (subscribers) {
+                    if (set.size() == 0 && animation.getAnimatedFraction() != 0f)
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (hyperAnimation != null) hyperAnimation.end();
+                            }
+                        });
+                    for (Spanimatable spanimatable : set) {
+                        if (spanimatable != null) {
+                            spanimatable.onAnimationUpdate(HYPER_PULSE, progress, HYPER_PULSE_MIN, HYPER_PULSE_MAX);
                         }
-                    });
-                for (Spanimatable spanimatable : set){
-                    if (spanimatable!=null){
-                        spanimatable.onAnimationUpdate(HYPER_PULSE,progress,HYPER_PULSE_MIN,HYPER_PULSE_MAX);
                     }
                 }
             }
@@ -107,20 +116,39 @@ public class Spanimator {
         if (hyperAnimation!=null)return (float)hyperAnimation.getAnimatedValue();
         else return HYPER_PULSE_MIN;
     }
-    public static void onResume(){
+    public static void onResume(int actHash){
         mPaused=false;
        // Log.d("Spanimator","spanimator lifecycle resume");
+        Spanimator.actHash = actHash;
         if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
+
+        synchronized (subscribers) {
+            for (Spanimatable spanimatable : subscribers.keySet()) {
+                if (spanimatable != null) {
+                    spanimatable.onSubscribed(actHash);
+                }
+            }
+        }
+
         GifProducer.onStart();
     }
-   public static void onPause(){
+   public static void onPause(int actHash){
         mPaused=true;
         //Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null)hyperAnimation.end();
+
+       synchronized (subscribers) {
+           for (Spanimatable spanimatable : subscribers.keySet()) {
+               if (spanimatable != null) {
+                   spanimatable.onUnsubscribed();
+               }
+           }
+       }
        GifProducer.onStop();
 
     }
     public static boolean isGifRunning(){
         return !mPaused;
     }
+    public static int actHash;
 }

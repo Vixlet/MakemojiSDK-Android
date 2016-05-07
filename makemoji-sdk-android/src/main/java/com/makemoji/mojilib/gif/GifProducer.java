@@ -165,10 +165,12 @@ public class GifProducer implements Runnable{
                     e.printStackTrace();
                 }
             }
-            ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
-            while (iterator.hasNext()) {
-                GifConsumer c = iterator.next().get();
-                if (c==null) iterator.remove();
+            synchronized (consumers) {
+                ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
+                while (iterator.hasNext()) {
+                    GifConsumer c = iterator.next().get();
+                    if (c == null) iterator.remove();
+                }
             }
         } while (!consumers.isEmpty());
         synchronized (consumers) {
@@ -183,17 +185,21 @@ public class GifProducer implements Runnable{
         removeProducer(this);
     }
     public void subscribe(GifConsumer consumer){
-        consumers.add(new WeakReference<>(consumer));
+        synchronized (consumers) {
+            consumers.add(new WeakReference<>(consumer));
+        }
         start();
         if (tmpBitmap!=null)
             consumer.onFrameAvailable(tmpBitmap);
     }
     public void unsubscribe(GifConsumer consumer){
-        ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
-        while (iterator.hasNext()) {
-            if (consumer.equals(iterator.next().get()))
-                iterator.remove();
+        synchronized (consumers) {
+            ListIterator<WeakReference<GifConsumer>> iterator = consumers.listIterator();
+            while (iterator.hasNext()) {
+                if (consumer.equals(iterator.next().get()))
+                    iterator.remove();
 
+            }
         }
     }
 }
