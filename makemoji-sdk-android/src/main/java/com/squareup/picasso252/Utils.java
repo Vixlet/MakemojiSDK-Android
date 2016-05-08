@@ -56,7 +56,7 @@ final class Utils {
   private static final String PICASSO_CACHE = "picasso-cache";
   private static final int KEY_PADDING = 50; // Determined by exact science.
   private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
-  private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+  private static final int MAX_DISK_CACHE_SIZE = 150 * 1024 * 1024; // 150MB
   static final int THREAD_LEAK_CLEANING_MS = 1000;
   static final char KEY_SEPARATOR = '\n';
 
@@ -269,7 +269,7 @@ final class Utils {
       StatFs statFs = new StatFs(dir.getAbsolutePath());
       long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
       // Target 2% of the total space.
-      size = available / 50;
+      size = available / 30;
     } catch (IllegalArgumentException ignored) {
     }
 

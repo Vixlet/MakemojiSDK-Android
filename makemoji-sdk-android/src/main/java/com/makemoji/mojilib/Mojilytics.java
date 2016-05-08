@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 
+import com.makemoji.mojilib.model.MojiModel;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,6 +50,9 @@ public class Mojilytics {
             handler.postDelayed(sendRunnable,TRACK_INTERVAL *1000);
             runnablePosted = true;
         }
+    }
+    public static void trackClick(MojiModel model){
+
     }
     static void forceSend(){
         sendRunnable.run();
