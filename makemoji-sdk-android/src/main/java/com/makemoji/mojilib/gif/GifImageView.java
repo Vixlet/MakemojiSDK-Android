@@ -86,6 +86,7 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     }
 
     public synchronized void clear(){
+        Log.d(TAG,"gif clear "+toString());
         if (producer!=null){
             producer.unsubscribe(this);
             producer=null;
@@ -108,19 +109,21 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
     Call call;
     public void load(){
+
+        Log.d(TAG,"gif load "+toString());
         if (url==null) return;
         producer = GifProducer.getProducerAndSub(this,null,url);
         if (producer!=null)return;
         call =Moji.okHttpClient.newCall(new Request.Builder().url(url).build());
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(Call call2, IOException e) {
                 call = null;
                 e.printStackTrace();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call2, Response response) throws IOException {
                 call = null;
                 setBytes(url,response.body().bytes());
             }
@@ -165,5 +168,12 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     @Override
     public void onKbStop() {
        if (useKbLifecycle) clear();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility==GONE)
+            clear();
     }
 }
