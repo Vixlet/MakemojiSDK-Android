@@ -48,6 +48,10 @@ public interface MojiApi {
     @POST("emoji/viewTrack")
     Call<Void> trackViews( @Body RequestBody array);
 
+    @FormUrlEncoded
+    @POST("emoji/clickTrackBatch")
+    Call<Void> trackClicks(@Field("emoji") String emoji);
+
     @GET("emoji/emojiwall")
     Call<Map<String,List<MojiModel>>> getEmojiWallData();
 

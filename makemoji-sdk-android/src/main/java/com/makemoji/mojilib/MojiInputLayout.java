@@ -517,6 +517,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     @Override
     public void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
+        Mojilytics.trackClick(model);
         int selectionStart = editText.getSelectionStart();
         if (selectionStart==-1)selectionStart = editText.length();
 

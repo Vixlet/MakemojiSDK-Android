@@ -3,12 +3,20 @@ package com.makemoji.mojilib;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.makemoji.mojilib.model.MojiModel;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,13 +30,16 @@ import retrofit2.Response;
  */
 public class Mojilytics {
     private static Map<Integer,Data> viewed = new ConcurrentHashMap<>();
+    private static final List<MojiModel> clickList = new ArrayList<>();
     private static Handler handler = new Handler(Looper.getMainLooper());
     private static boolean runnablePosted;
 
     private static int MAX_SIZE = 200;
+    private static int MAX_CLICK_SIZE = 25;
     private static int TRACK_INTERVAL = 30;
 
     private static DateFormat sdf = SimpleDateFormat.getInstance();
+    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     public static void trackView(int id) {
         Data d = viewed.get(id);
@@ -52,6 +63,20 @@ public class Mojilytics {
         }
     }
     public static void trackClick(MojiModel model){
+        synchronized (clickList){
+            clickList.add(model);
+        }
+        if (clickList.size()>MAX_CLICK_SIZE){
+            handler.removeCallbacks(sendRunnable);
+            sendRunnable.run();
+            runnablePosted=false;
+        }
+        else if (!runnablePosted) {
+            handler.postDelayed(sendRunnable,TRACK_INTERVAL *1000);
+            runnablePosted = true;
+        }
+
+
 
     }
     static void forceSend(){
@@ -78,6 +103,29 @@ public class Mojilytics {
                     }
                 }
             });
+            try {
+                JSONArray ja = new JSONArray();
+                synchronized (clickList){
+                    for (MojiModel model: clickList){
+                        JSONObject jo = new JSONObject();
+                        jo.put("click", df.format(new Date()));
+                        jo.put("id",model.id);
+                        ja.put(jo);
+                    }
+                    clickList.clear();
+                }
+                String s = ja.toString();
+                Log.d("click","click "+s);
+                Moji.mojiApi.trackClicks(s).enqueue(new SmallCB<Void>() {
+                    @Override
+                    public void done(Response<Void> response, @Nullable Throwable t) {
+                        if (t!=null) t.printStackTrace();
+                    }
+                });
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
     };
 
