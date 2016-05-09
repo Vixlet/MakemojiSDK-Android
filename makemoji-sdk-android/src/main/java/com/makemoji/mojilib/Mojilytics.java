@@ -115,7 +115,7 @@ public class Mojilytics {
                     clickList.clear();
                 }
                 String s = ja.toString();
-                Log.d("click","click "+s);
+                //Log.d("click","click "+s);
                 Moji.mojiApi.trackClicks(s).enqueue(new SmallCB<Void>() {
                     @Override
                     public void done(Response<Void> response, @Nullable Throwable t) {

@@ -22,12 +22,18 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
         mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context);
         Moji.mojiApi.getFlashtags().enqueue(new SmallCB<List<MojiModel>>() {
             @Override
-            public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
+            public void done(final Response<List<MojiModel>> response, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
                     return;
                 }
-                mojiSQLHelper.insert(response.body());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        mojiSQLHelper.insert(response.body());
+                    }
+                });
             }
         });
     }
