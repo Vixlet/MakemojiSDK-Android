@@ -12,6 +12,9 @@
         <attr name="_mm_mainBgColor" format="color"/>
         <attr name="_mm_phraseBgColor" format="color"/>
     </declare-styleable>
+    <declare-styleable name="MMForegroundImageView">
+        <attr name="_mm_foreground" format="reference"/>
+    </declare-styleable>
         <attr name="_mm_wall_tab_layout" format="reference"/>
         <attr name="_mm_wall_header_layout" format="reference"/>
         <attr name="_mm_wall_tabs_bg" format="color|reference"/>

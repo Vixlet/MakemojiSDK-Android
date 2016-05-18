@@ -64,7 +64,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     public void jiggle(){
         ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(60 * Moji.density),minSize);
         animator.setInterpolator(new OvershootInterpolator());
-        animator.setDuration(1200);
+        animator.setDuration(1000);
         animator.setStartDelay(100);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

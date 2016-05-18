@@ -53,6 +53,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
                     resize(width,width).placeholder(R.drawable.mm_placeholder).into(holder.image);
             holder.title.setText(category.name);
             holder.view.setTag(category);
+            if (category.isLocked())
+                holder.image.setForegroundResource(R.drawable.mm_locked_foreground);
+            else holder.image.setForeground(null);
         }
 
     }
@@ -69,7 +72,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
     }
 
     public class Holder extends RecyclerView.ViewHolder{
-        public ImageView image;
+        public MMForegroundImageView image;
         public TextView title;
         public View view;
         public int position =-1;
@@ -77,7 +80,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
             super(itemView);
             view = itemView;
             view.setOnClickListener(catClick);
-            image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
+            image = (MMForegroundImageView) itemView.findViewById(R.id._mm_item_category_iv);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
             title.setTextColor(textColor);
             int padding = view.getPaddingLeft()*2 ;

@@ -34,6 +34,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.makemoji.mojilib.model.MojiModel;
 
@@ -707,5 +708,23 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     public static boolean isVariation(char c){
         return (c >65023 && c<65040);
+    }
+    protected MojiUnlock.ILockedCategoryClicked iLockedCategoryClicked;
+    public void setLockedCategoryClicked( MojiUnlock.ILockedCategoryClicked clickListener){
+        iLockedCategoryClicked = clickListener;
+
+    }
+    protected void onLockedCategoryClicked(String name){
+        if (iLockedCategoryClicked==null){
+            Toast.makeText(getContext(),"use setLockedCategoryClicked to listen for this event",Toast.LENGTH_LONG).show();
+            return;
+        }
+        iLockedCategoryClicked.onClick(name);
+
+    }
+    public void refreshCategories(){
+        if (categoriesPage!=null){
+            categoriesPage.refresh();
+        }
     }
 }

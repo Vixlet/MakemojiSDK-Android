@@ -863,8 +863,16 @@ public class MMKB extends InputMethodService
 
         if ("trending".equals(tab.getContentDescription()))
             populator = new TrendingPopulator();
+        else if (Boolean.FALSE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
+            Intent i = new Intent(Moji.ACTION_LOCKED_CATEGORY_CLICK);
+            i.putExtra(Moji.EXTRA_CATEGORY_NAME,tab.getContentDescription());
+            i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN,getPackageName());
+            i.setPackage(getPackageName());
+            sendBroadcast(i);
+            return;
+        }
         else
-            populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));
+            populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(), null));
 
         populator.setup(this);
         gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
@@ -949,9 +957,9 @@ public class MMKB extends InputMethodService
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 FileOutputStream out = null;
-                File path = new File(getFilesDir(),"images");
+                File path = new File(getCacheDir(),"images");
                 path.mkdir();
-                File cacheFile = new File(path,"share.png");
+                File cacheFile = new File(path,""+model.name+".png");
                 try {
                     out = new FileOutputStream(cacheFile.getPath());
                     out.write(response.body().bytes());
@@ -979,9 +987,9 @@ public class MMKB extends InputMethodService
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 FileOutputStream out = null;
-                File path = new File(getFilesDir(),"images");
+                File path = new File(getCacheDir(),"images");
                 path.mkdir();
-                File cacheFile = new File(path,"share.png");
+                File cacheFile = new File(path,""+model.name+"share.png");
                 try {
                     out = new FileOutputStream(cacheFile.getPath());
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);

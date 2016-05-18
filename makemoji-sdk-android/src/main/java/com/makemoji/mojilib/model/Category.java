@@ -18,9 +18,13 @@ public class Category {
     public final String name;
     public String image_url;
     public @DrawableRes int drawableRes;
+    public int locked;
+    public int gif;
     public List<MojiModel> models;
 
 
+    public boolean isLocked(){ return locked==1;}
+    public boolean isgif(){ return gif==1;}
     public Category(String name, String image_url) {
         this.name = name;
         this.image_url = image_url;
@@ -32,6 +36,8 @@ public class Category {
             for (Category category : categoryList) {
                 JSONObject jo = new JSONObject();
                 jo.putOpt("name", category.name);
+                jo.putOpt("locked", category.locked);
+                jo.putOpt("gif", category.gif);
                 jo.putOpt("image_url", category.image_url);
                 ja.put(ja.length(), jo);
             }
@@ -44,7 +50,10 @@ public class Category {
             JSONArray ja = new JSONArray(Moji.context.getSharedPreferences("_mm_categories",0).getString("categories","[]"));
             for (int i = 0; i<ja.length();i++){
                 JSONObject jo = ja.getJSONObject(i);
-                categories.add(new Category(jo.optString("name"),jo.optString("image_url")));
+                Category c = new Category(jo.optString("name"),jo.optString("image_url"));
+                c.locked = jo.optInt("locked");
+                c.gif = jo.optInt("gif");
+                categories.add(c);
             }
         }
         catch (Exception e){

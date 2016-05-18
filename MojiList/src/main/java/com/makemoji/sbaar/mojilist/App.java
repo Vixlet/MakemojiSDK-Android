@@ -3,7 +3,6 @@ package com.makemoji.sbaar.mojilist;
 import android.app.Application;
 import android.content.Context;
 
-import com.makemoji.keyboard.MMKB;
 import com.makemoji.mojilib.Moji;
 import com.squareup.leakcanary.LeakCanary;
 

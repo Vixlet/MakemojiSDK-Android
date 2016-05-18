@@ -82,6 +82,8 @@ public class Moji {
     public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
     public static final String EXTRA_MM = "com.makemoji.mojilib.EXTRA_MM";
     public static final String EXTRA_PACKAGE_ORIGIN = "com.makemoji.mojilib.PACKAGE_ORIGIN";
+    public static final String EXTRA_CATEGORY_NAME = "com.makemoji.mojilib.EXTRA_CATEGORY_NAME";
+    public static final String ACTION_LOCKED_CATEGORY_CLICK = "com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED";
     static String userId;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.

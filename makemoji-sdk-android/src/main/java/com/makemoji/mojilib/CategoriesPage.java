@@ -61,9 +61,16 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     public void hide(){
         super.hide();
     }
+    public void refresh(){
+        if (adapter!=null) adapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onClick(Category category) {
+        if (category.isLocked()&& !MojiUnlock.getUnlockedGroups().contains(category.name)){
+            mMojiInput.onLockedCategoryClicked(category.name);
+            return;
+        }
         MakeMojiPage mmp = new OneGridPage(category.name,mMojiInput,new CategoryPopulator(category));
         mMojiInput.addPage(mmp);
     }

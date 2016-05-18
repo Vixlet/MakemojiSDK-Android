@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TableLayout;
 
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiApi;
@@ -69,14 +70,17 @@ public class KBCategory {
 
     }
 
-    public static List<TabLayout.Tab> createTabs(TabLayout tabLayout,List<Category> categories,@LayoutRes int layoutRes){
+    @SuppressWarnings("ConstantConditions")
+    public static List<TabLayout.Tab> createTabs(TabLayout tabLayout, List<Category> categories, @LayoutRes int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         for (Category c : categories) {
             if ("phrases".equalsIgnoreCase(c.name))//currently unicode is good, multiple makemojis does not work.
                 continue;
+            TabLayout.Tab tab = null;
             if (c.drawableRes!=0){
-                tabs.add(tabLayout.newTab().setCustomView(layoutRes).
-                        setContentDescription(c.name).setIcon(c.drawableRes));
+                tab = tabLayout.newTab().setCustomView(layoutRes).
+                        setContentDescription(c.name).setIcon(c.drawableRes);
+                tabs.add(tab);
                 if ("recent".equals(c.name)){
                     View v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
                     if ((v!=null) && v instanceof ImageView)
@@ -84,12 +88,17 @@ public class KBCategory {
                 }
             }
             else if (c.image_url!=null){
-                TabLayout.Tab tab = tabLayout.newTab().setCustomView(layoutRes).
+                tab = tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
                if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(c.image_url).into(iv);
                 tabs.add(tab);
 
+            }
+            if (tab!=null && c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name)){
+                tab.getCustomView().setTag(R.id._makemoji_locked_tag_id,true);
+                if (tab.getCustomView().findViewWithTag("iv") instanceof MMForegroundImageView)
+                    ((MMForegroundImageView) tab.getCustomView().findViewWithTag("iv")).setForegroundResource(R.drawable.mm_locked_foreground);
             }
         }
         return tabs;

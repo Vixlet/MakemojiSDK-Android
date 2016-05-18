@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <com.makemoji.mojilib.MMForegroundImageView
         android:layout_width="36dp"
         android:tag="iv"
         android:layout_height="36dp"
@@ -15,5 +15,5 @@
         android:scaleType="centerInside"
         android:layout_gravity="center"
         >
-    </ImageView>
+    </com.makemoji.mojilib.MMForegroundImageView>
 </FrameLayout>
