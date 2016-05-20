@@ -49,6 +49,7 @@ import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.MojiSpan;
+import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
@@ -71,7 +72,7 @@ import okhttp3.Response;
 
 public class MMKB extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
-        PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener {
+        PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener, MojiUnlock.ICategoryUnlock {
     static final boolean DEBUG = false;
 
     /**
@@ -181,6 +182,7 @@ public class MMKB extends InputMethodService
         if (shareMessage!=null && shareMessage.length()>0){
             shareText.setVisibility(View.VISIBLE);
         }
+        MojiUnlock.addListener(this);
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this,R.layout.kb_tab);
         onNewTabs(tabs);
 
@@ -194,6 +196,7 @@ public class MMKB extends InputMethodService
                     return;
                 }
                 CharSequence text = getCurrentInputConnection().getTextBeforeCursor(2, InputConnection.GET_TEXT_WITH_STYLES);
+                if (text==null) text ="";
                 int deleteLength =1;
                 if (text.length()>1 && (Character.isSurrogatePair(text.charAt(0),text.charAt(1))|| MojiInputLayout.isVariation(text.charAt(1))))
                     deleteLength =2;
@@ -847,7 +850,6 @@ public class MMKB extends InputMethodService
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        currentTab = tab.getPosition();
         heading.setText(tab.getContentDescription());
         if (populator!=null)populator.teardown();
         if ("keyboard".equals(tab.getContentDescription())){
@@ -863,17 +865,25 @@ public class MMKB extends InputMethodService
 
         if ("trending".equals(tab.getContentDescription()))
             populator = new TrendingPopulator();
-        else if (Boolean.FALSE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
+        else if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
             Intent i = new Intent(Moji.ACTION_LOCKED_CATEGORY_CLICK);
             i.putExtra(Moji.EXTRA_CATEGORY_NAME,tab.getContentDescription());
             i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN,getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.setPackage(getPackageName());
-            sendBroadcast(i);
+            try{
+                startActivity(i);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            tabLayout.getTabAt(currentTab).select();//go back to last tab
             return;
         }
         else
             populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(), null));
 
+        currentTab = tab.getPosition();
         populator.setup(this);
         gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
     }
@@ -918,6 +928,7 @@ public class MMKB extends InputMethodService
     public void onDestroy(){
         super.onDestroy();
         Spanimator.onKbStop();
+        MojiUnlock.removeListener(this);
     }
 
     public void share(MojiModel model, File cacheFile){
@@ -1066,5 +1077,22 @@ public class MMKB extends InputMethodService
         if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
             tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
         }
+    }
+
+    @Override
+    public void unlockChange() {
+        Moji.handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout, MMKB.this, R.layout.kb_tab);
+                    onNewTabs(tabs);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 }

@@ -31,6 +31,7 @@ import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
+import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.R;
 import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.SmallCB;
@@ -166,6 +167,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         while (it.hasNext()){
             Category c = it.next();
             if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
+                it.remove();
+            else if (c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name))
                 it.remove();
         }
         List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,tabRes);

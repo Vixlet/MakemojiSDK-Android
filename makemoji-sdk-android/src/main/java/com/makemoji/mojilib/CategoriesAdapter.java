@@ -2,6 +2,7 @@ package com.makemoji.mojilib;
 
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,14 +49,18 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
         Category category = categories.get(position);
         if (holder.position!=position){
             //Moji.loadImage(holder.image,category.image_url);
-            int width = (int)(80 *Moji.density * .9);
-            Picasso.with(Moji.context).load(category.image_url).
-                    resize(width,width).placeholder(R.drawable.mm_placeholder).into(holder.image);
+            int width = (int)(holder.view.getResources().getDimension(R.dimen.mm_cat_width) *Moji.density * 1);
+            if (!category.image_url.equals(holder.image.getTag())) {
+                Picasso.with(Moji.context).load(category.image_url).
+                        resize(width, width).placeholder(R.drawable.mm_placeholder).into(holder.image);
+                holder.image.setTag(category.image_url);
+            }
             holder.title.setText(category.name);
             holder.view.setTag(category);
-            if (category.isLocked())
-                holder.image.setForegroundResource(R.drawable.mm_locked_foreground);
-            else holder.image.setForeground(null);
+            if (category.isLocked()&& !MojiUnlock.getUnlockedGroups().contains(category.name))
+                holder.foreground.setVisibility(View.VISIBLE);
+            else
+                holder.foreground.setVisibility(View.GONE);
         }
 
     }
@@ -72,20 +77,21 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
     }
 
     public class Holder extends RecyclerView.ViewHolder{
-        public MMForegroundImageView image;
+        public ImageView image;
+        public ImageView foreground;
         public TextView title;
         public View view;
         public int position =-1;
+        public View parent;
         public Holder(View itemView, ViewGroup parent) {
             super(itemView);
+            this.parent=parent;
             view = itemView;
             view.setOnClickListener(catClick);
-            image = (MMForegroundImageView) itemView.findViewById(R.id._mm_item_category_iv);
+            image = (ImageView) itemView.findViewById(R.id._mm_item_category_iv);
+            foreground = (ImageView) itemView.findViewById(R.id._mm_item_category_foreground);
             title = (TextView) itemView.findViewById(R.id._mm_item_category_tv);
             title.setTextColor(textColor);
-            int padding = view.getPaddingLeft()*2 ;
-            image.setMinimumWidth((parent.getWidth()/4)-padding);
-            image.setMaxWidth((parent.getWidth()/4)-padding);
         }
     }
 }

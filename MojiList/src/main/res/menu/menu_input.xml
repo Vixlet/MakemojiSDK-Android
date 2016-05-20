@@ -28,4 +28,9 @@
         android:orderInCategory="100"
         android:title="Emoji Wall Activity"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear_unlocks"
+        android:orderInCategory="100"
+        android:title="Clear Unlocked Categories"
+        app:showAsAction="never" />
 </menu>

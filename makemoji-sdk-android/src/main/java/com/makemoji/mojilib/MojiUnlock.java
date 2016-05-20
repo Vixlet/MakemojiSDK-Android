@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,7 +19,7 @@ import retrofit2.Response;
 public class MojiUnlock {
     private static Set<String> unlocked;
     public interface ICategoryUnlock{
-        void unlockDone(String name, @Nullable Throwable throwable);
+        void unlockChange();
     }
     public interface ILockedCategoryClicked{
         void onClick(String name);
@@ -28,34 +29,44 @@ public class MojiUnlock {
            unlocked= Moji.context.getSharedPreferences("mm_unlock",0).getStringSet("groupUnlocks",new HashSet<String>());
         return unlocked;
     }
-    private static void addGroup(String name){
+    public static void addGroup(String name){
         getUnlockedGroups().add(name);
         Moji.context.getSharedPreferences("mm_unlock",0).edit().putStringSet("groupUnlocks",getUnlockedGroups()).apply();
-
+        alertListeners();
     }
-    public static void unlockCategory(final String name, final ICategoryUnlock unlockListener){
+    public static void removeGroup(String name){
+        getUnlockedGroups().remove(name);
+        Moji.context.getSharedPreferences("mm_unlock",0).edit().putStringSet("groupUnlocks",getUnlockedGroups()).apply();
+        alertListeners();
+    }
+    public static void clearGroups(){
+        getUnlockedGroups().clear();
+        Moji.context.getSharedPreferences("mm_unlock",0).edit().putStringSet("groupUnlocks",getUnlockedGroups()).apply();
+        alertListeners();
+    }
+    public static void unlockCategory(final String name){
+
+        addGroup(name);
         Moji.mojiApi.unlockGroup(name).enqueue(new SmallCB<JSONObject>() {
             @Override
             public void done(Response<JSONObject> response, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
-                    unlockListener.unlockDone(name,t);
-                    return;
                 }
-                if (!response.body().optBoolean("success")){
-                    String message = "No message";
-                    try {
-                        message = response.body().getJSONObject("response").getJSONObject("message").getString("error");
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                        unlockListener.unlockDone(name,new Throwable(e.getMessage()));
-                    }
-                }
-                addGroup(name);
-                unlockListener.unlockDone(name,null);
             }
         });
+    }
+    static void alertListeners(){
+        for (Map.Entry<ICategoryUnlock,Boolean> entry : listeners.entrySet())
+            entry.getKey().unlockChange();
+    }
+    static Map<ICategoryUnlock,Boolean> listeners = new ConcurrentHashMap<ICategoryUnlock,Boolean>();
+    public static void addListener(ICategoryUnlock unlock){
+        listeners.put(unlock,true);
+    }
+    public static void removeListener(ICategoryUnlock unlock){
+        listeners.remove(unlock);
+
     }
 
 }

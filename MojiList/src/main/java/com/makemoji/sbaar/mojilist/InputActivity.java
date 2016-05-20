@@ -29,8 +29,9 @@ import com.makemoji.mojilib.wall.MojiWallActivity;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
-public class InputActivity extends AppCompatActivity implements MojiUnlock.ICategoryUnlock{
+public class InputActivity extends AppCompatActivity{
     MojiEditText outsideMojiEdit;
     MojiInputLayout mojiInputLayout;
     boolean plainTextConversion = false;
@@ -80,7 +81,7 @@ public class InputActivity extends AppCompatActivity implements MojiUnlock.ICate
         mojiInputLayout.setLockedCategoryClicked(new MojiUnlock.ILockedCategoryClicked() {
             @Override
             public void onClick(String name) {
-                MojiUnlock.unlockCategory(name,InputActivity.this);
+                lockedCategoryClick(name);
             }
         });
 
@@ -124,6 +125,10 @@ public class InputActivity extends AppCompatActivity implements MojiUnlock.ICate
             intent.putExtra(MojiWallActivity.EXTRA_SHOWUNICODE,true);
             startActivityForResult(intent,IMojiSelected.REQUEST_MOJI_MODEL);
         }
+        else if (id == R.id.action_clear_unlocks){
+            MojiUnlock.clearGroups();
+            mojiInputLayout.refreshCategories();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -146,24 +151,8 @@ public class InputActivity extends AppCompatActivity implements MojiUnlock.ICate
     }
 
     public void lockedCategoryClick(String name){
-        MojiUnlock.unlockCategory(name,this);
-    }
-
-    //category unlock call complete
-    @Override
-    public void unlockDone(String name, @Nullable Throwable throwable) {
-        if (throwable!=null){
-            Toast.makeText(this,"Unlcok error "+ throwable.getMessage(),Toast.LENGTH_LONG).show();
-            return;
-        }
+        MojiUnlock.unlockCategory(name);
         mojiInputLayout.refreshCategories();
-
-        //restart the 3pk keyboard.
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
 
     }
 

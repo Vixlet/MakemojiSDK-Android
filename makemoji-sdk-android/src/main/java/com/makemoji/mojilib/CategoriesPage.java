@@ -51,6 +51,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
         glm = new GridLayoutManager(mView.getContext(),2, LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(glm);
         rv.setAdapter(adapter);
+        rv.setItemAnimator(null);
         ((TextView)mView.findViewById(R.id._mm_page_heading)).setTextColor(mMojiInput.getHeaderTextColor());
 
     }
@@ -62,7 +63,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
         super.hide();
     }
     public void refresh(){
-        if (adapter!=null) adapter.notifyDataSetChanged();
+        if (adapter!=null) adapter.notifyItemRangeChanged(0,adapter.getItemCount());
     }
 
     @Override

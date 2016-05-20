@@ -7,15 +7,26 @@
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
     android:layout_height="match_parent">
-    <com.makemoji.mojilib.MMForegroundImageView
-        app:_mm_foreground="@drawable/mm_locked_foreground"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="@dimen/mm_cat_width"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="1">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:src="@drawable/mm_grid_icon"
         tools:layout_width="80dp"
         tools:layout_height="80dp"
         android:id="@+id/_mm_item_category_iv"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/mm_locked_foreground"
+            android:visibility="gone"
+            tools:layout_width="80dp"
+            tools:layout_height="80dp"
+            android:id="@+id/_mm_item_category_foreground"/>
+    </FrameLayout>
     <TextView
         android:layout_width="wrap_content"
         tools:text="Expressions"
