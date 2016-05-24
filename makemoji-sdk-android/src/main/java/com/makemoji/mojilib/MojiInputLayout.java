@@ -483,6 +483,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             int parentHeight = ((ViewGroup)getParent()).getHeight()
                     - editText.getPaddingBottom()-editText.getPaddingTop() -(int) (20 * Moji.density);
             editText.setMaxHeight(parentHeight -maxTopScrollherH);
+            deactiveButtons();
             clearStack();
         }
         else {
