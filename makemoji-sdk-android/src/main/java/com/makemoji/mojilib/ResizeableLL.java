@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +26,10 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
 
     public ResizeableLL(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
+        super(context, attrs);
+    }
+    public ResizeableLL(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context,attrs,defStyleAttr);
     }
 
 

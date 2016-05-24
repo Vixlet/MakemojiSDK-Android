@@ -25,6 +25,8 @@
         android:minHeight="35dp"
         android:minWidth="35dp"
         android:background="@android:color/transparent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         />
     <com.makemoji.mojilib.MojiEditText
         android:background="@drawable/mm_et_bg"

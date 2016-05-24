@@ -116,6 +116,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
         @ColorInt int mainBgColor = a.getColor(R.styleable.MojiInputLayout__mm_mainBgColor,ContextCompat.getColor(getContext(),R.color._mm_top_layout_bg));
+
+        boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
+
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
@@ -190,7 +193,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 }
             }
         });
-
+        if (showKbOnInflate)
+                grabFocusShowKb();
 
         trendingPopulator = new TrendingPopulator();
         trendingPopulator.setup(trendingObserver);
@@ -444,13 +448,13 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     void hideKeyboard(){
         View view = editText;
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
     void showKeyboard(){
         InputMethodManager keyboard = (InputMethodManager)
-                Moji.getActivity(getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
+               getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         keyboard.showSoftInput(editText, 0);
     }
 
@@ -479,6 +483,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             int parentHeight = ((ViewGroup)getParent()).getHeight()
                     - editText.getPaddingBottom()-editText.getPaddingTop() -(int) (20 * Moji.density);
             editText.setMaxHeight(parentHeight -maxTopScrollherH);
+            clearStack();
         }
         else {
             keyboardVisible = false;
@@ -726,5 +731,23 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (categoriesPage!=null){
             categoriesPage.refresh();
         }
+    }
+    public boolean canHandleBack(){
+        return !pages.isEmpty();
+    }
+    public boolean onBackPressed(){
+        if (!canHandleBack())return false;
+        popPage();
+        if (pages.isEmpty()){
+            deactiveButtons();
+            topScroller.snapOpen();
+            grabFocusShowKb();
+        }
+        return true;
+    }
+    public void grabFocusShowKb(){
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 }

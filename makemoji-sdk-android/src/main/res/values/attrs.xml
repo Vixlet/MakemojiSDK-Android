@@ -11,6 +11,7 @@
         <attr name="_mm_headerTextColor" format="color"/>
         <attr name="_mm_mainBgColor" format="color"/>
         <attr name="_mm_phraseBgColor" format="color"/>
+        <attr name="_mm_showKbOnInflate" format="boolean"/>
     </declare-styleable>
     <declare-styleable name="MMForegroundImageView">
         <attr name="_mm_foreground" format="reference"/>

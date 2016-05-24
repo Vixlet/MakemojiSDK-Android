@@ -214,6 +214,7 @@ public class MojiEditText extends EditText {
             @Override
             public void run() {
                Moji.setText(storedHtml,MojiEditText.this,true,true);
+                setSelection(getText().length());
             }
         });
 

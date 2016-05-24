@@ -26,6 +26,7 @@
         <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>
         <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
         <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
+        <item name="_mm_showKbOnInflate">false</item>
     </style>
     <style name="MojiWallDefaultStyle" parent="Theme.AppCompat">
         <item name="_mm_wall_tab_layout">@layout/mm_wall_tab</item>
