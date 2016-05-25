@@ -80,6 +80,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     @ColorInt int phraseBgColor;
     @DrawableRes int backSpaceDrawableRes;
     final static String TAG = "MojiInputLayout";
+    boolean alwaysShowBar = false;
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -116,15 +117,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
         @ColorInt int mainBgColor = a.getColor(R.styleable.MojiInputLayout__mm_mainBgColor,ContextCompat.getColor(getContext(),R.color._mm_top_layout_bg));
-
         boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
-
+        alwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
         getChildAt(0).setBackgroundColor(mainBgColor);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
+        if (alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
+
         sendLayout = ((LinearLayout)inflate(getContext(),sendLayoutRes,horizontalLayout)).getChildAt(2);
         findViewById(R.id._mm_left_buttons).setBackgroundDrawable(leftContainerDrawable);
 
@@ -473,7 +475,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         int screenHeight = getRootView().getHeight();
         int heightDifference = screenHeight - (r.bottom - r.top);
         //Log.d("kb","kb h "+ heightDifference + " " + getHeight());
-        if (getHeight()!=0 && heightDifference>screenHeight/3) {
+        if (heightDifference>screenHeight/3) {
             measureHeight=false;
             //newHeight = heightDifference - topScroller.getHeight();// -topScroller.getHeight() - horizontalLayout.getHeight();
            // Log.d("newh","new h "+ newHeight);
@@ -482,9 +484,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             maxTopScrollherH = Math.max(topScroller.getHeight(),maxTopScrollherH);
             int parentHeight = ((ViewGroup)getParent()).getHeight()
                     - editText.getPaddingBottom()-editText.getPaddingTop() -(int) (20 * Moji.density);
-            editText.setMaxHeight(parentHeight -maxTopScrollherH);
+           if (!outsideEditText) editText.setMaxHeight(parentHeight -maxTopScrollherH);
             deactiveButtons();
             clearStack();
+            if (!alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
         }
         else {
             keyboardVisible = false;
@@ -498,6 +501,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         }
 
+        if (!keyboardVisible && pages.isEmpty() && !alwaysShowBar)setTopScrollerVisiblity(View.GONE);
         oldDiff = heightDifference;
     }
     void setHeight() {
@@ -750,5 +754,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.requestFocus();
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+    boolean hasJiggled = false;
+    protected void setTopScrollerVisiblity(int visiblity){
+       //if (visiblity==View.GONE && outsideEditText)return;
+        topScroller.setVisibility(visiblity);
+        if (!hasJiggled && visiblity ==VISIBLE) {
+            topScroller.jiggle();
+            hasJiggled = true;
+        }
     }
 }

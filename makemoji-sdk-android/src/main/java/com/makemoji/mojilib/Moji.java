@@ -24,6 +24,7 @@ import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.app.Application;
@@ -463,7 +464,12 @@ public class Moji {
         if (lastInvalidated+15>now) return;
 
         tv.invalidate();
-        if (tv instanceof EditText)tv.requestLayout();
+        if (tv instanceof EditText) {
+            tv.requestLayout();
+        }
+        if (tv instanceof MojiEditText){
+            ((MojiEditText) tv).invalidateReflect();
+        }
         tv.setTag(R.id._makemoji_last_invalidated_id,now);
 
     }

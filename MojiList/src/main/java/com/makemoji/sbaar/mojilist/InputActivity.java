@@ -44,7 +44,7 @@ public class InputActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
-        //mojiInputLayout.grabFocusShowKb(); //to show keyboard on startup, can also be changed in the mojiInputLayout style xml
+        //mojiInputLayout.grabFocusShowKb(); //show keyboard on demand; launch behavior defined in mojiInputLayout style xml
 
 
         final MAdapter mAdapter = new MAdapter(this,new ArrayList<MojiMessage>(),true);

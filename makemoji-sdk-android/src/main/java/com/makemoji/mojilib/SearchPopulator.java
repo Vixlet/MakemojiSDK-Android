@@ -33,7 +33,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
 
                         mojiSQLHelper.insert(response.body());
                     }
-                });
+                }).start();
             }
         });
     }

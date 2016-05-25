@@ -51,6 +51,7 @@
             android:layout_width="match_parent"
             android:id="@+id/_mm_horizontal_top_scroller"
             android:orientation="horizontal"
+            android:visibility="visible"
             android:layout_height="wrap_content">
             <include
                 layout="@layout/mm_top_left_page"

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,12 +61,19 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
             @Override
             public void run() {
                 maxSize = getWidth() - flashButton.getWidth();//-(int)(50 *Moji.density);
-                jiggle();
             }
         });
 
     }
-    public void jiggle(){
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        if (changedView!=this)return;
+        if (visibility==View.VISIBLE)
+            maxSize = getWidth() - flashButton.getWidth();
+    }
+
+
+    public synchronized void jiggle(){
         ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(60 * Moji.density),minSize);
         animator.setInterpolator(new OvershootInterpolator());
         animator.setDuration(1000);

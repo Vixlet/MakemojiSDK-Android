@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 
@@ -37,12 +38,32 @@ public class MojiEditText extends EditText {
         super(context, attrs, defStyleAttr);
         init();
     }
+    Field mEditor;
+    Object editor;
+    Method invalidateTextDisplayList;
+    static Object[] emptyObject = new Object[]{};
+    public void invalidateReflect(){
+    if (invalidateTextDisplayList!=null && mEditor!=null && editor!=null)
+        try{
+            invalidateTextDisplayList.invoke(editor,emptyObject);
+        }
+        catch (Exception e){
+           // e.printStackTrace();
 
-    /**
-     *
-     */
+        }
+    }
     private void init(){
-
+        try {
+            mEditor = getClass().getSuperclass().getSuperclass().getDeclaredField("mEditor");
+            mEditor.setAccessible(true);
+            Class c  = mEditor.getType();
+                    invalidateTextDisplayList = c.getDeclaredMethod("invalidateTextDisplayList");
+            invalidateTextDisplayList.setAccessible(true);
+            editor = mEditor.get(this);
+        }
+        catch (Exception e){
+           // e.printStackTrace();
+        }
         //If any mojispans span less than three characters, remove them because a backspace has happened.
         setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_FLAG_NO_FULLSCREEN);
         addTextChangedListener(new TextWatcher() {

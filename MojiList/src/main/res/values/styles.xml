@@ -39,7 +39,7 @@
     _mm_leftButtonBg -> Drawable bg for left button. Default is transparent, and highlighted when activated.
     _mm_leftContainerDrawable -> Drawable bg for button container left of emoji bar.
     _mm_showKbOnInflate -> Grab focus, show keyboard and cursor on input when view is inflated, or not.
-
+    _mm_alwaysShowEmojiBar -> Always show emoji bar, or only when the keyboard is up.
     To styles the edit text, define a editTextStyle in a theme set the theme attribute in this view.
 
     If you need additional customization, just ask or examine mm_moji_input_layout.xml and play around with findViewById.
@@ -57,6 +57,7 @@
         <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
         <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
         <item name="_mm_showKbOnInflate">false</item>
+        <item name="_mm_alwaysShowEmojiBar">false</item>
 
     </style>
     <style name="MojiWallDefaultStyle.CustomDrawables">

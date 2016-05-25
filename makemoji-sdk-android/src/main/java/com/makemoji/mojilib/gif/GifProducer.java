@@ -133,7 +133,7 @@ public class GifProducer implements Runnable{
                         break;
                     }
                     //handler.post(updateResults);
-                } catch (final ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
+                } catch (final ArrayIndexOutOfBoundsException | OutOfMemoryError| IllegalArgumentException e) {
                     Log.w(TAG, e);
                 }
                 if (!animating()) {

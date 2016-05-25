@@ -92,7 +92,7 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
             producer=null;
         }
         if (call!=null){
-            call.cancel();
+            //call.cancel();
             call = null;
         }
     }
