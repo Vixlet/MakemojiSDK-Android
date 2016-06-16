@@ -81,7 +81,8 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                setPrimaryContentWidth((int)animation.getAnimatedValue());
+                if (!mDragging)
+                    setPrimaryContentWidth((int)animation.getAnimatedValue());
             }
         });
         animator.start();
