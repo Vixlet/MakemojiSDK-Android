@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.Moji;
+import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.R;
 import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.model.MojiModel;
@@ -22,14 +23,16 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
     public static final String EXTRA_SHOWRECENT = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWRECENT";
     public static final String EXTRA_SHOWUNICODE = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWUNICODE";
+    public MojiWallFragment fragment;
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.MojiWallDefaultStyle));
         setContentView(R.layout.mm_moji_wall_activity);
+        fragment = MojiWallFragment.newInstance(getIntent().getBooleanExtra(EXTRA_SHOWRECENT,false),
+                getIntent().getBooleanExtra(EXTRA_SHOWUNICODE,false));
         getSupportFragmentManager().beginTransaction().
-                add(R.id._mm_page_container, MojiWallFragment.newInstance(getIntent().getBooleanExtra(EXTRA_SHOWRECENT,false),
-                        getIntent().getBooleanExtra(EXTRA_SHOWUNICODE,false)),"mojiWall")
+                add(R.id._mm_page_container,fragment ,"mojiWall")
                 .commitAllowingStateLoss();
     }
     @Override
@@ -52,6 +55,13 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     @Override
     public void mojiSelectionCanceled() {
         finish();
+    }
+
+    @Override
+    public void lockedCategoryClick(String name) {
+        MojiUnlock.addGroup(name);
+        fragment.refresh();
+
     }
 
     @Override

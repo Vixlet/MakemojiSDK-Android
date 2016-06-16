@@ -137,7 +137,15 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
 
         return view;
     }
+    public void refresh(){
+        if (currentData!=null)
+            handleData(currentData,currentCats);
+    }
+    Map<String,List<MojiModel>> currentData;
+    List<Category> currentCats;
     public synchronized void handleData(Map<String, List<MojiModel>> data,List<Category> cats){
+        currentData = data;
+        currentCats = cats;
         categories = new ArrayList<>();
         for (Category cat: cats){
            List<MojiModel> list = data.get(cat.name);
@@ -168,16 +176,17 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             Category c = it.next();
             if (c.drawableRes == 0 && (c.image_url==null || c.image_url.isEmpty()))
                 it.remove();
-            else if (c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name))
-                it.remove();
+           // if ("Animals".equals(c.name))
+         //       c.locked = 1;
         }
         List<TabLayout.Tab> tabs = KBCategory.createTabs(tabLayout,categories,tabRes);
         onNewTabs(tabs);
     }
 
+    int selectedPosition;
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
-        int selectedPosition = tabLayout.getSelectedTabPosition();
+        selectedPosition = tabLayout.getSelectedTabPosition();
         tabLayout.removeAllTabs();
         for (TabLayout.Tab tab: tabs) {
             tabLayout.addTab(tab);
@@ -185,6 +194,28 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
             tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
         }
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                TabLayout.Tab tab = tabLayout.getTabAt(position);
+                if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
+                    mojiSelected.lockedCategoryClick(tab.getContentDescription().toString());
+                    tabLayout.getTabAt(selectedPosition).select();
+                    return;
+                }
+                selectedPosition = tab.getPosition();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         pagerAdapter = new MojiWallAdapter(getChildFragmentManager(),categories);
         pager.setAdapter(pagerAdapter);
     }
