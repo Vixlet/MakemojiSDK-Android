@@ -301,12 +301,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     OnClickListener abcClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            layoutRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    clearStack();
-                }
-            };
+
+            clearStack();
+            topScroller.snapOpen();
             showKeyboard();
             deactiveButtons();
         }

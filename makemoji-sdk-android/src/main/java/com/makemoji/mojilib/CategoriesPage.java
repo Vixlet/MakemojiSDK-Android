@@ -21,15 +21,12 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     GridLayoutManager glm;
     MojiApi api;
     CategoriesAdapter adapter;
-    boolean cacheEmpty ;
     public CategoriesPage(ViewStub stub, MojiApi mojiApi, MojiInputLayout mojiInputLayout){
         super(stub,mojiInputLayout);
         api=mojiApi;
         adapter = new CategoriesAdapter(this,mojiInputLayout.getHeaderTextColor());
         List<Category> categories = Category.getCategories();
         adapter.setCategories(categories);
-        if (categories.isEmpty())
-            cacheEmpty=true;
 
         api.getCategories().enqueue(new SmallCB<List<Category>>() {
             @Override
@@ -39,7 +36,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
                     return;
                 }
                 Category.saveCategories(response.body());
-                if (cacheEmpty)adapter.setCategories(response.body());
+                adapter.setCategories(response.body());
             }
         });
 
