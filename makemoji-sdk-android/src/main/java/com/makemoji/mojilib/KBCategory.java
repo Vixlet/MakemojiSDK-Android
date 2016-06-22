@@ -95,6 +95,7 @@ public class KBCategory {
                 tabs.add(tab);
 
             }
+            //if ("Animals".equals(c.name))c.locked=1;
             if (tab!=null && c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name)){
                 tab.getCustomView().setTag(R.id._makemoji_locked_tag_id,true);
                 if (tab.getCustomView().findViewWithTag("iv") instanceof MMForegroundImageView)

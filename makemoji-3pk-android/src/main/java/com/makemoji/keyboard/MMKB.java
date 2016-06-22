@@ -21,6 +21,7 @@ import android.inputmethodservice.KeyboardView;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v7.view.ContextThemeWrapper;
@@ -32,13 +33,16 @@ import android.text.method.MetaKeyKeyListener;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,7 +77,10 @@ import okhttp3.Response;
 public class MMKB extends InputMethodService
         implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
         PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener, MojiUnlock.ICategoryUnlock {
-    static final boolean DEBUG = false;
+    public interface ILockedCategorySelected{
+        void categorySelected(String category, FrameLayout parent);
+    }
+    static ILockedCategorySelected lockedListener;
 
     /**
      * This boolean indicates the optional example code for performing
@@ -106,7 +113,7 @@ public class MMKB extends InputMethodService
     private String mWordSeparators;
 
 
-    View inputView;
+    FrameLayout inputView;
     String packageName;
     TabLayout tabLayout;
     RecyclerView rv;
@@ -159,6 +166,9 @@ public class MMKB extends InputMethodService
         }
     }
 
+    public static void setLockedListener(@NonNull ILockedCategorySelected listener){
+        lockedListener = listener;
+    }
     /**
      * Called by the framework when your view for creating input needs to
      * be generated.  This will be called the first time your input method
@@ -167,7 +177,7 @@ public class MMKB extends InputMethodService
      */
     @Override public View onCreateInputView() {
         assertAuthorityChanged();
-        inputView =  getLayoutInflater().
+        inputView =  (FrameLayout)getLayoutInflater().
                 cloneInContext(new ContextThemeWrapper(getContext(),R.style.KBAppTheme)).
                 inflate(R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
@@ -181,6 +191,25 @@ public class MMKB extends InputMethodService
         shareMessage = getString(R.string._mm_kb_share_message);
         if (shareMessage!=null && shareMessage.length()>0){
             shareText.setVisibility(View.VISIBLE);
+        }
+
+        if (lockedListener==null){
+            lockedListener=new ILockedCategorySelected() {
+                @Override
+                public void categorySelected(String category, FrameLayout parent) {
+                    Intent i = new Intent(Moji.ACTION_LOCKED_CATEGORY_CLICK);
+                    i.putExtra(Moji.EXTRA_CATEGORY_NAME,category);
+                    i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN,Moji.context.getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.setPackage(Moji.context.getPackageName());
+                    try{
+                        Moji.context.startActivity(i);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            };
         }
         MojiUnlock.addListener(this);
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this,R.layout.kb_tab);
@@ -866,17 +895,8 @@ public class MMKB extends InputMethodService
         if ("trending".equals(tab.getContentDescription()))
             populator = new TrendingPopulator();
         else if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-            Intent i = new Intent(Moji.ACTION_LOCKED_CATEGORY_CLICK);
-            i.putExtra(Moji.EXTRA_CATEGORY_NAME,tab.getContentDescription());
-            i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN,getPackageName());
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.setPackage(getPackageName());
-            try{
-                startActivity(i);
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+
+            lockedListener.categorySelected(tab.getContentDescription().toString(),inputView);
             tabLayout.getTabAt(currentTab).select();//go back to last tab
             return;
         }
