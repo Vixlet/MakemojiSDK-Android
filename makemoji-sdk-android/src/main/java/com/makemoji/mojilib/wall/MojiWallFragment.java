@@ -187,6 +187,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
         selectedPosition = tabLayout.getSelectedTabPosition();
+        if (selectedPosition==-1) selectedPosition=0;
         tabLayout.removeAllTabs();
         for (TabLayout.Tab tab: tabs) {
             tabLayout.addTab(tab);

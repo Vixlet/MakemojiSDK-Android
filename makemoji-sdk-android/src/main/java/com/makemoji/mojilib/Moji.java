@@ -376,7 +376,10 @@ public class Moji {
             String idString = m.group(2);
             String url = m.group(3);
             int id = (int)base62.decodeBase62(idString);
-            MojiModel model = MojiSQLHelper.getInstance(context).get(id);
+            MojiModel model = new MojiModel();
+            model.id = id;
+            model.image_url ="http://d1tvcfe0bfyi6u.cloudfront.net/emoji/"+id+"-large@2x.png";
+            /*MojiModel model = MojiSQLHelper.getInstance(context).get(id);
             if (model ==null){
                 Log.d("Make Moji plain text", "cannot find emoji with id "+ id);
                 model = new MojiModel(name,"http://s3.amazonaws.com/me-source/emoji/854@2x.png");
@@ -386,7 +389,7 @@ public class Moji {
                 modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
                 m = plainMojiRegex.matcher(modifiedText);
                 continue;
-            }
+            }*/
             model.name = name;
             model.link_url = url;
             MojiSpan mojiSpan = MojiSpan.fromModel(model,null,null);
