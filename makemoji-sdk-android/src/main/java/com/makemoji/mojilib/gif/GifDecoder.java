@@ -33,6 +33,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Reads frame data from a GIF image source and decodes it into individual frames
@@ -335,7 +336,9 @@ public class GifDecoder {
 
         // final location of blended pixels
         final int[] dest = mainScratch;
-
+        if (previousFrame == null) {
+                  Arrays.fill(dest, 0);
+               }
         // fill in starting image contents based on last image's dispose code
         if (previousFrame != null && previousFrame.dispose > DISPOSAL_UNSPECIFIED) {
             if (previousFrame.dispose == DISPOSAL_NONE && currentImage != null) {
