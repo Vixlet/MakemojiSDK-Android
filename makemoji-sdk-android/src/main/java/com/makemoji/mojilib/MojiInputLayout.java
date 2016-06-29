@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
@@ -75,6 +76,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     TrendingPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
+    Drawable bottomPageBg;
 
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
@@ -116,13 +118,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor,ContextCompat.getColor(getContext(),R.color._mm_header_text_color));
         phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
-        @ColorInt int mainBgColor = a.getColor(R.styleable.MojiInputLayout__mm_mainBgColor,ContextCompat.getColor(getContext(),R.color._mm_top_layout_bg));
+
+        Drawable topBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
+        bottomPageBg = a.getDrawable(R.styleable.MojiInputLayout__mm_bottomPageBg);
+
         boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
         alwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
-        getChildAt(0).setBackgroundColor(mainBgColor);
+        getChildAt(0).setBackgroundDrawable(topBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
         if (alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
@@ -138,13 +143,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         myEditText = editText;
 
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
-        rv.setBackgroundColor(mainBgColor);
         LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(llm);
         rv.setItemViewCacheSize(20);
+        rv.setBackgroundDrawable(bottomPageBg);
         adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
+        pageContainer.setBackgroundDrawable(bottomPageBg);
         categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
 
@@ -683,7 +689,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
 
     }
-    public static boolean keepCharForAnalytics(char c){
+    public boolean keepCharForAnalytics(char c){
         int type = Character.getType(c);
         if (c==MojiEditText.replacementChar||
                 Character.isHighSurrogate(c)||Character.isLowSurrogate(c)||
@@ -713,7 +719,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
         return false;
     }
-    public static boolean isVariation(char c){
+    public static boolean  isVariation(char c){
         return (c >65023 && c<65040);
     }
     protected MojiUnlock.ILockedCategoryClicked iLockedCategoryClicked;
@@ -760,5 +766,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             topScroller.jiggle();
             hasJiggled = true;
         }
+    }
+    Drawable getPageBackground(){
+        return bottomPageBg;
     }
 }

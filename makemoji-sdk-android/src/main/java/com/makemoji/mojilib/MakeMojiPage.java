@@ -39,6 +39,7 @@ public class MakeMojiPage implements PagerPopulator.PopulatorObserver{
             setup();
         if (mView.getParent()==null)mMojiInput.getPageFrame().addView(mView);
         mView.setVisibility(View.VISIBLE);
+        mView.setBackgroundDrawable(mMojiInput.getPageBackground());
     }
     @CallSuper
     public void hide(){

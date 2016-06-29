@@ -32,7 +32,8 @@
     _mm_backSpaceButtonDrawable -> Drawable for the backspace button
     _mm_cameraButtonDrawable -> Drawable to be used for ImageView to left of input
     _mm_cameraButtonVisible -> Display the camera button by default
-    _mm_mainBgColor - > Background color of the root view and hence most children.
+    _mm_topBarBg -> Background resource of top [camera,text,sendButton] view
+    _mm_bottomPageBg -> Background resource of emoji suggestion/search bar and category pages
     _mm_phraseBgColor -> bg color for a phrase item, if you have a phrase category.
     _mm_headerTextColor -> Text color of page headers and text in search bar
     _mm_leftButtonColor -> Color filter to apply to the trending, category, search, and recent buttons. Complements leftContainerDrawable
@@ -50,19 +51,22 @@
         <item name="_mm_backSpaceButtonDrawable">@drawable/mm_backspace_grey600_24dp</item>
         <item name="_mm_cameraButtonDrawable">@drawable/mm_camera_icon</item>
         <item name="_mm_cameraButtonVisible">true</item>
-        <item name="_mm_mainBgColor">@color/_mm_top_layout_bg</item>
+
+        <item name="_mm_topBarBg">@color/_mm_top_layout_bg</item>
+        <item name="_mm_bottomPageBg">@color/_mm_top_layout_bg</item>
         <item name="_mm_phraseBgColor">@color/_mm_default_phrase_bg_color</item>
         <item name="_mm_headerTextColor">@color/_mm_header_text_color</item>
         <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>
         <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
         <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
+
         <item name="_mm_showKbOnInflate">false</item>
         <item name="_mm_alwaysShowEmojiBar">false</item>
 
     </style>
-    <style name="MojiWallDefaultStyle.CustomDrawables">
-        <item name="_mm_backSpaceButtonDrawable">@drawable/mm_trending</item>
-        <item name="_mm_cameraButtonDrawable">@drawable/mm_back_icon</item>
+    <style name="MojiWallDefaultStyle.CustomBg">
+        <item name="_mm_topBarBg">@android:color/holo_red_dark</item>
+        <item name="_mm_bottomPageBg">@android:color/holo_blue_dark</item>
     </style>
 
 </resources>

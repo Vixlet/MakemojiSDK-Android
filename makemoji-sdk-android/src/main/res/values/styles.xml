@@ -20,7 +20,8 @@
         <item name="_mm_backSpaceButtonDrawable">@drawable/mm_backspace_grey600_24dp</item>
         <item name="_mm_cameraButtonDrawable">@drawable/mm_camera_icon</item>
         <item name="_mm_cameraButtonVisible">true</item>
-        <item name="_mm_mainBgColor">@color/_mm_top_layout_bg</item>
+        <item name="_mm_topBarBg">@color/_mm_top_layout_bg</item>
+        <item name="_mm_bottomPageBg">@color/_mm_top_layout_bg</item>
         <item name="_mm_phraseBgColor">@color/_mm_default_phrase_bg_color</item>
         <item name="_mm_headerTextColor">@color/_mm_header_text_color</item>
         <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>

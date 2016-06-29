@@ -7,9 +7,10 @@
         <attr name="_mm_cameraButtonVisible" format="boolean"/>
         <attr name="_mm_leftButtonColor" format="color"/>
         <attr name="_mm_leftButtonBg" format="reference"/>
-        <attr name="_mm_leftContainerDrawable" format="integer"/>
+        <attr name="_mm_leftContainerDrawable" format="integer|color"/>
         <attr name="_mm_headerTextColor" format="color"/>
-        <attr name="_mm_mainBgColor" format="color"/>
+        <attr name="_mm_topBarBg" format="integer|color"/>
+        <attr name="_mm_bottomPageBg" format="integer|color"/>
         <attr name="_mm_phraseBgColor" format="color"/>
         <attr name="_mm_showKbOnInflate" format="boolean"/>
         <attr name="_mm_alwaysShowEmojiBar" format="boolean"/>

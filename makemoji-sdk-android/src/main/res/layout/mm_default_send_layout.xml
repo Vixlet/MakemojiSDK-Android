@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content" android:layout_height="match_parent"
     android:gravity="center"
-    android:paddingTop="8dp"
+    android:paddingTop="0dp"
     android:textStyle="bold"
     android:paddingRight="4dp"
     tools:enabled="false"
     android:enabled="false"
-    android:text="Send" android:textSize="14sp"
+    android:text="@string/mm_send_text" android:textSize="14sp"
     android:textColor="@color/mm_send_layout_selector">
 
 </TextView>
