@@ -21,7 +21,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
 
-    libraryVersion = '0.9.708'
+    libraryVersion = '0.9.710'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'
@@ -33,7 +33,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion '23.0.3'
 
     defaultConfig {
@@ -63,8 +63,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.0.0'
     compile 'com.android.support:design:24.0.0'
     compile 'com.squareup.okhttp:okhttp:2.7.0'
-    compile 'com.squareup.retrofit2:retrofit:2.0.2'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.1'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     //compile 'com.githang:viewpagerindicator:2.4.2@aar'//not needed unless we want viewpagerpage back
 }
 
