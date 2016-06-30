@@ -81,6 +81,7 @@ public class KBCategory {
                 tab = tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(c.drawableRes);
                 tabs.add(tab);
+                tab.getCustomView().setSelected(false);
                 if ("recent".equals(c.name)){
                     View v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
                     if ((v!=null) && v instanceof ImageView)
@@ -90,6 +91,7 @@ public class KBCategory {
             else if (c.image_url!=null){
                 tab = tabLayout.newTab().setCustomView(layoutRes).
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
+                tab.getCustomView().setSelected(false);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
                if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(c.image_url).into(iv);
                 tabs.add(tab);
