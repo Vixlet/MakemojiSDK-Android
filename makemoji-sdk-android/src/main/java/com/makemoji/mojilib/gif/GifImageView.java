@@ -175,5 +175,7 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
         super.onVisibilityChanged(changedView, visibility);
         if (visibility==GONE)
             clear();
+        if (visibility==VISIBLE)
+            load();
     }
 }

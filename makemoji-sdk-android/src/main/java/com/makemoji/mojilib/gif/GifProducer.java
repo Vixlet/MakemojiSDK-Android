@@ -54,11 +54,11 @@ public class GifProducer implements Runnable{
     private GifProducer(GifConsumer consumer,byte[] bytes,String url) {
         this.url = url;
         consumers.add(new WeakReference<>(consumer));
-        gifDecoder = new GifDecoder();
+        gifDecoder = new GifDecoder(new SimpleBitmapProvider());
         try {
             gifDecoder.read(bytes);
             gifDecoder.advance();
-        } catch (final OutOfMemoryError e) {
+        } catch (final Exception e) {
             gifDecoder = null;
             Log.e(TAG, e.getMessage(), e);
             return;

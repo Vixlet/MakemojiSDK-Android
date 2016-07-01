@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
+import android.util.Log;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -58,10 +59,6 @@ public class Spanimator {
     public static synchronized void unsubscribe(@Spanimation int spanimation, Spanimatable spanimatable ){
         subscribers.remove(spanimatable);
         spanimatable.onUnsubscribed(actHash);
-        if (subscribers.isEmpty() && hyperAnimation!=null){
-            hyperAnimation.end();
-            hyperAnimation=null;
-        }
     }
     private static synchronized void setupStartAnimation(@Spanimation int spanimation){
         if (mPaused)return;
@@ -118,9 +115,12 @@ public class Spanimator {
     }
     public static void onResume(int actHash){
         mPaused=false;
-       // Log.d("Spanimator","spanimator lifecycle resume");
+        Log.d("Spanimator","spanimator lifecycle resume");
         Spanimator.actHash = actHash;
-        if (hyperAnimation!=null && !hyperAnimation.isRunning())hyperAnimation.start();
+        if (hyperAnimation!=null && !hyperAnimation.isRunning()){
+            hyperAnimation.start();
+            hyperAnimation.setRepeatCount(ValueAnimator.INFINITE);
+        }
 
         synchronized (subscribers) {
             for (Spanimatable spanimatable : subscribers.keySet()) {
@@ -134,8 +134,11 @@ public class Spanimator {
     }
    public static void onPause(int actHash){
         mPaused=true;
-        //Log.d("Spanimator","spanimator lifecycle pause");
-        if (hyperAnimation!=null)hyperAnimation.end();
+        Log.d("Spanimator","spanimator lifecycle pause");
+        if (hyperAnimation!=null){
+            hyperAnimation.setRepeatCount(0);
+            hyperAnimation.end();
+        }
 
        synchronized (subscribers) {
            for (Spanimatable spanimatable : subscribers.keySet()) {

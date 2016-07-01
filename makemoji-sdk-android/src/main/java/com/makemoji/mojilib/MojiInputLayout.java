@@ -127,7 +127,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
-        getChildAt(0).setBackgroundDrawable(topBg);
+        findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
         if (alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);

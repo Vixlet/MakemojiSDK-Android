@@ -74,6 +74,10 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         rv.setAdapter(adapter);
 
     }
+    @Override
+    public void hide(){
+        super.hide();
+    }
 }
 
 
