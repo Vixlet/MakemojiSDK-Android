@@ -44,6 +44,16 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
     int mTouchSlop;
     ImageView flashButton;
+    boolean enableScroll = true;
+    boolean showLeft = true;
+    public void setEnableScroll(boolean enable){
+        enableScroll = enable;
+    }
+    public void setShowLeft(boolean show){
+        showLeft = show;
+        if (leftView!=null) leftView.setVisibility(show?VISIBLE:GONE);
+
+    }
     @Override
     public void onFinishInflate(){
         super.onFinishInflate();
@@ -74,6 +84,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
 
     public synchronized void jiggle(){
+        if (!enableScroll |!showLeft) return;
         ValueAnimator animator = ValueAnimator.ofInt(minSize + (int)(60 * Moji.density),minSize);
         animator.setInterpolator(new OvershootInterpolator());
         animator.setDuration(1000);
@@ -97,7 +108,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
-
+        if (!enableScroll |!showLeft) return false;
         // Always handle the case of the touch gesture being complete.
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             // Release the scroll.
@@ -171,6 +182,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     }
 
     private boolean setPrimaryContentWidth(int newWidth) {
+        if (!enableScroll |!showLeft) return false;
         newWidth=  Math.max((int)(minSize *.5),newWidth);
         newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
@@ -188,6 +200,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
     ValueAnimator animator;
     public void snapOpen(){
+        if (!enableScroll |!showLeft) return;
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
         int currentWidth = lp.width;
         if (currentWidth==minSize)return;
@@ -203,6 +216,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         animator.start();
     }
     private void snapOpenOrClose(int currentWidth){
+        if (!enableScroll |!showLeft) return;
         int goalWidth = maxSize;
         if ((lastStateOpened && maxSize-currentWidth>MAXIMIZED_VIEW_TOLERANCE_DIP)//closed enough to snap close
                 || (!lastStateOpened && minSize+MINIMIZED_VIEW_TOLERANCE_DIP>currentWidth))//not open enough to snap open.

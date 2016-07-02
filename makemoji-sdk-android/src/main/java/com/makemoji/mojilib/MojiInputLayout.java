@@ -77,6 +77,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
     Drawable bottomPageBg;
+    View leftButtons;
 
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
@@ -133,7 +134,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
 
         sendLayout = ((LinearLayout)inflate(getContext(),sendLayoutRes,horizontalLayout)).getChildAt(2);
-        findViewById(R.id._mm_left_buttons).setBackgroundDrawable(leftContainerDrawable);
+
+        leftButtons = findViewById(R.id._mm_left_buttons);
+        leftButtons.setBackgroundDrawable(leftContainerDrawable);
 
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
@@ -769,5 +772,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     Drawable getPageBackground(){
         return bottomPageBg;
+    }
+
+    public void showLeftNavigation(boolean visible){
+        topScroller.setEnableScroll(visible);
+        topScroller.setShowLeft(visible);
     }
 }
