@@ -119,7 +119,7 @@ public class Spanimator {
         Spanimator.actHash = actHash;
         if (hyperAnimation!=null && !hyperAnimation.isRunning()){
             hyperAnimation.start();
-            hyperAnimation.setRepeatCount(ValueAnimator.INFINITE);
+
         }
 
         synchronized (subscribers) {
@@ -136,7 +136,7 @@ public class Spanimator {
         mPaused=true;
         Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null){
-            hyperAnimation.setRepeatCount(0);
+
             hyperAnimation.end();
         }
 

@@ -21,6 +21,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.CharacterStyle;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
@@ -363,7 +364,7 @@ public class Moji {
     }
     public static Base62 base62 = new Base62();
     @WorkerThread
-    public static Spanned plainTextToSpanned(String plainText){
+    public static Spanned plainTextToSpanned(String plainText) {
         String modifiedText = plainText;
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         List<MojiSpan> spans = new ArrayList<>();
@@ -371,42 +372,47 @@ public class Moji {
         if (!m.find())
             return new SpannableStringBuilder(plainText);
         m.reset();
-        while (m.find()){
+        while (m.find()) {
             String name = m.group(1);
             String idString = m.group(2);
             String url = m.group(3);
-            int id = (int)base62.decodeBase62(idString);
+            int id = (int) base62.decodeBase62(idString);
             MojiModel model = new MojiModel();
             model.id = id;
-            model.image_url ="http://d1tvcfe0bfyi6u.cloudfront.net/emoji/"+id+"-large@2x.png";
-            /*MojiModel model = MojiSQLHelper.getInstance(context).get(id);
-            if (model ==null){
-                Log.d("Make Moji plain text", "cannot find emoji with id "+ id);
-                model = new MojiModel(name,"http://s3.amazonaws.com/me-source/emoji/854@2x.png");
-                model.link_url = url;
-                MojiSpan mojiSpan = MojiSpan.fromModel(model,null,null);
-                spans.add(mojiSpan);
-                modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
-                m = plainMojiRegex.matcher(modifiedText);
-                continue;
-            }*/
+            model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-large@2x.png";
             model.name = name;
             model.link_url = url;
-            MojiSpan mojiSpan = MojiSpan.fromModel(model,null,null);
+            MojiSpan mojiSpan = MojiSpan.fromModel(model, null, null);
             spans.add(mojiSpan);
-            modifiedText = m.replaceFirst(""+MojiEditText.replacementChar);
+            modifiedText = m.replaceFirst("" + MojiEditText.replacementChar);
             m = plainMojiRegex.matcher(modifiedText);
         }
         int spanCount = 0;
-        for (int i = 0; i<modifiedText.length();i++){
+        for (int i = 0; i < modifiedText.length(); i++) {
             char c = modifiedText.charAt(i);
             ssb.append(modifiedText.charAt(i));
-            if (MojiEditText.replacementChar.equals(c) && spanCount<spans.size()){
-                ssb.setSpan(spans.get(spanCount), i,i+1,
+            if (MojiEditText.replacementChar.equals(c) && spanCount < spans.size()) {
+                MojiSpan mojiSpan = spans.get(spanCount);
+                ssb.setSpan(mojiSpan, i, i + 1,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 spanCount++;
+                final String link = mojiSpan.getLink();
+                if (mojiSpan.getLink() != null && !mojiSpan.getLink().isEmpty()) {
+                    ClickableSpan clickableSpan = new MojiClickableSpan() {
+                        @Override
+                        public void onClick(View widget) {
+                            HyperMojiListener hyperMojiListener = (HyperMojiListener) widget.getTag(R.id._makemoji_hypermoji_listener_tag_id);
+                            if (hyperMojiListener == null)
+                                hyperMojiListener = Moji.getDefaultHyperMojiClickBehavior();
+                            hyperMojiListener.onClick(link);
+                        }
+                    };
+                    ssb.setSpan(clickableSpan, i, i + 1,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
         }
+
         return ssb;
     }
 
