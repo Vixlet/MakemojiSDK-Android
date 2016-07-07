@@ -59,4 +59,13 @@ public interface MojiApi {
     @POST("emoji/unlockGroup")
     Call<JSONObject> unlockGroup(@Field("category_name")String categoryName);
 
+    @GET("reactions/get/{sha1_content_id}")
+    Call<JSONObject> getReactionData(@Path("sha1_content_id") String sha1ContentId);
+
+    @FormUrlEncoded
+    @POST("reactions/create/{sha1_content_id}")
+    Call<JSONObject> createReaction(@Field("sha1_content_id")String sha1ContentId, @Field("emoji_id") String emojiId,@Field("emoji_type") String emojiType);
+
+
+
 }

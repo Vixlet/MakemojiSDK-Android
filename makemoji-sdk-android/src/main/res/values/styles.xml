@@ -39,4 +39,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <style name="ReactionsDefaultStyle" >
+        <item name="_mm_reactionTextColor">@color/_mm_default_send_text_color</item>
+        <item name="_mm_reactionCellBg">@drawable/mm_left_page_gradient</item>
+    </style>
 </resources>

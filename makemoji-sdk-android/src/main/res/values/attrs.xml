@@ -22,4 +22,9 @@
         <attr name="_mm_wall_header_layout" format="reference"/>
         <attr name="_mm_wall_tabs_bg" format="color|reference"/>
         <attr name="_mm_wall_pager_bg" format="color|reference"/>
+
+    <declare-styleable name="ReactionsLayout">
+        <attr name="_mm_reactionTextColor" format="color"/>
+        <attr name="_mm_reactionCellBg" format="reference"/>
+    </declare-styleable>
 </resources>

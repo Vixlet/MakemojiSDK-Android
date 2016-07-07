@@ -132,6 +132,9 @@ public class InputActivity extends AppCompatActivity{
             MojiUnlock.clearGroups();
             mojiInputLayout.refreshCategories();
         }
+        else if (id == R.id.action_reactions_activity){
+            startActivity(new Intent(this,ReactionsActivity.class));
+        }
 
         return super.onOptionsItemSelected(item);
     }

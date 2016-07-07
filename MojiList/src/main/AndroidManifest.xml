@@ -5,33 +5,34 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.makemoji.sbaar.mojilist.App"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.makemoji.sbaar.mojilist.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.makemoji.mojilib.wall.MojiWallActivity"
-            android:label="Emoji Wall Activity">
-        </activity>
+            android:label="Emoji Wall Activity"></activity>
         <activity
-            android:name="com.makemoji.sbaar.mojilist.InputActivity"
+            android:name=".InputActivity"
             android:label="@string/title_activity_input"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED"/>
+                <action android:name="com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
             <intent-filter>
@@ -39,17 +40,17 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
-            android:name="com.makemoji.sbaar.mojilist.ActivateActivity"
-            android:windowSoftInputMode="stateUnchanged"
+            android:name=".ActivateActivity"
+            android:label="MakeMoji Keyboard"
             android:theme="@style/AppTheme"
-            android:label="MakeMoji Keyboard">
+            android:windowSoftInputMode="stateUnchanged">
             <intent-filter>
                 <action android:name="android.intent.action.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ReactionsActivity"></activity>
     </application>
 
 </manifest>

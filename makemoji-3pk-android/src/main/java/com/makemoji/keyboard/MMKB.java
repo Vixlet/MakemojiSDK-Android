@@ -169,6 +169,9 @@ public class MMKB extends InputMethodService
     public static void setLockedListener(@NonNull ILockedCategorySelected listener){
         lockedListener = listener;
     }
+    public void setShareMessage(CharSequence message){
+        shareMessage = message;
+    }
     /**
      * Called by the framework when your view for creating input needs to
      * be generated.  This will be called the first time your input method
@@ -188,7 +191,7 @@ public class MMKB extends InputMethodService
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
         pageFrame = inputView.findViewById(R.id._mm_kb_pageframe);
 
-        shareMessage = getString(R.string._mm_kb_share_message);
+        if (shareMessage==null)shareMessage = getString(R.string._mm_kb_share_message);
         if (shareMessage!=null && shareMessage.length()>0){
             shareText.setVisibility(View.VISIBLE);
         }

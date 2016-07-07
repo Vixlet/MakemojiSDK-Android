@@ -33,4 +33,9 @@
         android:orderInCategory="100"
         android:title="Clear Unlocked Categories"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_reactions_activity"
+        android:orderInCategory="100"
+        android:title="Reactions Activity"
+        app:showAsAction="never" />
 </menu>

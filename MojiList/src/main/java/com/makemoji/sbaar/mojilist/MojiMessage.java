@@ -1,6 +1,7 @@
 package com.makemoji.sbaar.mojilist;
 
 import com.makemoji.mojilib.ParsedAttributes;
+import com.makemoji.mojilib.model.ReactionsData;
 
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import java.util.Random;
 public class MojiMessage {
     public String from,to, fromImg, toImg, messageRaw, id;
     public ParsedAttributes parsedAttributes;
+    public ReactionsData reactionsData;
     public MojiMessage(JSONObject jo){
         from = jo.optString("from_username");
         to = jo.optString("to_username");

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="mm_cat_width">90dp</dimen>
+    <dimen name="mm_reaction_cell_height">30dp</dimen>
 </resources>
