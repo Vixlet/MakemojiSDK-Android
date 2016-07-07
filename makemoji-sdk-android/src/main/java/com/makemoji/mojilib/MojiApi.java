@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import com.google.gson.JsonObject;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
@@ -43,7 +44,7 @@ public interface MojiApi {
 
     @FormUrlEncoded
     @POST("messages/create")
-    Call<JSONObject> sendPressed(@Field("message") String htmlMessage);
+    Call<JsonObject> sendPressed(@Field("message") String htmlMessage);
 
     @POST("emoji/viewTrack")
     Call<Void> trackViews( @Body RequestBody array);
@@ -57,14 +58,14 @@ public interface MojiApi {
 
     @FormUrlEncoded
     @POST("emoji/unlockGroup")
-    Call<JSONObject> unlockGroup(@Field("category_name")String categoryName);
+    Call<JsonObject> unlockGroup(@Field("category_name")String categoryName);
 
     @GET("reactions/get/{sha1_content_id}")
-    Call<JSONObject> getReactionData(@Path("sha1_content_id") String sha1ContentId);
+    Call<JsonObject> getReactionData(@Path("sha1_content_id") String sha1ContentId);
 
     @FormUrlEncoded
     @POST("reactions/create/{sha1_content_id}")
-    Call<JSONObject> createReaction(@Field("sha1_content_id")String sha1ContentId, @Field("emoji_id") String emojiId,@Field("emoji_type") String emojiType);
+    Call<JsonObject> createReaction(@Path("sha1_content_id") String sha1ContentId, @Field("emoji_id") int emojiId,@Field("emoji_type") String emojiType);
 
 
 

@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.makemoji.mojilib.model.MojiModel;
 
 import org.json.JSONObject;
@@ -679,9 +680,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     ssb.replace(i,i+1,"");
                 }
                 String html = Moji.toHtml(ssb);
-                Moji.mojiApi.sendPressed(html).enqueue(new SmallCB<JSONObject>() {
+                Moji.mojiApi.sendPressed(html).enqueue(new SmallCB<JsonObject>() {
                     @Override
-                    public void done(Response<JSONObject> response, @Nullable Throwable t) {
+                    public void done(Response<JsonObject> response, @Nullable Throwable t) {
                         if (t!=null){
                             t.printStackTrace();
                         }

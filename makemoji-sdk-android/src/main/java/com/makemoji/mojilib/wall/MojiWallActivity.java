@@ -23,12 +23,15 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
     public static final String EXTRA_SHOWRECENT = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWRECENT";
     public static final String EXTRA_SHOWUNICODE = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWUNICODE";
+    public static final String EXTRA_REACTION_ID = "com.makemoji.mojilib.wall.MojiWallActivity.REACTION_ID";
     public MojiWallFragment fragment;
+    String reactionId;
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         setTheme(getIntent().getIntExtra(EXTRA_THEME, R.style.MojiWallDefaultStyle));
         setContentView(R.layout.mm_moji_wall_activity);
+        reactionId = getIntent().getStringExtra(EXTRA_REACTION_ID);
         fragment = MojiWallFragment.newInstance(getIntent().getBooleanExtra(EXTRA_SHOWRECENT,false),
                 getIntent().getBooleanExtra(EXTRA_SHOWUNICODE,false));
         getSupportFragmentManager().beginTransaction().
@@ -42,6 +45,7 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
         RecentPopulator.addRecent(model);
         if (jo!=null) {
             intent.putExtra(Moji.EXTRA_JSON, jo.toString());
+            intent.putExtra(EXTRA_REACTION_ID,reactionId);
             setResult(RESULT_OK, intent);
             selected = true;
             finish();

@@ -336,6 +336,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
             mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),true,
                     size);
+                    mojiGridAdapter.setEnablePulse(false);
             mojiGridAdapter.setImagesSizedtoSpan(false);
             if (itemDecoration!=null) {
                 rv.removeItemDecoration(itemDecoration);

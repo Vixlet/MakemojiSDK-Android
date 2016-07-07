@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.model.MojiModel;
 import com.makemoji.mojilib.model.ReactionsData;
+import com.makemoji.mojilib.wall.MojiWallActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,28 +20,38 @@ import java.util.List;
  */
 class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
 
-    MojiInputLayout mil;
     List<ReactionsData.Reaction> list = new ArrayList<>();
-    boolean showNames = false;
+    ReactionsData data;
     public ReactionsAdapter(){}
     @Override
     public CellHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.mm_horiz_moji_item, parent, false);
+                .inflate(R.layout.mm_reaction_cell, parent, false);
         return new CellHolder(v,parent);
     }
 
     @Override
-    public void onBindViewHolder(CellHolder holder, int position) {
-        ReactionsData.Reaction r = list.get(position);
+    public void onBindViewHolder(final CellHolder holder, final int position) {
+        final ReactionsData.Reaction r = list.get(position);
         Moji.setText(r.toSpanned(holder.left),holder.left);
-        holder.right.setText(""+r.total);
+        holder.right.setText(getTotalString(r.total));
+        holder.right.setVisibility(r.total>0?View.VISIBLE:View.GONE);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data.onClick(position);
+                notifyDataSetChanged();
+
+            }
+        });
+        holder.itemView.setSelected(r.selected);
 
     }
 
 
-    public void setReactions(List<ReactionsData.Reaction> newList){
-        list = newList;
+    public void setReactions(ReactionsData data){
+        list = data.getReactions();
+        this.data = data;
         notifyDataSetChanged();
     }
     @Override
@@ -59,5 +71,20 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
             right =(TextView) v.findViewById(R.id._mm_reaction_right_tv);
 
         }
+    }
+    static String abbreviations[] = {"K","M","B"};
+    static String getTotalString(int total) {
+        if (total < 1000) return "" + total;
+
+        for (int i = abbreviations.length; i >=0; i--) {
+
+            double size = Math.pow(10, (i + 1) * 3);
+            if (size < total) {
+                total = (int) (total / size);
+                return total + abbreviations[i];
+            }
+
+        }
+        return "" + total;
     }
 }

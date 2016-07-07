@@ -1,18 +1,26 @@
 package com.makemoji.mojilib;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.makemoji.mojilib.model.ReactionsData;
+import com.makemoji.mojilib.wall.MojiWallActivity;
 
 import java.util.List;
 
@@ -24,6 +32,7 @@ public class ReactionsLayout extends LinearLayout implements PagerPopulator.Popu
     List<ReactionsData.Reaction> reactions;
     ReactionsAdapter adapter;
     RecyclerView rv;
+    ImageButton addReaction;
 
     public ReactionsLayout(Context context) {
         super(context);
@@ -40,11 +49,36 @@ public class ReactionsLayout extends LinearLayout implements PagerPopulator.Popu
         init(attrs,defStyleAttr);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public ReactionsLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context,attrs,defStyleAttr,defStyleRes);
+    }
+
     public void init(AttributeSet attrs,int defStyle){
         inflate(getContext(),R.layout.mm_reactions_layout,this);
-        rv = (RecyclerView)findViewById(R.id.recyclerView);
+        rv = (RecyclerView)findViewById(R.id._mm_recylcer_view);
+        addReaction = (ImageButton) findViewById(R.id.mm_add_reaction);
         rv.setLayoutManager(new LinearLayoutManager(getContext(),HORIZONTAL,false));
         adapter = new ReactionsAdapter();
+        rv.setAdapter(adapter);
+
+        addReaction.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (data==null) return;
+                Intent intent = new Intent(getContext(), MojiWallActivity.class);
+                //intent.putExtra(MojiWallActivity.EXTRA_THEME,R.style.MojiWallDefaultStyle_Light); //to theme it
+                intent.putExtra(MojiWallActivity.EXTRA_SHOWRECENT,true);
+                intent.putExtra(MojiWallActivity.EXTRA_SHOWUNICODE,true);
+                intent.putExtra(MojiWallActivity.EXTRA_REACTION_ID,data.id);
+                if (getContext()instanceof Activity)
+                    ((Activity) getContext()).startActivityForResult(intent,IMojiSelected.REQUEST_MOJI_MODEL);
+                else
+                    Toast.makeText(getContext(),"Reaction layout must be in an activity",Toast.LENGTH_LONG).show();
+
+                ReactionsData.onNewReactionClicked(data);
+            }
+        });
 
     }
     public void setReactionsData(ReactionsData newData){
@@ -56,8 +90,8 @@ public class ReactionsLayout extends LinearLayout implements PagerPopulator.Popu
     @Override
     public void onNewDataAvailable() {
         reactions = data.getReactions();
-        adapter.setReactions(reactions);
-
+        adapter.setReactions(data);
+        adapter.notifyDataSetChanged();
     }
 
 }

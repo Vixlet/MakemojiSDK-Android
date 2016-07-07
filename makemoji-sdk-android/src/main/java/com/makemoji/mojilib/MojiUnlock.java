@@ -2,6 +2,8 @@ package com.makemoji.mojilib;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.JsonObject;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -47,9 +49,9 @@ public class MojiUnlock {
     public static void unlockCategory(final String name){
 
         addGroup(name);
-        Moji.mojiApi.unlockGroup(name).enqueue(new SmallCB<JSONObject>() {
+        Moji.mojiApi.unlockGroup(name).enqueue(new SmallCB<JsonObject>() {
             @Override
-            public void done(Response<JSONObject> response, @Nullable Throwable t) {
+            public void done(Response<JsonObject> response, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
                 }

@@ -1,8 +1,11 @@
 package com.makemoji.sbaar.mojilist;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
+
+import com.makemoji.mojilib.model.ReactionsData;
 
 import org.json.JSONArray;
 
@@ -25,5 +28,9 @@ public class ReactionsActivity extends AppCompatActivity {
         }
         catch (Exception e){}
         lv.setAdapter(adapter);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ReactionsData.onActivityResult(requestCode,resultCode,data);
     }
 }

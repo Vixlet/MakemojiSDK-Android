@@ -115,7 +115,7 @@ public class Spanimator {
     }
     public static void onResume(int actHash){
         mPaused=false;
-        Log.d("Spanimator","spanimator lifecycle resume");
+        //Log.d("Spanimator","spanimator lifecycle resume");
         Spanimator.actHash = actHash;
         if (hyperAnimation!=null && !hyperAnimation.isRunning()){
             hyperAnimation.start();
@@ -134,7 +134,7 @@ public class Spanimator {
     }
    public static void onPause(int actHash){
         mPaused=true;
-        Log.d("Spanimator","spanimator lifecycle pause");
+        //Log.d("Spanimator","spanimator lifecycle pause");
         if (hyperAnimation!=null){
 
             hyperAnimation.end();
