@@ -30,6 +30,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.method.MetaKeyKeyListener;
+import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
@@ -169,7 +170,7 @@ public class MMKB extends InputMethodService
     public static void setLockedListener(@NonNull ILockedCategorySelected listener){
         lockedListener = listener;
     }
-    public void setShareMessage(CharSequence message){
+    public static void setShareMessage(CharSequence message){
         shareMessage = message;
     }
     /**
@@ -1094,8 +1095,17 @@ public class MMKB extends InputMethodService
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
         int selectedPosition = tabLayout.getSelectedTabPosition();
+
+        //to resolve timing issue: If tablayout/inputview is rapidly created->destroyed->created, old tab will try to be added to the new tablayout.
+        if (!tabs.isEmpty()){
+            if (tabs.get(0).getCustomView().getParent()!=null && tabs.get(0).getCustomView().getParent().getParent() !=null){
+                Log.d("MMKB","tried to insert old tabs into new tablayout. aborting.");
+                return;
+            }
+        }
         tabLayout.removeAllTabs();
         for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
+
         tabLayout.setOnTabSelectedListener(this);
         if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
             tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
