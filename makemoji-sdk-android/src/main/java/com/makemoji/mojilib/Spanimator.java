@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
-import android.util.Log;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -72,7 +71,7 @@ public class Spanimator {
                 });
             return;
         }
-        int duration = Moji.resources.getInteger(R.integer._makemoji_pulse_duration);
+        int duration = Moji.resources.getInteger(R.integer._mm_pulse_duration);
         Interpolator interpolator = new DecelerateInterpolator();
         hyperAnimation = ValueAnimator.ofFloat(HYPER_PULSE_MAX,HYPER_PULSE_MIN).setDuration(duration);
         hyperAnimation.setInterpolator(interpolator);

@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -87,6 +88,14 @@ public class InputActivity extends AppCompatActivity{
                 lockedCategoryClick(name);
             }
         });
+       /* ((EditText) findViewById(R.id._mm_edit_text)).setCompoundDrawablesWithIntrinsicBounds(null,null,
+                getResources().getDrawable(R.drawable.mm_backspace_grey600_24dp),null);
+        mojiInputLayout.setDrawableClickListener(new MojiEditText.IDrawableClick() {
+            @Override
+            public void onClick(int drawablePosition) {
+                mojiInputLayout.setInputText(""+drawablePosition);
+            }
+        });*/
 
 
     }

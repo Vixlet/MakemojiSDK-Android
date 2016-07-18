@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.IntDef;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -16,6 +17,8 @@ import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
@@ -24,6 +27,14 @@ import java.util.regex.Pattern;
  * Created by Scott Baar on 1/29/2016.
  */
 public class MojiEditText extends EditText {
+    public static final int DRAWABLE_LEFT = 0;
+    public static final int DRAWABLE_TOP = 1;
+    public static final int DRAWABLE_RIGHT = 2;
+    public static final int DRAWABLE_BOTTOM = 3;
+
+    public interface IDrawableClick{
+        void onClick(int drawablePosition );
+    }
     public MojiEditText(Context context) {
         super(context);
         init();

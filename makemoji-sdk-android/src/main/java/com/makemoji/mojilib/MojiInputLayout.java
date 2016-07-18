@@ -190,8 +190,28 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         //don't show kb if pages are showing.
         editText.setOnTouchListener(new OnTouchListener() {
+            boolean within(int t, int min, int max){
+                if (t>max)return false;
+                return t >= min;
+            }
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP && drawableClick!=null)
+
+                    if(editText.getCompoundDrawables()[MojiEditText.DRAWABLE_RIGHT]!=null&&
+                            event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[MojiEditText.DRAWABLE_RIGHT].getBounds().width())) {
+                        drawableClick.onClick(MojiEditText.DRAWABLE_RIGHT);
+                        return true;
+                    }
+                if(editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT] !=null && event.getRawX() <=
+                        (editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT].getBounds().width()+editText.getLeft())) {
+                    {
+                        drawableClick.onClick(MojiEditText.DRAWABLE_LEFT);
+                        return true;
+                    }
+                }
+
+
                 if (pages.empty()) return editText.onTouchEvent(event);
                 else
                 {
@@ -491,7 +511,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             maxTopScrollherH = Math.max(topScroller.getHeight(),maxTopScrollherH);
             int parentHeight = ((ViewGroup)getParent()).getHeight()
                     - editText.getPaddingBottom()-editText.getPaddingTop() -(int) (20 * Moji.density);
-           if (!outsideEditText) editText.setMaxHeight(parentHeight -maxTopScrollherH);
+           //if (!outsideEditText) editText.setMaxHeight(parentHeight -maxTopScrollherH);
             deactiveButtons();
             clearStack();
             if (!alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
@@ -778,5 +798,10 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     public void showLeftNavigation(boolean visible){
         topScroller.setEnableScroll(visible);
         topScroller.setShowLeft(visible);
+    }
+
+    protected MojiEditText.IDrawableClick drawableClick;
+    public void setDrawableClickListener(MojiEditText.IDrawableClick drawableClick){
+        this.drawableClick = drawableClick;
     }
 }

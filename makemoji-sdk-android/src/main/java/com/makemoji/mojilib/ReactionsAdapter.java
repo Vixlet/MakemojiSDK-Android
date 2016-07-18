@@ -39,7 +39,13 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+               // ReactionsData.Reaction reaction = null;
+              //  for (ReactionsData.Reaction r : data.getReactions())
+               //     if (r.selected) reaction = r;
                 data.onClick(position);
+             //   notifyItemMoved(position,0);
+            //    notifyItemChanged(position);
+             //   if (reaction!=null) notifyItemChanged(data.getReactions().indexOf(r));
                 notifyDataSetChanged();
 
             }
