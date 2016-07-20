@@ -85,6 +85,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     @DrawableRes int backSpaceDrawableRes;
     final static String TAG = "MojiInputLayout";
     boolean alwaysShowBar = false;
+    int minimumSendLength;
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -119,6 +120,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         Drawable buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
         headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor,ContextCompat.getColor(getContext(),R.color._mm_header_text_color));
         phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
+        minimumSendLength = a.getInteger(R.styleable.MojiInputLayout__mm_minimumSendLength,1);
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
 
         Drawable topBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
@@ -145,6 +147,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         editText = (EditText)findViewById(R.id._mm_edit_text);
         myEditText = editText;
+        sendLayout.setEnabled(editText.getText().length()>=minimumSendLength);
 
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
@@ -278,7 +281,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         @Override
         public void afterTextChanged(Editable s) {
             final String t = s.toString();
-            sendLayout.setEnabled(t.length()>0);
+            sendLayout.setEnabled(t.length()>=minimumSendLength);
 
             int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
             if (selectionEnd==-1){

@@ -29,6 +29,7 @@
         <item name="_mm_leftContainerDrawable">@drawable/mm_left_page_gradient</item>
         <item name="_mm_showKbOnInflate">false</item>
         <item name="_mm_alwaysShowEmojiBar">false</item>
+        <item name="_mm_minimumSendLength">1</item>
     </style>
     <style name="MojiWallDefaultStyle" parent="Theme.AppCompat">
         <item name="_mm_wall_tab_layout">@layout/mm_wall_tab</item>

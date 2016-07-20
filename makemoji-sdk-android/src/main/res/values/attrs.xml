@@ -14,6 +14,7 @@
         <attr name="_mm_phraseBgColor" format="color"/>
         <attr name="_mm_showKbOnInflate" format="boolean"/>
         <attr name="_mm_alwaysShowEmojiBar" format="boolean"/>
+        <attr name="_mm_minimumSendLength" format="integer"/>
     </declare-styleable>
     <declare-styleable name="MMForegroundImageView">
         <attr name="_mm_foreground" format="reference"/>
