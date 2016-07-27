@@ -1,26 +1,8 @@
 package com.makemoji.mojilib.gif;
 
-/**
- * Copyright 2014 Google, Inc. All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
- * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 import java.util.List;
 
+        import android.support.annotation.ColorInt;
 
         import java.util.ArrayList;
         import java.util.List;
@@ -28,33 +10,41 @@ import java.util.List;
 /**
  * A header object containing the number of frames in an animated GIF image as well as basic
  * metadata like width and height that can be used to decode each individual frame of the GIF. Can
- * be shared by one or more {@link GifDecoder}s to play the same animated GIF in multiple views.
+ * be shared by one or more {@link com.bumptech.glide.gifdecoder.GifDecoder}s to play the same
+ * animated GIF in multiple views.
+ *
+ * @see <a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF 89a Specification</a>
  */
 public class GifHeader {
 
+    @ColorInt
     int[] gct = null;
+    @GifDecoder.GifDecodeStatus
     int status = GifDecoder.STATUS_OK;
     int frameCount = 0;
 
     GifFrame currentFrame;
     List<GifFrame> frames = new ArrayList<>();
-    // Logical screen size.
-    // Full image width.
+    /** Logical screen size: Full image width. */
     int width;
-    // Full image height.
+    /** Logical screen size: Full image height. */
     int height;
 
     // 1 : global color table flag.
     boolean gctFlag;
-    // 2-4 : color resolution.
-    // 5 : gct sort flag.
-    // 6-8 : gct size.
+    /**
+     * Size of Global Color Table.
+     * The value is already computed to be a regular number, this field doesn't store the exponent.
+     */
     int gctSize;
-    // Background color index.
+    /** Background color index into the Global/Local color table. */
     int bgIndex;
-    // Pixel aspect ratio.
+    /**
+     * Pixel aspect ratio.
+     * Factor used to compute an approximation of the aspect ratio of the pixel in the original image.
+     */
     int pixelAspect;
-    //TODO: this is set both during reading the header and while decoding frames...
+    @ColorInt
     int bgColor;
     int loopCount;
 
@@ -73,6 +63,7 @@ public class GifHeader {
     /**
      * Global status code of GIF data parsing.
      */
+    @GifDecoder.GifDecodeStatus
     public int getStatus() {
         return status;
     }

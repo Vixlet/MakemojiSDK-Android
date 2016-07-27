@@ -153,8 +153,6 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         Rect rect = d.getBounds();
         rect.bottom = mHeight;
         rect.right = mWidth;
-        if (mWidth!=78)
-            Log.d("span","not 78");
 
 
         if (fm != null) {

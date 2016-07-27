@@ -54,7 +54,7 @@ public class GifProducer implements Runnable{
     private GifProducer(GifConsumer consumer,byte[] bytes,String url) {
         this.url = url;
         consumers.add(new WeakReference<>(consumer));
-        gifDecoder = new GifDecoder(new SimpleBitmapProvider());
+        gifDecoder = new StandardGifDecoder(new SimpleBitmapProvider());
         try {
             gifDecoder.read(bytes);
             gifDecoder.advance();
