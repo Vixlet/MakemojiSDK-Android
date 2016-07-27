@@ -29,7 +29,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mojiInputLayout);
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
-            ROWS = 1;
+            ROWS = 2;
         }
         mPopulator = p;
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);

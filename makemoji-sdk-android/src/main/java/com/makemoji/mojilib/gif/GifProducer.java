@@ -36,7 +36,6 @@ public class GifProducer implements Runnable{
         if (bytes==null)return null;
         producer = new GifProducer(consumer,bytes,url);
         producerMap.put(url,producer);
-        Log.d(TAG,"producer size "+ producerMap.size());
         return producer;
     }
     private static void removeProducer(GifProducer producer){
@@ -107,7 +106,6 @@ public class GifProducer implements Runnable{
     @Override
     public void run() {
         if (shouldClear) {
-            Log.d(TAG,"cleanup ");
             handler.post(cleanupRunnable);
             return;
         }

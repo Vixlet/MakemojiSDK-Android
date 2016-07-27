@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.makemoji.mojilib.Moji;
@@ -111,7 +112,10 @@ public class GifSpan extends MojiSpan implements GifConsumer {
                 (long)v.getTag(R.id._makemoji_last_invalidated_id);
         long now = System.currentTimeMillis();
         bitmapDrawable = new BitmapDrawable(Moji.context.getResources(),b);
-        bitmapDrawable.setBounds(0,0,b.getWidth(),b.getHeight());
+        if (isSmallGif)
+            bitmapDrawable.setBounds(0,0,mWidth,mHeight);
+        else
+            bitmapDrawable.setBounds(0,0,b.getWidth(),b.getHeight());
         if (lastInvalidated+15>now) return;
         Boolean gifInvalidated = (Boolean) v.getTag(R.id._makemoji_gif_invalidated_id);
         if (gifInvalidated==null || !gifInvalidated) {
@@ -149,7 +153,9 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         Rect rect = d.getBounds();
         rect.bottom = mHeight;
         rect.right = mWidth;
-        //rect.bottom=100;
+        if (mWidth!=78)
+            Log.d("span","not 78");
+
 
         if (fm != null) {
             fm.ascent = -rect.bottom;
