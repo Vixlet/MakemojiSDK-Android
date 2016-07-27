@@ -27,6 +27,7 @@ public class App extends Application {
         LeakCanary.install(this);
 
 //bow moji 6b503d6ba664bdb2565a6421f0a8fda1791b3e49
+        //Yt bfd3eea60abad87d378f87939ef3a116e8b23a35
         //sdk 940ced93abf2ca4175a4a865b38f1009d8848a58
         //a custom listener that will display a view (ie to prompt a purchase), when a locked category is clicked
         MMKB.setLockedListener(new MMKB.ILockedCategorySelected() {

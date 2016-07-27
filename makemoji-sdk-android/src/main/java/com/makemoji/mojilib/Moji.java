@@ -474,6 +474,8 @@ public class Moji {
         long lastInvalidated = tv.getTag(R.id._makemoji_last_invalidated_id)==null?0:
                 (long)tv.getTag(R.id._makemoji_last_invalidated_id);
         Long now = System.currentTimeMillis();
+
+        tv.setTag(R.id._makemoji_gif_invalidated_id,false);
         if (lastInvalidated+15>now) return;
 
         tv.invalidate();

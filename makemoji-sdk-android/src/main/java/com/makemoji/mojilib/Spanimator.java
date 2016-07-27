@@ -26,7 +26,7 @@ public class Spanimator {
 
     public static final int HYPER_PULSE = 0;
     public static final float HYPER_PULSE_MAX = 1f;
-    public static final float HYPER_PULSE_MIN = .15f;
+    public static final float HYPER_PULSE_MIN = .25f;
 
 
     private static final Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());

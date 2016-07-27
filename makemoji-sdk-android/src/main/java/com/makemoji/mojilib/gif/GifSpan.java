@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiSpan;
+import com.makemoji.mojilib.R;
 import com.makemoji.mojilib.Spanimator;
 
 import java.io.IOException;
@@ -30,6 +31,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     BitmapFactory.Options options;
     Bitmap bitmap;
     BitmapDrawable bitmapDrawable= new BitmapDrawable();
+    public static boolean USE_SMALL_GIFS = true;
+    public boolean isSmallGif = USE_SMALL_GIFS;
     /**
      * @param d           The placeholder drawable.
      * @param source      URL of the actual emoji
@@ -66,8 +69,10 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     private synchronized void load(){
         producer = GifProducer.getProducerAndSub(this,null,mSource);
         if (producer!=null){
-            mWidth = producer.getWidth();
-            mHeight = producer.getHeight();
+            if (!USE_SMALL_GIFS && !isSmallGif) {
+                mWidth = producer.getWidth();
+                mHeight = producer.getHeight();
+            }
             return;
         }
         Moji.okHttpClient.newCall(new Request.Builder().url(mSource).build()).enqueue(new Callback() {
@@ -80,8 +85,10 @@ public class GifSpan extends MojiSpan implements GifConsumer {
             public void onResponse(Call call, Response response) throws IOException {
                 producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
                 if (producer!=null){
-                    mWidth = producer.getWidth();
-                    mHeight = producer.getHeight();
+                    if (!USE_SMALL_GIFS && !isSmallGif) {
+                        mWidth = producer.getWidth();
+                        mHeight = producer.getHeight();
+                    }
                 }
             }
         });
@@ -91,24 +98,32 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     public void onFrameAvailable(final Bitmap b) {
         final TextView v = mViewRef.get();
         if (v==null){
-            Moji.handler.post(new Runnable() {//prevent concurrent modificication
-                @Override
-                public void run() {
+        //    Moji.handler.post(new Runnable() {//prevent concurrent modificication
+        //        @Override
+         //       public void run() {
                     if (producer!=null)producer.unsubscribe(GifSpan.this);
-                }
-            });
+        //        }
+      //      });
             return;
         }
 
-            bitmapDrawable = new BitmapDrawable(Moji.context.getResources(),b);
-            bitmapDrawable.setBounds(0,0,b.getWidth(),b.getHeight());
+        Long lastInvalidated = v.getTag(R.id._makemoji_last_invalidated_id)==null?0:
+                (long)v.getTag(R.id._makemoji_last_invalidated_id);
+        long now = System.currentTimeMillis();
+        bitmapDrawable = new BitmapDrawable(Moji.context.getResources(),b);
+        bitmapDrawable.setBounds(0,0,b.getWidth(),b.getHeight());
+        if (lastInvalidated+15>now) return;
+        Boolean gifInvalidated = (Boolean) v.getTag(R.id._makemoji_gif_invalidated_id);
+        if (gifInvalidated==null || !gifInvalidated) {
+            v.setTag(R.id._makemoji_gif_invalidated_id,true);
             Moji.handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Moji.invalidateTextView(v);
                 }
             });
-
+        }
+//
     }
 
     @Override

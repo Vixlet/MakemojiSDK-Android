@@ -36,6 +36,7 @@ public class GifProducer implements Runnable{
         if (bytes==null)return null;
         producer = new GifProducer(consumer,bytes,url);
         producerMap.put(url,producer);
+        Log.d(TAG,"producer size "+ producerMap.size());
         return producer;
     }
     private static void removeProducer(GifProducer producer){
@@ -72,7 +73,7 @@ public class GifProducer implements Runnable{
     public int getWidth(){
         return gifDecoder==null?0:gifDecoder.getWidth();
     }
-    void start(){
+    synchronized void start(){
         if (animationThread==null && canStart()){
                 animationThread = new Thread(this);
                 animationThread.setName(TAG+ url);
@@ -106,6 +107,7 @@ public class GifProducer implements Runnable{
     @Override
     public void run() {
         if (shouldClear) {
+            Log.d(TAG,"cleanup ");
             handler.post(cleanupRunnable);
             return;
         }
@@ -185,9 +187,7 @@ public class GifProducer implements Runnable{
         removeProducer(this);
     }
     public void subscribe(GifConsumer consumer){
-        synchronized (consumers) {
-            consumers.add(new WeakReference<>(consumer));
-        }
+        consumers.add(new WeakReference<>(consumer));
         start();
         if (tmpBitmap!=null)
             consumer.onFrameAvailable(tmpBitmap);

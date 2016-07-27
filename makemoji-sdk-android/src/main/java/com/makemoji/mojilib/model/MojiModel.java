@@ -41,6 +41,8 @@ public class MojiModel {
 
     @SerializedName("native")
     public int _native;
+    @SerializedName("40x40_url")
+    public String fourtyX40Url;
     public int phrase;
     public List<MojiModel> emoji = new ArrayList<>();
 

@@ -103,6 +103,7 @@ import java.lang.ref.WeakReference;
         else{//scale based on font size to be set
             mFontRatio = (fontSize*Moji.density)/BASE_TEXT_PX_SCALED;
         }
+
         mWidth = (int) (w * Moji.density *BASE_SIZE_MULT * mFontRatio);
         mHeight = (int) (h * Moji.density * BASE_SIZE_MULT * mFontRatio);
 
@@ -131,10 +132,20 @@ if (mSource!=null && !mSource.isEmpty())
     public static MojiSpan fromModel(MojiModel model, @Nullable TextView tv, @Nullable BitmapDrawable bitmapDrawable){
         Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_placeholder);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        MojiSpan span = createMojiSpan(d,model.image_url,20,20,14,true,model.link_url,tv);
+        MojiSpan span = createMojiSpan(d,extractImageUrl(model),20,20,14,true,model.link_url,tv);
+        if (GifSpan.USE_SMALL_GIFS && model.fourtyX40Url!=null && !model.fourtyX40Url.isEmpty() && span instanceof GifSpan)
+            ((GifSpan)span).isSmallGif=true;
         span.name = model.name;
         span.id = model.id;
         return span;
+    }
+    private static String extractImageUrl(MojiModel model){
+        if (model.image_url==null)return null;
+        if (model.image_url.toLowerCase().endsWith(".gif")){
+            if (GifSpan.USE_SMALL_GIFS && model.fourtyX40Url!=null && !model.fourtyX40Url.isEmpty())
+                return model.fourtyX40Url;
+        }
+        return model.image_url;
     }
 
     Target t = new Target() {
