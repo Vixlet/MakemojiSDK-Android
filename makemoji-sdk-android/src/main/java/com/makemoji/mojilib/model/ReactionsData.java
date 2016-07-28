@@ -105,6 +105,8 @@ public class ReactionsData {
                                         }
                                     }
                                 });
+
+                        r.selected = false;
                         return;
                     }
                 }

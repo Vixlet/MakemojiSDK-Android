@@ -99,12 +99,13 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     public void onFrameAvailable(final Bitmap b) {
         final TextView v = mViewRef.get();
         if (v==null){
-        //    Moji.handler.post(new Runnable() {//prevent concurrent modificication
-        //        @Override
-         //       public void run() {
+            if (producer!=null)
+            Moji.handler.post(new Runnable() {//prevent concurrent modificication
+                @Override
+               public void run() {
                     if (producer!=null)producer.unsubscribe(GifSpan.this);
-        //        }
-      //      });
+                }
+            });
             return;
         }
 
