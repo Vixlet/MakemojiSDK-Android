@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by s_baa on 7/5/2016.
  */
-public class ReactionsLayout extends LinearLayout implements PagerPopulator.PopulatorObserver {
+public class ReactionsLayout extends LinearLayout implements PagerPopulator.PopulatorObserver, ReactionsAdapter.onItemClick {
     ReactionsData data;
     List<ReactionsData.Reaction> reactions;
     ReactionsAdapter adapter;
@@ -59,7 +59,7 @@ public class ReactionsLayout extends LinearLayout implements PagerPopulator.Popu
         rv = (RecyclerView)findViewById(R.id._mm_recylcer_view);
         addReaction = (ImageButton) findViewById(R.id.mm_add_reaction);
         rv.setLayoutManager(new LinearLayoutManager(getContext(),HORIZONTAL,false));
-        adapter = new ReactionsAdapter();
+        adapter = new ReactionsAdapter(this);
         rv.setAdapter(adapter);
 
         addReaction.setOnClickListener(new OnClickListener() {
@@ -94,4 +94,8 @@ public class ReactionsLayout extends LinearLayout implements PagerPopulator.Popu
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void scrollNeeded() {
+        rv.scrollToPosition(0);
+    }
 }

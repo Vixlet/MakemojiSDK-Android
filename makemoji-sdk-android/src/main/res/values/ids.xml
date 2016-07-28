@@ -3,5 +3,6 @@
     <item name="_makemoji_hypermoji_listener_tag_id" type="id"/>
     <item name="_makemoji_last_invalidated_id" type="id"/>
     <item name="_makemoji_gif_invalidated_id" type="id"/>
+    <item name="_makemoji_request_layout_id" type="id"/>
     <item name="_makemoji_locked_tag_id" type="id"/>
 </resources>

@@ -89,13 +89,28 @@ public class ReactionsData {
         }
     }
     public void onClick(int position){
-        if (user!=null)
-            for (int i = 0; i<reactions.size();i++){
+        if (user!=null) {
+            for (int i = 0; i < reactions.size(); i++) {
                 Reaction r = reactions.get(i);
-                if (user.emoji_id==r.emoji_id)
+                if (user.emoji_id == r.emoji_id) {
                     r.total--;
+                    user.emoji_id = 0;
+                    if (i==position){
+                        Moji.mojiApi.createReaction(getHash(id),user.emoji_id,user.emoji_type).
+                                enqueue(new SmallCB<JsonObject>() {
+                                    @Override
+                                    public void done(Response<JsonObject> response, @Nullable Throwable t) {
+                                        if (t!=null) {
+                                            t.printStackTrace();
+                                        }
+                                    }
+                                });
+                        return;
+                    }
+                }
                 r.selected = false;
             }
+        }
         Reaction r = reactions.get(position);
         r.selected = true;
         r.total++;
@@ -173,7 +188,7 @@ public class ReactionsData {
                 Reaction r = new Reaction();
                 r.emoji_id = model.id;
                 r.selected=true;
-                r.image_url = model.image_url;
+                r.image_url = MojiSpan.extractImageUrl(model);
                 r.character = model.character;
                 reaction.getReactions().add(0,r);
                 reaction.onClick(0);

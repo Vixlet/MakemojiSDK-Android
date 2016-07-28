@@ -81,7 +81,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
         setContentDescription(""+model.name);
         int size = MojiSpan.getDefaultSpanDimension(MojiSpan.BASE_TEXT_PX_SCALED);
         Drawable d = getResources().getDrawable(R.drawable.mm_placeholder);
-            if (!model.image_url.isEmpty()) {
+            if (model.image_url!=null && !model.image_url.isEmpty()) {
                 if (sizeImagesToSpanSize)//resize if re using bitmap loaded for moji spans.
                     Moji.picasso.load(m.image_url)
                             .resize(size, size)
@@ -90,7 +90,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                     Moji.picasso.load(m.image_url)
                             .placeholder(d).into(this);
 
-            } else {
+            } else if (m.character!=null){
                 setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));
                 //setScaleType(ScaleType.CENTER_INSIDE);
 

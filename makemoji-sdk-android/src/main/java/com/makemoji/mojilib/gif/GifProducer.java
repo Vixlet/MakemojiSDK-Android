@@ -185,7 +185,9 @@ public class GifProducer implements Runnable{
         removeProducer(this);
     }
     public void subscribe(GifConsumer consumer){
-        consumers.add(new WeakReference<>(consumer));
+        synchronized (consumers) {
+            consumers.add(new WeakReference<>(consumer));
+        }
         start();
         if (tmpBitmap!=null)
             consumer.onFrameAvailable(tmpBitmap);

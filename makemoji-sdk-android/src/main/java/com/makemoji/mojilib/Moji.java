@@ -479,6 +479,7 @@ public class Moji {
         if (lastInvalidated+15>now) return;
 
         tv.invalidate();
+        if (tv.getTag(R.id._makemoji_request_layout_id)!=null) tv.requestLayout();
         if (tv instanceof EditText) {
             tv.requestLayout();
         }

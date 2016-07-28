@@ -71,8 +71,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         producer = GifProducer.getProducerAndSub(this,null,mSource);
         if (producer!=null){
             if (!USE_SMALL_GIFS && !isSmallGif) {
-                mWidth = producer.getWidth();
-                mHeight = producer.getHeight();
+                mWidth = Math.max(mWidth,producer.getWidth());
+                mHeight = Math.max(mHeight,producer.getHeight());
             }
             return;
         }
@@ -87,8 +87,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
                 producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
                 if (producer!=null){
                     if (!USE_SMALL_GIFS && !isSmallGif) {
-                        mWidth = producer.getWidth();
-                        mHeight = producer.getHeight();
+                        mWidth = Math.max(mWidth,producer.getWidth());
+                        mHeight = Math.max(mHeight,producer.getHeight());
                     }
                 }
             }

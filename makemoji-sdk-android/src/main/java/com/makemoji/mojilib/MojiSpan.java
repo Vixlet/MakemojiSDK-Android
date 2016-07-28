@@ -139,7 +139,7 @@ if (mSource!=null && !mSource.isEmpty())
         span.id = model.id;
         return span;
     }
-    private static String extractImageUrl(MojiModel model){
+    public static String extractImageUrl(MojiModel model){
         if (model.image_url==null)return null;
         if (model.image_url.toLowerCase().endsWith(".gif")){
             if (GifSpan.USE_SMALL_GIFS && model.fourtyX40Url!=null && !model.fourtyX40Url.isEmpty())

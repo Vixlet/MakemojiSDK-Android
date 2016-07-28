@@ -22,7 +22,13 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
 
     List<ReactionsData.Reaction> list = new ArrayList<>();
     ReactionsData data;
-    public ReactionsAdapter(){}
+    public interface onItemClick{
+        void scrollNeeded();
+    }
+    onItemClick onItemClick;
+    public ReactionsAdapter(onItemClick onItemClick){
+        this.onItemClick = onItemClick;
+    }
     @Override
     public CellHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -34,6 +40,7 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
     public void onBindViewHolder(final CellHolder holder, final int position) {
         final ReactionsData.Reaction r = list.get(position);
         Moji.setText(r.toSpanned(holder.left),holder.left);
+        holder.left.setTag(R.id._makemoji_request_layout_id,true);
         holder.right.setText(getTotalString(r.total));
         holder.right.setVisibility(r.total>0?View.VISIBLE:View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -43,10 +50,14 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
               //  for (ReactionsData.Reaction r : data.getReactions())
                //     if (r.selected) reaction = r;
                 data.onClick(position);
-             //   notifyItemMoved(position,0);
+                notifyItemMoved(position,0);
+                notifyItemRangeChanged(0,getItemCount());
+                onItemClick.scrollNeeded();
+
+
             //    notifyItemChanged(position);
              //   if (reaction!=null) notifyItemChanged(data.getReactions().indexOf(r));
-                notifyDataSetChanged();
+                //notifyDataSetChanged();
 
             }
         });
@@ -63,6 +74,10 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
     @Override
     public int getItemCount() {
        return list.size();
+    }
+    @Override
+    public long getItemId(int position){
+        return list.get(position).emoji_id;
     }
 
     public class CellHolder extends ViewHolder

@@ -59,6 +59,7 @@ public class MojiModel {
         MojiModel m = (MojiModel) o;
         if (m.character!=null && !m.character.equals(character))return false;
         else if (character!=null && !character.equals(m.character))return false;
+        if (m.image_url==null)return image_url==null;
         return  (m.image_url).equals(image_url);
     }
     public static JSONObject toJson(MojiModel m){
