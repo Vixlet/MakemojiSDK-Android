@@ -518,7 +518,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         Rect r = new Rect();
         getRootView().getWindowVisibleDisplayFrame(r);
-
+        topScroller.setMaxSize(getWidth());
         int screenHeight = getRootView().getHeight();
         int heightDifference = screenHeight - (r.bottom - r.top);
         //Log.d("kb","kb h "+ heightDifference + " " + getHeight());

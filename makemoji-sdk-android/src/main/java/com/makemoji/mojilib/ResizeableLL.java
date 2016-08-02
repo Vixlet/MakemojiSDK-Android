@@ -10,6 +10,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -54,6 +55,10 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         if (leftView!=null) leftView.setVisibility(show?VISIBLE:GONE);
 
     }
+    void setMaxSize(int max){
+        maxSize = max - (int)(Moji.density *45);
+    }
+
     @Override
     public void onFinishInflate(){
         super.onFinishInflate();
@@ -67,12 +72,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();
         flashButton = (ImageView) findViewById(R.id._mm_flashtag_button);
-        post(new Runnable() {
-            @Override
-            public void run() {
-                maxSize = getWidth() - flashButton.getWidth();//-(int)(50 *Moji.density);
-            }
-        });
 
     }
     @Override
@@ -186,6 +185,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         newWidth=  Math.max((int)(minSize *.5),newWidth);
         newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
+        Log.d("ll","width " + newWidth);
         lp.width=newWidth;
         leftView.setLayoutParams(lp);
 
