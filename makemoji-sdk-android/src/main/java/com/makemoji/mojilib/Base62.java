@@ -12,7 +12,7 @@ public class Base62 {
          * Constructs a Base62 object with the default charset (0..9a..zA..Z).
          */
         public Base62() {
-            this("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            this("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
         }
 
         /**

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.app.Application;
 import android.widget.Toast;
 
+import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.LruCache;
 import com.squareup.picasso252.Picasso;
@@ -385,6 +386,11 @@ public class Moji {
             model.id = id;
             model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-large@2x.png";
             model.name = name;
+            if ("gif".equals(name)){
+                if (GifSpan.USE_SMALL_GIFS) model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-40x40@2x.gif";
+                else
+                    model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + ".gif";
+            }
             model.link_url = url;
             MojiSpan mojiSpan = MojiSpan.fromModel(model, null, null);
             spans.add(mojiSpan);

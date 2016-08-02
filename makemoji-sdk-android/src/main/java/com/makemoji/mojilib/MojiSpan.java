@@ -332,7 +332,8 @@ if (mSource!=null && !mSource.isEmpty())
     public String toPlainText(){
 
         String b62Id = Moji.base62.encodeBase10(id);
-        return  "[" + name + '.' + b62Id + (mLink == null ||mLink.isEmpty() ? "]" :
+        return  "[" + ((this instanceof GifSpan)?"gif":name)
+                + '.' + b62Id + (mLink == null ||mLink.isEmpty() ? "]" :
                 " " + mLink+"]");
     }
     public boolean equivelant (Object o){
