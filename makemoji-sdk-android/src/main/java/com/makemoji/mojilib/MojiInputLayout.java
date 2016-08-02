@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.makemoji.mojilib.model.MojiModel;
 
@@ -267,6 +268,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         return headerTextColor;
     }
 
+    String currentSearchQuery;
     private TextWatcher editTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -297,10 +299,25 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 useTrendingAdapter(true);//no bang or there's whitespace afterward.
                 return;
             }
-            String query = text.substring(lastBang+1,selectionEnd);
+            final String query = text.substring(lastBang+1,selectionEnd);
+            currentSearchQuery = query;
                 useTrendingAdapter(false);
                 searchPopulator.search(query);
-
+               if (query.length()>1)Moji.offHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (query.equals(currentSearchQuery)) {
+                            Moji.mojiApi.flashtagSearchAnalytics(query).enqueue(new SmallCB<Void>() {
+                                @Override
+                                public void done(Response<Void> response, @Nullable Throwable t) {
+                                    if (t != null)
+                                        t.printStackTrace();
+                                }
+                            });
+                           // Log.d(TAG,"sending search query " + query);
+                        }
+                    }
+                },1000);
 
         }
     };

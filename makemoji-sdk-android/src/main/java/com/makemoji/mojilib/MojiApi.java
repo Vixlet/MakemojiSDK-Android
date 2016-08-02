@@ -1,9 +1,11 @@
 package com.makemoji.mojilib;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -67,6 +69,8 @@ public interface MojiApi {
     @POST("reactions/create/{sha1_content_id}")
     Call<JsonObject> createReaction(@Path("sha1_content_id") String sha1ContentId, @Field("emoji_id") int emojiId,@Field("emoji_type") String emojiType);
 
-
+    @FormUrlEncoded
+    @POST("emoji/flashtag")
+    Call<Void> flashtagSearchAnalytics(@Field("tag") String searchQuery);
 
 }
