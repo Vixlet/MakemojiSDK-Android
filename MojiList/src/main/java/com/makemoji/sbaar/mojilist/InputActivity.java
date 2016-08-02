@@ -46,7 +46,13 @@ public class InputActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
         //mojiInputLayout.grabFocusShowKb(); //show keyboard on demand; launch behavior defined in mojiInputLayout style xml
-
+        mojiInputLayout.setVisibility(View.GONE);
+        Moji.handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mojiInputLayout.setVisibility(View.VISIBLE);
+            }
+        },1000);
 
         final MAdapter mAdapter = new MAdapter(this,new ArrayList<MojiMessage>(),true);
         ListView lv = (ListView) findViewById(R.id.list_view);
