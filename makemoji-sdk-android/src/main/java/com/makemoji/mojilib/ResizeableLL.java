@@ -185,7 +185,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         newWidth=  Math.max((int)(minSize *.5),newWidth);
         if (maxSize>minSize)newWidth = Math.min(maxSize,newWidth);// clamp >--(◣_◢)--<
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
-        Log.d("ll","width " + newWidth);
+        //Log.d("ll","width " + newWidth);
         lp.width=newWidth;
         leftView.setLayoutParams(lp);
 

@@ -2,4 +2,6 @@
 <resources>
     <integer name="_mm_pulse_duration">1500</integer>
     <integer name="_mm_moji_input_max_lines">5</integer>
+    <integer name="_mm_gif_rows">2</integer>
+    <integer name="_mm_video_rows">2</integer>
 </resources>

@@ -2,4 +2,5 @@
 <resources>
     <dimen name="mm_cat_width">90dp</dimen>
     <dimen name="mm_reaction_cell_height">30dp</dimen>
+    <dimen name="mm_video_moji_item_text_size">12sp</dimen>
 </resources>

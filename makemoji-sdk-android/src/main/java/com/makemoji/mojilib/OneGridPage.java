@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.model.MojiModel;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * page that contains one long grid of emojis
  * Created by Scott Baar on 1/19/2016.
@@ -17,7 +20,6 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     PagerPopulator<MojiModel> mPopulator;
     TextView heading;
     int count;
-    int mojisPerPage = 10;
     public int ROWS = DEFAULT_ROWS;
     public static final int DEFAULT_ROWS = 5;
     RecyclerView rv;
@@ -29,7 +31,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mojiInputLayout);
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
-            ROWS = 2;
+            ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_gif_rows);
         }
         mPopulator = p;
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
@@ -57,21 +59,30 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     @Override
     public void onNewDataAvailable() {
         if (mView.getHeight()==0 || mPopulator.getTotalCount()==0)return;
+        count = mPopulator.getTotalCount();
+        List<MojiModel> mojiModelList = mPopulator.populatePage(count,0);
+        if (hasVideo(mojiModelList)){
+                ROWS = rv.getResources().getInteger(R.integer._mm_video_rows);
+                rv.setLayoutManager(new GridLayoutManager(rv.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
+        }
         int h = rv.getHeight();
         int size = h / DEFAULT_ROWS;
         int vSpace = (h - (size * DEFAULT_ROWS)) / DEFAULT_ROWS;
         int hSpace = (mView.getWidth() - (size * 8)) / 16;
 
-
-        mojisPerPage = Math.max(10, 8 * ROWS);
-        count = mPopulator.getTotalCount();
-        MojiGridAdapter adapter = new MojiGridAdapter(mPopulator.populatePage(mPopulator.getTotalCount(), 0), mMojiInput, false, size);
+        MojiGridAdapter adapter = new MojiGridAdapter(mojiModelList, mMojiInput, false, size);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
        // if (!gifs){
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
             rv.addItemDecoration(itemDecoration);
         //}
         rv.setAdapter(adapter);
+
+    }
+    private boolean hasVideo(Collection<MojiModel> list){
+        for (MojiModel m : list)
+            if (m.isVideo())return true;
+        return false;
 
     }
     @Override

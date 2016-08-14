@@ -22,22 +22,24 @@ import java.util.List;
 public class MojiModel {
     public static Gson gson = new Gson();//new GsonBuilder().enableComplexMapKeySerialization().create();
     public int id;
-    public String user_id;
-    public String origin_id;
+ //   public String user_id;
+ //   public String origin_id;
     public  String name;
     public String image_url;
     public String link_url;
-    public String legacy;
-    public String deleted;
+ //   public String legacy;
+//    public String deleted;
     public String created;
-    public String access;
-    public String username;
+  //  public String access;
+ //   public String username;
     public String flashtag;
-    public int shares;
-    public int remoji;
-    public int likes;
+ //   public int shares;
+   // public int remoji;
+  //  public int likes;
     public int gif;
     public String character;
+    public int video;
+
 
     @SerializedName("native")
     public int _native;
@@ -71,36 +73,10 @@ public class MojiModel {
             e.printStackTrace();
         }
         return null;
-        /*
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put("image_url", m.image_url);
-            jo.put("link_url", m.link_url);
-            jo.put("name", m.name);
-            jo.put("id", m.id);
-            jo.put("phrase",m.phrase);
-            if (m.emoji!=null){
-                JSONArray ja = new JSONArray();
-                for (MojiModel emoji : m.emoji) ja.put(toJson(emoji));
-                jo.put("emoji",ja.toString());
-            }
-        }
-        catch (Exception e){e.printStackTrace();}
-        return jo;
-        */
+
     }
     public static MojiModel fromJson(JSONObject jo){
        return gson.fromJson(jo.toString(),MojiModel.class);
-        /*MojiModel m= new MojiModel(jo.optString("name"),jo.optString("image_url"));
-        m.link_url = jo.optString("link_url",null);
-        m.id = jo.optInt("id",-1);
-        m.phrase = jo.optBoolean("phrase");
-        if (jo.has("emoji")){
-            JSONArray ja = jo.optJSONArray("emoji");
-            m.emoji = new ArrayList<>();
-            for (int i = 0; i < ja.length();i++) m.emoji.add
-        }
-        return m;*/
     }
     public static JSONArray toJsonArray(Collection<MojiModel> models){
         JSONArray ja = new JSONArray();
@@ -144,4 +120,5 @@ public class MojiModel {
     }
     public boolean isNative(){return _native==1;}
     public boolean isPhrase(){return phrase==1;}
+    public boolean isVideo(){return video==1;}
 }

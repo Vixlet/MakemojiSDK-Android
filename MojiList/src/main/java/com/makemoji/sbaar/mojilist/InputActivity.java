@@ -45,15 +45,16 @@ public class InputActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
-        //mojiInputLayout.grabFocusShowKb(); //show keyboard on demand; launch behavior defined in mojiInputLayout style xml
-        mojiInputLayout.setVisibility(View.GONE);
+     /*   //mojiInputLayout.grabFocusShowKb(); //show keyboard on demand; launch behavior defined in mojiInputLayout style xml
+       // mojiInputLayout.setVisibility(View.GONE);
         Moji.handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mojiInputLayout.setVisibility(View.VISIBLE);
             }
         },1000);
-
+       // mojiInputLayout.showLeftNavigation(false);
+    */
         final MAdapter mAdapter = new MAdapter(this,new ArrayList<MojiMessage>(),true);
         ListView lv = (ListView) findViewById(R.id.list_view);
         outsideMojiEdit = (MojiEditText) findViewById(R.id.outside_met);
