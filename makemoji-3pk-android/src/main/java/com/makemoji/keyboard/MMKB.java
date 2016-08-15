@@ -1002,7 +1002,7 @@ public class MMKB extends InputMethodService
         spb.progressiveStop();
     }
     public void getOther(final MojiModel model){
-        onDownloadStart();
+        if (model.isVideo())onDownloadStart();
         final String url = (model.isVideo()?model.video_url:model.image_url);
         Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
             @Override
@@ -1013,7 +1013,7 @@ public class MMKB extends InputMethodService
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                onDownloadFinish();
+                if (model.isVideo())onDownloadFinish();
                 FileOutputStream out = null;
                 File path = new File(getCacheDir(),"images");
                 path.mkdir();
