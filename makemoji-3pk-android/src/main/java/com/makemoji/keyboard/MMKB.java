@@ -55,6 +55,7 @@ import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.MojiSpan;
 import com.makemoji.mojilib.MojiUnlock;
+import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
@@ -70,6 +71,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -120,12 +122,13 @@ public class MMKB extends InputMethodService
     RecyclerView rv;
     RecyclerView.ItemDecoration itemDecoration;
     PagerPopulator<MojiModel> populator;
+    SmoothProgressBar spb;
     int mojisPerPage;
     MojiGridAdapter adapter;
     TextView heading, shareText;
     View pageFrame;
     static CharSequence shareMessage;
-    int rows, cols, gifRows;
+    int rows, cols, gifRows,videoRows;
 
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -137,6 +140,7 @@ public class MMKB extends InputMethodService
         mWordSeparators = getResources().getString(R.string.word_separators);
         rows = Moji.context.getResources().getInteger(R.integer.mm_3pk_rows);
         gifRows = Moji.context.getResources().getInteger(R.integer.mm_3pk_gif_rows);
+        videoRows = Moji.context.getResources().getInteger(R.integer._mm_video_rows);
         cols = Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
     }
 
@@ -191,6 +195,8 @@ public class MMKB extends InputMethodService
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
         pageFrame = inputView.findViewById(R.id._mm_kb_pageframe);
+        spb = (SmoothProgressBar)inputView.findViewById(R.id._mm_spb);
+        spb.progressiveStop();
 
         if (shareMessage==null)shareMessage = getString(R.string._mm_kb_share_message);
         if (shareMessage!=null && shareMessage.length()>0){
@@ -944,6 +950,7 @@ public class MMKB extends InputMethodService
             rv.addItemDecoration(itemDecoration);
      //   }
         ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?gifRows:rows);
+        if (OneGridPage.hasVideo(models)) ((GridLayoutManager) rv.getLayoutManager()).setSpanCount(videoRows);
         rv.setAdapter(adapter);
 
 
@@ -967,12 +974,14 @@ public class MMKB extends InputMethodService
         i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         i.putExtra(Moji.EXTRA_JSON, MojiModel.toJson(model).toString());
         i.setType("image/*");
+        if (cacheFile.getName().toLowerCase().endsWith("mp4"))
+            i.setType("video/*");
         List<ResolveInfo> bcs = pm.queryBroadcastReceivers(i,0);
         List<ResolveInfo> ris = pm.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
         if (ris.isEmpty()) {
-            Moji.toast( "App does not support sharing images. URL copied to clip board", Toast.LENGTH_LONG);
+            Moji.toast( "App does not support sharing "+ (model.isVideo()?"videos": "images")+ ". URL copied to clip board", Toast.LENGTH_LONG);
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("MakeMoji emoji", model.image_url);
+            ClipData clip = ClipData.newPlainText("MakeMoji emoji", model.isVideo()?model.video_url:model.image_url);
             clipboard.setPrimaryClip(clip);
             return;
         }
@@ -982,19 +991,35 @@ public class MMKB extends InputMethodService
         startActivity(i);
 
     }
-    public void getGif(final MojiModel model){
-        Moji.okHttpClient.newCall(new Request.Builder().url(model.image_url).build()).enqueue(new Callback() {
+    boolean isDownloading;
+    void onDownloadStart(){
+        isDownloading = true;
+        spb.setVisibility(View.VISIBLE);
+        spb.progressiveStart();
+    }
+    void onDownloadFinish(){
+        isDownloading = false;
+        spb.progressiveStop();
+    }
+    public void getOther(final MojiModel model){
+        onDownloadStart();
+        final String url = (model.isVideo()?model.video_url:model.image_url);
+        Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                onDownloadFinish();
                 e.printStackTrace();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                onDownloadFinish();
                 FileOutputStream out = null;
                 File path = new File(getCacheDir(),"images");
                 path.mkdir();
-                File cacheFile = new File(path,""+model.name+".png");
+                String extension = ".png";
+                if (url.lastIndexOf('.')!=-1) extension = url.substring(url.lastIndexOf('.')-1,url.length());
+                final File cacheFile = new File(path,""+model.name+extension);
                 try {
                     out = new FileOutputStream(cacheFile.getPath());
                     out.write(response.body().bytes());
@@ -1012,15 +1037,23 @@ public class MMKB extends InputMethodService
                         Moji.toast( "Load failed", Toast.LENGTH_SHORT);
                         return;
                     }
-                    share(model,cacheFile);
+                    Moji.handler.post(new Runnable() {
+                                          @Override
+                                          public void run() {
+
+                                              share(model, cacheFile);
+                                          }
+                                      });
             }
         }
     });
     }
     public Target getTarget(final MojiModel model) {
+        //onDownloadStart();
         return new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+               // onDownloadFinish();
                 FileOutputStream out = null;
                 File path = new File(getCacheDir(),"images");
                 path.mkdir();
@@ -1056,7 +1089,7 @@ public class MMKB extends InputMethodService
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-
+               // onDownloadFinish();
                 Moji.toast( "Load failed", Toast.LENGTH_SHORT);
             }
 
@@ -1069,15 +1102,17 @@ public class MMKB extends InputMethodService
     Target t;
     @Override
     public void addMojiModel(MojiModel model, BitmapDrawable d) {
-        t = getTarget(model);
+
         if (model.character!=null && !model.character.isEmpty()){
             getCurrentInputConnection().finishComposingText();
             getCurrentInputConnection().setComposingText(model.character, 1);
             getCurrentInputConnection().finishComposingText();
             return;
         }
-        if (model.image_url!=null && model.image_url.toLowerCase().endsWith(".gif"))
-            getGif(model);
+        if (isDownloading)return;
+        t = getTarget(model);
+        if (model.image_url!=null && model.image_url.toLowerCase().endsWith(".gif")|| model.isVideo())
+            getOther(model);
         else if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).into(t);
     }
 

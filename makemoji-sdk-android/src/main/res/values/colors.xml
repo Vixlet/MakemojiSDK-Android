@@ -17,5 +17,6 @@
 
     <color name="mmKBPageTitleColor">@color/_mm_header_text_color</color>
     <color name="mmKBIconColor">@color/_mm_grey_600</color>
+    <color name="mmKBProgressColor">@color/_mm_default_send_text_color</color>
     <color name="_mm_reaction_bg_color">#ffffff</color>
 </resources>

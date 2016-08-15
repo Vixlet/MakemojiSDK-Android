@@ -39,6 +39,7 @@ public class MojiModel {
     public int gif;
     public String character;
     public int video;
+    public String video_url;
 
 
     @SerializedName("native")

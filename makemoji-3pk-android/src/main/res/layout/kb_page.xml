@@ -5,6 +5,25 @@
     android:orientation="vertical" android:layout_width="match_parent"
     tools:layout_height="wrap_content"
     android:layout_height="210dp">
+    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:indeterminate="true"
+        android:id="@+id/_mm_spb"
+        android:visibility="invisible"
+        app:spb_sections_count="4"
+        app:spb_color="@color/_mm_default_send_text_color"
+        app:spb_speed="1.5"
+        app:spb_stroke_width="4dp"
+        app:spb_stroke_separator_length="12dp"
+        app:spb_reversed="false"
+        app:spb_mirror_mode="false"
+        app:spb_progressiveStart_activated="false"
+        app:spb_progressiveStart_speed="1.5"
+        app:spb_progressiveStop_speed="3.4"
+        />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -79,7 +79,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         rv.setAdapter(adapter);
 
     }
-    private boolean hasVideo(Collection<MojiModel> list){
+    public static boolean hasVideo(Collection<MojiModel> list){
         for (MojiModel m : list)
             if (m.isVideo())return true;
         return false;
