@@ -88,6 +88,7 @@ public class Moji {
     public static final String EXTRA_CATEGORY_NAME = "com.makemoji.mojilib.EXTRA_CATEGORY_NAME";
     public static final String ACTION_LOCKED_CATEGORY_CLICK = "com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED";
     static String userId;
+    static String channel;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
@@ -143,11 +144,12 @@ public class Moji {
                 Request original = chain.request();
 
                 // Customize the request
-                Request request = original.newBuilder()
+                 Request.Builder builder = original.newBuilder()
                         .header("makemoji-sdkkey", key)
                         .header("makemoji-deviceId", userId)
-                        .method(original.method(), original.body())
-                        .build();
+                        .method(original.method(), original.body());
+                if (channel!=null) builder.addHeader("makemoji-channel",channel);
+                Request request = builder.build();
 
                 Response response = chain.proceed(request);
                 return response;
@@ -169,6 +171,9 @@ public class Moji {
         SharedPreferences sp = context.getSharedPreferences("_mm_id",0);
         sp.edit().putString("id",id).apply();
         userId=id;
+    }
+    public static void setChannel(String channel){
+        Moji.channel= channel;
     }
 
     /**
