@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import android.content.SharedPreferences;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -7,10 +8,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 
+import com.google.gson.reflect.TypeToken;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiApi;
 import com.makemoji.mojilib.SmallCB;
 import com.makemoji.mojilib.model.Category;
+import com.makemoji.mojilib.model.MojiModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,18 +45,31 @@ public class KBCategory {
     public static List<TabLayout.Tab> getTabs(final TabLayout tabLayout, final KBTAbListener kbtAbListener, @LayoutRes final int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         List<Category> cachedCategories = Category.getCategories();
-        Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
+        Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
             @Override
-            public void done(final Response<List<Category>> response, @Nullable Throwable t) {
+            public void done(final Response<Map<String, List<MojiModel>>> wallData, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
                     return;
                 }
-                Category.saveCategories(response.body());
-                kbtAbListener.onNewTabs(returnTabs(tabLayout,response.body(),layoutRes));
+                Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
+                    @Override
+                    public void done(final Response<List<Category>> categories, @Nullable Throwable t) {
+                        if (t!=null){
+                            t.printStackTrace();
+                            return;
+                        }
+                        Category.saveCategories(categories.body());
+                        for (Category c : categories.body())
+                            if (wallData.body().containsKey(c.name))
+                                c.models = wallData.body().get(c.name);
+                        kbtAbListener.onNewTabs(returnTabs(tabLayout,categories.body(),layoutRes));
 
+                    }
+                });
             }
         });
+
         if (cachedCategories.isEmpty()) {
             for (int i = 0; i < defaultCategories.length; i++) {
                 tabs.add(tabLayout.newTab().setCustomView(layoutRes).
@@ -62,6 +78,22 @@ public class KBCategory {
             return tabs;
         }
         else {
+            final SharedPreferences sp = Moji.context.getSharedPreferences("emojiWall",0);
+            try {
+                String s = sp.getString("data", null);
+                Map<String, List<MojiModel>> data =
+                        MojiModel.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
+                        }.getType());
+                if (data != null) {
+                    for (Category c : cachedCategories)
+                        if (data.containsKey(c.name))
+                            c.models = data.get(c.name);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
             return returnTabs(tabLayout,cachedCategories,layoutRes);
         }
     }
@@ -93,6 +125,7 @@ public class KBCategory {
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
                 tab.getCustomView().setSelected(false);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
+                tab.getCustomView().setTag(R.id._makemoji_category_tag_id,c);
                if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(c.image_url).into(iv);
                 tabs.add(tab);
 

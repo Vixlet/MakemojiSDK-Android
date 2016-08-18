@@ -50,6 +50,7 @@ import android.widget.Toast;
 import com.makemoji.mojilib.BackSpaceDelegate;
 import com.makemoji.mojilib.CategoryPopulator;
 import com.makemoji.mojilib.KBCategory;
+import com.makemoji.mojilib.LocalPopulator;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiGridAdapter;
 import com.makemoji.mojilib.MojiInputLayout;
@@ -910,12 +911,15 @@ public class MMKB extends InputMethodService
             tabLayout.getTabAt(currentTab).select();//go back to last tab
             return;
         }
-        else
-            populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(), null));
+        else{
+            Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
+           if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
+            else populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));//should not happen
+        }
 
         currentTab = tab.getPosition();
-        populator.setup(this);
         gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
+        populator.setup(this);
     }
 
     @Override
