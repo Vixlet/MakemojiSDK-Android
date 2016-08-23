@@ -24,7 +24,7 @@ public class App extends Application {
         super.onCreate();
         context=this;
         Moji.initialize(this,"bfd3eea60abad87d378f87939ef3a116e8b23a35");
-        LeakCanary.install(this);
+        //LeakCanary.install(this);
         Moji.setChannel("Channel2");
 
 //bow moji 6b503d6ba664bdb2565a6421f0a8fda1791b3e49

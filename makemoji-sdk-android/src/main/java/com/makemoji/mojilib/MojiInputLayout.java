@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -7,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -86,7 +88,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     @DrawableRes int backSpaceDrawableRes;
     final static String TAG = "MojiInputLayout";
     boolean alwaysShowBar = false;
+    boolean tryAlwaysShowBar = false;
     int minimumSendLength;
+
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
+        if (!isInMultiWindowMode)
+            alwaysShowBar = tryAlwaysShowBar;
+        else
+            alwaysShowBar = true;
+    }
+
     public interface SendClickListener{
         /**
          * The send layout has been clicked. Returns the raw message and the transformed html
@@ -96,6 +107,18 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
          */
         boolean onClick(String html, Spanned spanned);
     }
+    public interface RNUpdateListener{
+        void needsUpdate();
+    }
+    RNUpdateListener rnUpdateListener;
+    @Deprecated
+    protected void setRnUpdateListener(RNUpdateListener listener){
+        rnUpdateListener = listener;
+        topScroller.setRnUpdateListener(listener);
+
+
+    }
+
 
     public MojiInputLayout(Context context) {
         super(context);
@@ -128,7 +151,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         bottomPageBg = a.getDrawable(R.styleable.MojiInputLayout__mm_bottomPageBg);
 
         boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
-        alwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
+        tryAlwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
+        alwaysShowBar = tryAlwaysShowBar;
+        if (Build.VERSION.SDK_INT>=24){
+            Activity activity = Moji.getActivity(getContext());
+            if (activity!=null && activity.isInMultiWindowMode())alwaysShowBar = true;
+        }
         a.recycle();
 
         inflate(getContext(),R.layout.mm_moji_input_layout,this);
@@ -344,6 +372,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             if (!usingTrendingAdapter){
                 adapter.showNames(true);
                 adapter.setMojiModels(searchPopulator.populatePage(50,0));
+                if (rnUpdateListener!=null)rnUpdateListener.needsUpdate();
             }
         }
     };

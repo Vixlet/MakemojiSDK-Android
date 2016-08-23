@@ -36,7 +36,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
 
 
-
+    MojiInputLayout.RNUpdateListener rnUpdateListener;
     View leftView;
     RecyclerView recyclerView;
     int minSize, maxSize;
@@ -55,10 +55,14 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         if (leftView!=null) leftView.setVisibility(show?VISIBLE:GONE);
 
     }
+    static int SNAP_DURATION = 200;
     void setMaxSize(int max){
         maxSize = max - (int)(Moji.density *45);
     }
 
+    void setRnUpdateListener(MojiInputLayout.RNUpdateListener listener){
+        rnUpdateListener = listener;
+    }
     @Override
     public void onFinishInflate(){
         super.onFinishInflate();
@@ -188,6 +192,11 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         //Log.d("ll","width " + newWidth);
         lp.width=newWidth;
         leftView.setLayoutParams(lp);
+        if (rnUpdateListener!=null){
+            invalidate();
+            requestLayout();
+            rnUpdateListener.needsUpdate();
+        }
 
         //change snap affinity when the open or close is done.
         if (maxSize == newWidth)
@@ -205,7 +214,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         int currentWidth = lp.width;
         if (currentWidth==minSize)return;
         animator = ValueAnimator.ofInt(currentWidth,minSize);
-        animator.setDuration(200);
+        animator.setDuration(SNAP_DURATION);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -224,7 +233,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
 
         animator = ValueAnimator.ofInt(currentWidth,goalWidth);
-        animator.setDuration(200);
+        animator.setDuration(SNAP_DURATION);
         animator.setInterpolator(new DecelerateInterpolator());
         if (goalWidth==minSize)
             animator.addListener(new AnimatorListenerAdapter() {
