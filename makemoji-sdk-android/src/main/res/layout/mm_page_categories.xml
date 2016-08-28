@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:id="@+id/_mm_page_heading"
-        android:text="Categories"
+        android:text="@string/_mm_categories"
         style="@style/MakeMojiHeaderTextAppearance"
 
         android:layout_height="wrap_content" />
@@ -30,7 +30,7 @@
             android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_gravity="left"
-        android:text="ABC"
+        android:text="@string/_mm_abc"
         android:layout_height="wrap_content" />
         <View
         android:layout_width="0dp"

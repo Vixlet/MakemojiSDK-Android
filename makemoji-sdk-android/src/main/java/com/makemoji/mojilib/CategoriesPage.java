@@ -21,12 +21,15 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     GridLayoutManager glm;
     MojiApi api;
     CategoriesAdapter adapter;
-    public CategoriesPage(ViewStub stub, MojiApi mojiApi, MojiInputLayout mojiInputLayout){
+    MojiInputLayout mojiInputLayout;
+    public CategoriesPage(ViewStub stub, MojiApi mojiApi, final MojiInputLayout mojiInputLayout){
         super(stub,mojiInputLayout);
+        this.mojiInputLayout = mojiInputLayout;
         api=mojiApi;
         adapter = new CategoriesAdapter(this,mojiInputLayout.getHeaderTextColor());
         List<Category> categories = Category.getCategories();
         adapter.setCategories(categories);
+        mojiInputLayout.requestRnUpdate();
 
         api.getCategories().enqueue(new SmallCB<List<Category>>() {
             @Override
@@ -37,6 +40,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
                 }
                 Category.saveCategories(response.body());
                 adapter.setCategories(response.body());
+                mojiInputLayout.requestRnUpdate();
             }
         });
 
@@ -54,6 +58,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     }
     public void show(){
         super.show();
+        mojiInputLayout.requestRnUpdate();
 
     }
     public void hide(){
@@ -61,6 +66,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
     }
     public void refresh(){
         if (adapter!=null) adapter.notifyItemRangeChanged(0,adapter.getItemCount());
+        mojiInputLayout.requestRnUpdate();
     }
 
     @Override

@@ -9,7 +9,7 @@
     android:paddingRight="4dp"
     tools:enabled="false"
     android:enabled="false"
-    android:text="@string/mm_send_text" android:textSize="14sp"
+    android:text="@string/_mm_send_text" android:textSize="14sp"
     android:textColor="@color/mm_send_layout_selector">
 
 </TextView>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
     <TextView
         android:layout_width="wrap_content"
-        android:text="Categories"
+        android:text="@string/_mm_categories"
         style="@style/MakeMojiHeaderTextAppearance"
         android:id="@+id/_mm_page_heading"
         android:layout_height="wrap_content" />
@@ -32,7 +32,7 @@
             android:padding="6dp"
             android:layout_width="wrap_content"
             android:layout_gravity="left"
-            android:text="ABC"
+            android:text="@string/_mm_abc"
             android:layout_height="wrap_content" />
         <!--
         <com.viewpagerindicator.CirclePageIndicator

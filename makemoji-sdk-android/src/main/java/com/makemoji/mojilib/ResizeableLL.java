@@ -55,7 +55,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         if (leftView!=null) leftView.setVisibility(show?VISIBLE:GONE);
 
     }
-    static int SNAP_DURATION = 200;
+    public static int SNAP_DURATION = 200;
     void setMaxSize(int max){
         maxSize = max - (int)(Moji.density *45);
     }

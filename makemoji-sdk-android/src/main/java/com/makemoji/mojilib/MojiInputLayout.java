@@ -115,8 +115,12 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     protected void setRnUpdateListener(RNUpdateListener listener){
         rnUpdateListener = listener;
         topScroller.setRnUpdateListener(listener);
-
-
+    }
+    void requestRnUpdate(){
+        if (rnUpdateListener!=null) rnUpdateListener.needsUpdate();
+    }
+    boolean hasRnListener(){
+        return rnUpdateListener!=null;
     }
 
 
@@ -282,22 +286,29 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     };
             }
         });
-        flashtagButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
-        recentButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
-        trendingButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
-        categoriesButton.setBackgroundDrawable(buttonBg.getConstantState().newDrawable());
 
-        flashtagButton.setColorFilter(buttonColor);
-        recentButton.setColorFilter(buttonColor);
-        trendingButton.setColorFilter(buttonColor);
-        categoriesButton.setColorFilter(buttonColor);
+        setButtonBackground(buttonBg);
+        setButtonColor(buttonColor);
+    }
+    void setButtonBackground(Drawable d){
+        flashtagButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+        recentButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+        trendingButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+        categoriesButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+    }
+    void setButtonColor(int color){
+
+        flashtagButton.setColorFilter(color);
+        recentButton.setColorFilter(color);
+        trendingButton.setColorFilter(color);
+        categoriesButton.setColorFilter(color);
     }
     @ColorInt int getHeaderTextColor(){
         return headerTextColor;
     }
 
     String currentSearchQuery;
-    private TextWatcher editTextWatcher = new TextWatcher() {
+     TextWatcher editTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -357,6 +368,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (usingTrendingAdapter && !wasUsingTrending) {
             adapter.showNames(false);
             adapter.setMojiModels(trendingPopulator.populatePage(200, 0));
+            if (rnUpdateListener!=null) rnUpdateListener.needsUpdate();
         }
 
     }
@@ -440,7 +452,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         hideKeyboard();
         deactiveButtons();
         if (trendingPage==null)
-            trendingPage = new OneGridPage("Trending",this,new TrendingPopulator());
+            trendingPage = new OneGridPage(getContext().getString(R.string._mm_trending),this,new TrendingPopulator());
 
         if (trendingPage.isVisible()){
             onLeftClosed();
@@ -469,7 +481,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         hideKeyboard();
         deactiveButtons();
         if (recentPage==null)
-            recentPage = new OneGridPage("Recent",this,new RecentPopulator());
+            recentPage = new OneGridPage(getContext().getString(R.string._mm_recent),this,new RecentPopulator());
 
         if (recentPage.isVisible()){
             onLeftClosed();
@@ -677,14 +689,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     boolean outsideEditText = false;
     public void attatchMojiEditText(@NonNull MojiEditText met){
-        editText = met;
-        if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
-        horizontalLayout.setVisibility(View.GONE);
-        outsideEditText = true;
-        met.addTextChangedListener(editTextWatcher);
-        myEditText.removeTextChangedListener(editTextWatcher);
-        editText.setSelection(editText.getText().length());
-        editTextWatcher.afterTextChanged(editText.getText());
+        attatchEditText(met);
     }
     public void detachMojiEditText(){
         editText.removeTextChangedListener(editTextWatcher);
@@ -694,6 +699,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         outsideEditText = false;
         editText.addTextChangedListener(editTextWatcher);
         editText.setSelection(editText.getText().length());//set selection to end
+        editTextWatcher.afterTextChanged(editText.getText());
+    }
+    void attatchEditText(EditText met){
+        editText = met;
+        if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
+        horizontalLayout.setVisibility(View.GONE);
+        outsideEditText = true;
+        met.addTextChangedListener(editTextWatcher);
+        myEditText.removeTextChangedListener(editTextWatcher);
+        editText.setSelection(editText.getText().length());
         editTextWatcher.afterTextChanged(editText.getText());
     }
 

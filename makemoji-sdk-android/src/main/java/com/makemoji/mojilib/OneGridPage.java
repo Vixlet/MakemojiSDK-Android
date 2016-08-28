@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
@@ -25,10 +26,14 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     RecyclerView rv;
     RecyclerView.ItemDecoration itemDecoration;
     boolean gifs;
+    MojiInputLayout mojiInputLayout;
+    View footer;
 
     private int oldH;
-    public OneGridPage(String title, MojiInputLayout mojiInputLayout, PagerPopulator p) {
-        super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mojiInputLayout);
+    int height;
+    public OneGridPage(String title, MojiInputLayout mil, PagerPopulator p) {
+        super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
+        this.mojiInputLayout = mil;
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
             ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_gif_rows);
@@ -38,7 +43,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         if (!gifs)heading.setTextColor(mMojiInput.getHeaderTextColor());
         heading.setText(title);
         rv = (RecyclerView) mView.findViewById(R.id._mm_page_grid);
-
+        footer = mView.findViewById(R.id._mm_one_grid_footer);
         rv.setLayoutManager(new GridLayoutManager(mojiInputLayout.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
         mPopulator.setup(this);
 
@@ -52,13 +57,31 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
             }
         });
 
+        height = (mojiInputLayout.getPageFrame().getHeight() - heading.getHeight() - footer.getHeight());
+        if (mojiInputLayout.hasRnListener())
+            mojiInputLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    rv.invalidate();
+                    rv.requestLayout();
+                    mojiInputLayout.requestRnUpdate();
+                    mojiInputLayout.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onNewDataAvailable();
+                        }
+                    },30);
+                }
+            }, 30);
+
 
     }
 
     //called by the populater once a query is complete.
     @Override
     public void onNewDataAvailable() {
-        if (mView.getHeight()==0 || mPopulator.getTotalCount()==0)return;
+        height = (mojiInputLayout.getPageFrame().getHeight() - heading.getHeight() - footer.getHeight());
+        if (height==0 || mPopulator.getTotalCount()==0)return;
         count = mPopulator.getTotalCount();
         List<MojiModel> mojiModelList = mPopulator.populatePage(count,0);
         if (hasVideo(mojiModelList)){
@@ -66,9 +89,11 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
                 rv.setLayoutManager(new GridLayoutManager(rv.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
         }
         int h = rv.getHeight();
+        if (h ==0)
+            h = (int) (height*.75f);
         int size = h / DEFAULT_ROWS;
         int vSpace = (h - (size * DEFAULT_ROWS)) / DEFAULT_ROWS;
-        int hSpace = (mView.getWidth() - (size * 8)) / 16;
+        int hSpace = (mojiInputLayout.getWidth() - (size * 8)) / 16;
 
         MojiGridAdapter adapter = new MojiGridAdapter(mojiModelList, mMojiInput, false, size);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
@@ -77,6 +102,11 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
             rv.addItemDecoration(itemDecoration);
         //}
         rv.setAdapter(adapter);
+        if (mojiInputLayout.hasRnListener()) {
+            rv.invalidate();
+            rv.requestLayout();
+            mojiInputLayout.requestRnUpdate();
+        }
 
     }
     public static boolean hasVideo(Collection<MojiModel> list){
