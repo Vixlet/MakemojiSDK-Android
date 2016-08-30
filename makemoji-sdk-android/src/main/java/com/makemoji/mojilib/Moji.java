@@ -494,8 +494,8 @@ public class Moji {
         if (tv instanceof EditText) {
             tv.requestLayout();
         }
-        if (tv instanceof MojiEditText){
-            ((MojiEditText) tv).invalidateReflect();
+        if (tv instanceof ISpecialInvalidate){
+            ((ISpecialInvalidate) tv).specialInvalidate();
         }
         tv.setTag(R.id._makemoji_last_invalidated_id,now);
 

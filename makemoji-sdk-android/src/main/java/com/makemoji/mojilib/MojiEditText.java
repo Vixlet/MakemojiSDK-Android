@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
@@ -26,15 +27,24 @@ import java.util.regex.Pattern;
 /**
  * Created by Scott Baar on 1/29/2016.
  */
-public class MojiEditText extends EditText {
+public class MojiEditText extends EditText implements ISpecialInvalidate {
     public static final int DRAWABLE_LEFT = 0;
     public static final int DRAWABLE_TOP = 1;
     public static final int DRAWABLE_RIGHT = 2;
     public static final int DRAWABLE_BOTTOM = 3;
+    public static boolean REACT_NATIVE = false;
+
+    boolean mIsJSSettingFocus =false;
+
+    @Override
+    public void specialInvalidate() {
+        invalidateReflect();
+    }
 
     public interface IDrawableClick{
         void onClick(int drawablePosition );
     }
+
     public MojiEditText(Context context) {
         super(context);
         init();
@@ -254,5 +264,33 @@ public class MojiEditText extends EditText {
     protected void onSelectionChanged(int selStart, int selEnd) {
        // Log.d("met","selection " + selStart + " " +(selStart %3));
     }
+    //react stuff
+    @Override
+    public void clearFocus() {
+        if (REACT_NATIVE)setFocusableInTouchMode(false);
+        super.clearFocus();
+    }
+
+    @Override
+    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+        // Always return true if we are already focused. This is used by android in certain places,
+        // such as text selection.
+        if (!REACT_NATIVE)return super.requestFocus(direction,previouslyFocusedRect);
+        if (isFocused()) {
+            return true;
+        }
+        if (!mIsJSSettingFocus) {
+            return false;
+        }
+        setFocusableInTouchMode(true);
+        boolean focused = super.requestFocus(direction, previouslyFocusedRect);
+        return focused;
+    }
+    public void requestFocusFromJS() {
+        mIsJSSettingFocus = true;
+        requestFocus();
+        mIsJSSettingFocus = false;
+    }
+
 
 }
