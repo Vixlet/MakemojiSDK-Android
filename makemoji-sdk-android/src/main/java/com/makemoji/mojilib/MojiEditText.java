@@ -220,9 +220,9 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     }
     private void stopActionMode(){
         try{
-            Method m = getClass().getSuperclass().getSuperclass().getDeclaredMethod("stopTextActionMode",null);
+            Method m = getClass().getSuperclass().getSuperclass().getDeclaredMethod("stopTextActionMode");
             m.setAccessible(true);
-            m.invoke(this,null);
+            m.invoke(this);
         }
         catch (Exception e){
             //e.printStackTrace();
