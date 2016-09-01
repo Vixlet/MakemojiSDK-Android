@@ -40,10 +40,13 @@ import java.util.concurrent.ThreadFactory;
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.GINGERBREAD;
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.HONEYCOMB_MR1;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR1;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
+import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static android.provider.Settings.System.AIRPLANE_MODE_ON;
 import static com.squareup.picasso252.Picasso.TAG;
 import static java.lang.String.format;
 
@@ -55,8 +58,8 @@ final class Utils {
   static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 15 * 1000; // 15s
   private static final String PICASSO_CACHE = "picasso-cache";
   private static final int KEY_PADDING = 50; // Determined by exact science.
-  private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
-  private static final int MAX_DISK_CACHE_SIZE = 150 * 1024 * 1024; // 150MB
+  public static int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
+  public static int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
   static final int THREAD_LEAK_CLEANING_MS = 1000;
   static final char KEY_SEPARATOR = '\n';
 
@@ -107,7 +110,9 @@ final class Utils {
 
   static int getBitmapBytes(Bitmap bitmap) {
     int result;
-    if (SDK_INT >= HONEYCOMB_MR1) {
+    if (SDK_INT >= KITKAT) {
+      result = bitmap.getAllocationByteCount();
+    } else if (SDK_INT >= HONEYCOMB_MR1) {
       result = BitmapHoneycombMR1.getByteCount(bitmap);
     } else {
       result = bitmap.getRowBytes() * bitmap.getHeight();
@@ -133,7 +138,7 @@ final class Utils {
 
   static void checkMain() {
     if (!isMain()) {
-     // throw new IllegalStateException("Method call should happen from the main thread.");
+      throw new IllegalStateException("Method call should happen from the main thread.");
     }
   }
 
@@ -201,7 +206,7 @@ final class Utils {
       builder.append(KEY_SEPARATOR);
     }
     if (data.centerCrop) {
-      builder.append("centerCrop").append(KEY_SEPARATOR);
+      builder.append("centerCrop:").append(data.centerCropGravity).append(KEY_SEPARATOR);
     } else if (data.centerInside) {
       builder.append("centerInside").append(KEY_SEPARATOR);
     }
@@ -245,10 +250,17 @@ final class Utils {
   }
 
   static Downloader createDefaultDownloader(Context context) {
-    try {
-      Class.forName("com.squareup.okhttp.OkHttpClient");
-      return OkHttpLoaderCreator.create(context);
-    } catch (ClassNotFoundException ignored) {
+    if (SDK_INT >= GINGERBREAD) {
+      try {
+        Class.forName("okhttp3.OkHttpClient");
+        return OkHttp3DownloaderCreator.create(context);
+      } catch (ClassNotFoundException ignored) {
+      }
+      try {
+        Class.forName("com.squareup.okhttp.OkHttpClient");
+        return OkHttpDownloaderCreator.create(context);
+      } catch (ClassNotFoundException ignored) {
+      }
     }
     return new UrlConnectionDownloader(context);
   }
@@ -262,14 +274,21 @@ final class Utils {
     return cache;
   }
 
+  @TargetApi(JELLY_BEAN_MR2)
   static long calculateDiskCacheSize(File dir) {
     long size = MIN_DISK_CACHE_SIZE;
 
     try {
       StatFs statFs = new StatFs(dir.getAbsolutePath());
-      long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
+      //noinspection deprecation
+      long blockCount =
+          SDK_INT < JELLY_BEAN_MR2 ? (long) statFs.getBlockCount() : statFs.getBlockCountLong();
+      //noinspection deprecation
+      long blockSize =
+          SDK_INT < JELLY_BEAN_MR2 ? (long) statFs.getBlockSize() : statFs.getBlockSizeLong();
+      long available = blockCount * blockSize;
       // Target 2% of the total space.
-      size = available / 30;
+      size = available / 50;
     } catch (IllegalArgumentException ignored) {
     }
 
@@ -285,16 +304,23 @@ final class Utils {
       memoryClass = ActivityManagerHoneycomb.getLargeMemoryClass(am);
     }
     // Target ~15% of the available heap.
-    return 1024 * 1024 * memoryClass / 7;
+    return (int) (1024L * 1024L * memoryClass / 7);
   }
 
   static boolean isAirplaneModeOn(Context context) {
     ContentResolver contentResolver = context.getContentResolver();
     try {
-      return Settings.System.getInt(contentResolver, AIRPLANE_MODE_ON, 0) != 0;
+      if (SDK_INT < JELLY_BEAN_MR1) {
+        //noinspection deprecation
+        return Settings.System.getInt(contentResolver, Settings.System.AIRPLANE_MODE_ON, 0) != 0;
+      }
+      return Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     } catch (NullPointerException e) {
       // https://github.com/square/picasso/issues/761, some devices might crash here, assume that
       // airplane mode is off.
+      return false;
+    } catch (SecurityException e) {
+      //https://github.com/square/picasso/issues/1197
       return false;
     }
   }
@@ -419,9 +445,15 @@ final class Utils {
     }
   }
 
-  private static class OkHttpLoaderCreator {
+  private static class OkHttpDownloaderCreator {
     static Downloader create(Context context) {
       return new OkHttpDownloader(context);
+    }
+  }
+
+  private static class OkHttp3DownloaderCreator {
+    static Downloader create(Context context) {
+      return new OkHttp3Downloader(context);
     }
   }
 }

@@ -19,6 +19,8 @@ import android.util.Log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import static com.squareup.picasso252.Picasso.TAG;
+
 /** Represents all stats for a {@link Picasso} instance at a single point in time. */
 public class StatsSnapshot {
   public final int maxSize;
@@ -61,7 +63,7 @@ public class StatsSnapshot {
   @SuppressWarnings("UnusedDeclaration") public void dump() {
     StringWriter logWriter = new StringWriter();
     dump(new PrintWriter(logWriter));
-    Log.i(Picasso.TAG, logWriter.toString());
+    Log.i(TAG, logWriter.toString());
   }
 
   /** Prints out this {@link StatsSnapshot} with the the provided {@link PrintWriter}. */

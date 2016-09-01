@@ -40,6 +40,8 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Intent.ACTION_AIRPLANE_MODE_CHANGED;
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static com.squareup.picasso252.BitmapHunter.forRequest;
+import static com.squareup.picasso252.MemoryPolicy.shouldWriteToMemoryCache;
 import static com.squareup.picasso252.Utils.OWNER_DISPATCHER;
 import static com.squareup.picasso252.Utils.VERB_BATCHED;
 import static com.squareup.picasso252.Utils.VERB_CANCELED;
@@ -196,7 +198,7 @@ class Dispatcher {
       return;
     }
 
-    hunter = BitmapHunter.forRequest(action.getPicasso(), this, cache, stats, action);
+    hunter = forRequest(action.getPicasso(), this, cache, stats, action);
     hunter.future = service.submit(hunter);
     hunterMap.put(action.getKey(), hunter);
     if (dismissFailed) {
@@ -364,7 +366,7 @@ class Dispatcher {
   }
 
   void performComplete(BitmapHunter hunter) {
-    if (MemoryPolicy.shouldWriteToMemoryCache(hunter.getMemoryPolicy())) {
+    if (shouldWriteToMemoryCache(hunter.getMemoryPolicy())) {
       cache.set(hunter.getKey(), hunter.getResult());
     }
     hunterMap.remove(hunter.getKey());

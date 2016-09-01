@@ -18,34 +18,28 @@ package com.squareup.picasso252;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-
-import com.squareup.okhttp.CacheControl;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.ResponseBody;
+import android.support.annotation.VisibleForTesting;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import okhttp3.Cache;
+import okhttp3.CacheControl;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 
 /** A {@link Downloader} which uses OkHttp to download images. */
-public class OkHttpDownloader implements Downloader {
-  private static OkHttpClient defaultOkHttpClient() {
-    OkHttpClient client = new OkHttpClient();
-    client.setConnectTimeout(Utils.DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-    client.setReadTimeout(Utils.DEFAULT_READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-    client.setWriteTimeout(Utils.DEFAULT_WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-    return client;
-  }
-
-  private final OkHttpClient client;
+public final class OkHttp3Downloader implements Downloader {
+  private final Call.Factory client;
+  private final Cache cache;
   private boolean sharedClient = true;
 
   /**
    * Create new downloader that uses OkHttp. This will install an image cache into your application
    * cache directory.
    */
-  public OkHttpDownloader(final Context context) {
+  public OkHttp3Downloader(final Context context) {
     this(Utils.createDefaultCacheDir(context));
   }
 
@@ -55,7 +49,7 @@ public class OkHttpDownloader implements Downloader {
    *
    * @param cacheDir The directory in which the cache should be stored
    */
-  public OkHttpDownloader(final File cacheDir) {
+  public OkHttp3Downloader(final File cacheDir) {
     this(cacheDir, Utils.calculateDiskCacheSize(cacheDir));
   }
 
@@ -65,7 +59,7 @@ public class OkHttpDownloader implements Downloader {
    *
    * @param maxSize The size limit for the cache.
    */
-  public OkHttpDownloader(final Context context, final long maxSize) {
+  public OkHttp3Downloader(final Context context, final long maxSize) {
     this(Utils.createDefaultCacheDir(context), maxSize);
   }
 
@@ -76,22 +70,28 @@ public class OkHttpDownloader implements Downloader {
    * @param cacheDir The directory in which the cache should be stored
    * @param maxSize The size limit for the cache.
    */
-  public OkHttpDownloader(final File cacheDir, final long maxSize) {
-    this(defaultOkHttpClient());
+  public OkHttp3Downloader(final File cacheDir, final long maxSize) {
+    this(new OkHttpClient.Builder().cache(new Cache(cacheDir, maxSize)).build());
     sharedClient = false;
-    client.setCache(new com.squareup.okhttp.Cache(cacheDir, maxSize));
   }
 
   /**
    * Create a new downloader that uses the specified OkHttp instance. A response cache will not be
    * automatically configured.
    */
-  public OkHttpDownloader(OkHttpClient client) {
+  public OkHttp3Downloader(OkHttpClient client) {
     this.client = client;
+    this.cache = client.cache();
   }
 
-  protected final OkHttpClient getClient() {
-    return client;
+  /** Create a new downloader that uses the specified {@link Call.Factory} instance. */
+  public OkHttp3Downloader(Call.Factory client) {
+    this.client = client;
+    this.cache = null;
+  }
+
+  @VisibleForTesting Cache getCache() {
+    return ((OkHttpClient) client).cache();
   }
 
   @Override public Response load(@NonNull Uri uri, int networkPolicy) throws IOException {
@@ -111,12 +111,12 @@ public class OkHttpDownloader implements Downloader {
       }
     }
 
-    Request.Builder builder = new Request.Builder().url(uri.toString());
+    Request.Builder builder = new okhttp3.Request.Builder().url(uri.toString());
     if (cacheControl != null) {
       builder.cacheControl(cacheControl);
     }
 
-    com.squareup.okhttp.Response response = client.newCall(builder.build()).execute();
+    okhttp3.Response response = client.newCall(builder.build()).execute();
     int responseCode = response.code();
     if (responseCode >= 300) {
       response.body().close();
@@ -132,7 +132,6 @@ public class OkHttpDownloader implements Downloader {
 
   @Override public void shutdown() {
     if (!sharedClient) {
-      com.squareup.okhttp.Cache cache = client.getCache();
       if (cache != null) {
         try {
           cache.close();

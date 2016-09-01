@@ -19,6 +19,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.view.Gravity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -28,6 +30,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL;
+import static android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
+import static android.media.ExifInterface.ORIENTATION_TRANSPOSE;
+import static android.media.ExifInterface.ORIENTATION_TRANSVERSE;
+import static com.squareup.picasso252.MemoryPolicy.shouldReadFromMemoryCache;
 import static com.squareup.picasso252.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso252.Picasso.Priority;
 import static com.squareup.picasso252.Picasso.Priority.LOW;
@@ -83,7 +93,7 @@ class BitmapHunter implements Runnable {
   Future<?> future;
   Picasso.LoadedFrom loadedFrom;
   Exception exception;
-  int exifRotation; // Determined during decoding of original resource.
+  int exifOrientation; // Determined during decoding of original resource.
   int retryCount;
   Priority priority;
 
@@ -112,17 +122,19 @@ class BitmapHunter implements Runnable {
   static Bitmap decodeStream(InputStream stream, Request request) throws IOException {
     MarkableInputStream markStream = new MarkableInputStream(stream);
     stream = markStream;
-
-    long mark = markStream.savePosition(65536); // TODO fix this crap.
+    markStream.allowMarksToExpire(false);
+    long mark = markStream.savePosition(1024);
 
     final BitmapFactory.Options options = RequestHandler.createBitmapOptions(request);
     final boolean calculateSize = RequestHandler.requiresInSampleSize(options);
 
     boolean isWebPFile = Utils.isWebPFile(stream);
+    boolean isPurgeable = request.purgeable && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP;
     markStream.reset(mark);
-    // When decode WebP network stream, BitmapFactory throw JNI Exception and make app crash.
-    // Decode byte array instead
-    if (isWebPFile) {
+    // We decode from a byte array because, a) when decoding a WebP network stream, BitmapFactory
+    // throws a JNI Exception, so we workaround by decoding a byte array, or b) user requested
+    // purgeable, which only affects bitmaps decoded from byte arrays.
+    if (isWebPFile || isPurgeable) {
       byte[] bytes = Utils.toByteArray(stream);
       if (calculateSize) {
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
@@ -135,9 +147,9 @@ class BitmapHunter implements Runnable {
         BitmapFactory.decodeStream(stream, null, options);
         RequestHandler.calculateInSampleSize(request.targetWidth, request.targetHeight, options,
             request);
-
         markStream.reset(mark);
       }
+      markStream.allowMarksToExpire(true);
       Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
       if (bitmap == null) {
         // Treat null as an IO exception, we will eventually retry.
@@ -189,7 +201,7 @@ class BitmapHunter implements Runnable {
   Bitmap hunt() throws IOException {
     Bitmap bitmap = null;
 
-    if (MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)) {
+    if (shouldReadFromMemoryCache(memoryPolicy)) {
       bitmap = cache.get(key);
       if (bitmap != null) {
         stats.dispatchCacheHit();
@@ -205,8 +217,7 @@ class BitmapHunter implements Runnable {
     RequestHandler.Result result = requestHandler.load(data, networkPolicy);
     if (result != null) {
       loadedFrom = result.getLoadedFrom();
-      exifRotation = result.getExifOrientation();
-
+      exifOrientation = result.getExifOrientation();
       bitmap = result.getBitmap();
 
       // If there was no Bitmap then we need to decode it from the stream.
@@ -225,10 +236,10 @@ class BitmapHunter implements Runnable {
         log(OWNER_HUNTER, VERB_DECODED, data.logId());
       }
       stats.dispatchBitmapDecoded(bitmap);
-      if (data.needsTransformation() || exifRotation != 0) {
+      if (data.needsTransformation() || exifOrientation != 0) {
         synchronized (DECODE_LOCK) {
-          if (data.needsMatrixTransform() || exifRotation != 0) {
-            bitmap = transformResult(data, bitmap, exifRotation);
+          if (data.needsMatrixTransform() || exifOrientation != 0) {
+            bitmap = transformResult(data, bitmap, exifOrientation);
             if (picasso.loggingEnabled) {
               log(OWNER_HUNTER, VERB_TRANSFORMED, data.logId());
             }
@@ -482,7 +493,7 @@ class BitmapHunter implements Runnable {
     return result;
   }
 
-  static Bitmap transformResult(Request data, Bitmap result, int exifRotation) {
+  static Bitmap transformResult(Request data, Bitmap result, int exifOrientation) {
     int inWidth = result.getWidth();
     int inHeight = result.getHeight();
     boolean onlyScaleDown = data.onlyScaleDown;
@@ -494,42 +505,117 @@ class BitmapHunter implements Runnable {
 
     Matrix matrix = new Matrix();
 
-    if (data.needsMatrixTransform()) {
+    if (data.needsMatrixTransform() || exifOrientation != 0) {
       int targetWidth = data.targetWidth;
       int targetHeight = data.targetHeight;
 
       float targetRotation = data.rotationDegrees;
       if (targetRotation != 0) {
+        double cosR = Math.cos(Math.toRadians(targetRotation));
+        double sinR = Math.sin(Math.toRadians(targetRotation));
         if (data.hasRotationPivot) {
           matrix.setRotate(targetRotation, data.rotationPivotX, data.rotationPivotY);
+          // Recalculate dimensions after rotation around pivot point
+          double x1T = data.rotationPivotX * (1.0 - cosR) + (data.rotationPivotY * sinR);
+          double y1T = data.rotationPivotY * (1.0 - cosR) - (data.rotationPivotX * sinR);
+          double x2T = x1T + (data.targetWidth * cosR);
+          double y2T = y1T + (data.targetWidth * sinR);
+          double x3T = x1T + (data.targetWidth * cosR) - (data.targetHeight * sinR);
+          double y3T = y1T + (data.targetWidth * sinR) + (data.targetHeight * cosR);
+          double x4T = x1T - (data.targetHeight * sinR);
+          double y4T = y1T + (data.targetHeight * cosR);
+
+          double maxX = Math.max(x4T, Math.max(x3T, Math.max(x1T, x2T)));
+          double minX = Math.min(x4T, Math.min(x3T, Math.min(x1T, x2T)));
+          double maxY = Math.max(y4T, Math.max(y3T, Math.max(y1T, y2T)));
+          double minY = Math.min(y4T, Math.min(y3T, Math.min(y1T, y2T)));
+          targetWidth = (int) Math.floor(maxX - minX);
+          targetHeight  = (int) Math.floor(maxY - minY);
         } else {
           matrix.setRotate(targetRotation);
+          // Recalculate dimensions after rotation (around origin)
+          double x1T = 0.0;
+          double y1T = 0.0;
+          double x2T = (data.targetWidth * cosR);
+          double y2T = (data.targetWidth * sinR);
+          double x3T = (data.targetWidth * cosR) - (data.targetHeight * sinR);
+          double y3T = (data.targetWidth * sinR) + (data.targetHeight * cosR);
+          double x4T = -(data.targetHeight * sinR);
+          double y4T = (data.targetHeight * cosR);
+
+          double maxX = Math.max(x4T, Math.max(x3T, Math.max(x1T, x2T)));
+          double minX = Math.min(x4T, Math.min(x3T, Math.min(x1T, x2T)));
+          double maxY = Math.max(y4T, Math.max(y3T, Math.max(y1T, y2T)));
+          double minY = Math.min(y4T, Math.min(y3T, Math.min(y1T, y2T)));
+          targetWidth = (int) Math.floor(maxX - minX);
+          targetHeight  = (int) Math.floor(maxY - minY);
+        }
+      }
+
+      // EXIf interpretation should be done before cropping in case the dimensions need to
+      // be recalculated
+      if (exifOrientation != 0) {
+        int exifRotation = getExifRotation(exifOrientation);
+        int exifTranslation = getExifTranslation(exifOrientation);
+        if (exifRotation != 0) {
+          matrix.preRotate(exifRotation);
+          if (exifRotation == 90 || exifRotation == 270) {
+             // Recalculate dimensions after exif rotation
+             int tmpHeight = targetHeight;
+             targetHeight = targetWidth;
+             targetWidth = tmpHeight;
+          }
+        }
+        if (exifTranslation != 1) {
+          matrix.postScale(exifTranslation, 1);
         }
       }
 
       if (data.centerCrop) {
-        float widthRatio = targetWidth / (float) inWidth;
-        float heightRatio = targetHeight / (float) inHeight;
+        // Keep aspect ratio if one dimension is set to 0
+        float widthRatio =
+            targetWidth != 0 ? targetWidth / (float) inWidth : targetHeight / (float) inHeight;
+        float heightRatio =
+            targetHeight != 0 ? targetHeight / (float) inHeight : targetWidth / (float) inWidth;
         float scaleX, scaleY;
         if (widthRatio > heightRatio) {
           int newSize = (int) Math.ceil(inHeight * (heightRatio / widthRatio));
-          drawY = (inHeight - newSize) / 2;
+          if ((data.centerCropGravity & Gravity.TOP) == Gravity.TOP) {
+            drawY = 0;
+          } else if ((data.centerCropGravity & Gravity.BOTTOM) == Gravity.BOTTOM) {
+            drawY = inHeight - newSize;
+          } else {
+            drawY = (inHeight - newSize) / 2;
+          }
           drawHeight = newSize;
           scaleX = widthRatio;
           scaleY = targetHeight / (float) drawHeight;
-        } else {
+        } else if (widthRatio < heightRatio) {
           int newSize = (int) Math.ceil(inWidth * (widthRatio / heightRatio));
-          drawX = (inWidth - newSize) / 2;
+          if ((data.centerCropGravity & Gravity.LEFT) == Gravity.LEFT) {
+            drawX = 0;
+          } else if ((data.centerCropGravity & Gravity.RIGHT) == Gravity.RIGHT) {
+            drawX = inWidth - newSize;
+          } else {
+            drawX = (inWidth - newSize) / 2;
+          }
           drawWidth = newSize;
           scaleX = targetWidth / (float) drawWidth;
           scaleY = heightRatio;
+        } else {
+          drawX = 0;
+          drawWidth = inWidth;
+          scaleX = scaleY = heightRatio;
         }
         if (shouldResize(onlyScaleDown, inWidth, inHeight, targetWidth, targetHeight)) {
           matrix.preScale(scaleX, scaleY);
         }
       } else if (data.centerInside) {
-        float widthRatio = targetWidth / (float) inWidth;
-        float heightRatio = targetHeight / (float) inHeight;
+        // Keep aspect ratio if one dimension is set to 0
+        float widthRatio =
+            targetWidth != 0 ? targetWidth / (float) inWidth : targetHeight / (float) inHeight;
+        float heightRatio =
+            targetHeight != 0 ? targetHeight / (float) inHeight : targetWidth / (float) inWidth;
         float scale = widthRatio < heightRatio ? widthRatio : heightRatio;
         if (shouldResize(onlyScaleDown, inWidth, inHeight, targetWidth, targetHeight)) {
           matrix.preScale(scale, scale);
@@ -549,10 +635,6 @@ class BitmapHunter implements Runnable {
       }
     }
 
-    if (exifRotation != 0) {
-      matrix.preRotate(exifRotation);
-    }
-
     Bitmap newResult =
         Bitmap.createBitmap(result, drawX, drawY, drawWidth, drawHeight, matrix, true);
     if (newResult != result) {
@@ -565,6 +647,44 @@ class BitmapHunter implements Runnable {
 
   private static boolean shouldResize(boolean onlyScaleDown, int inWidth, int inHeight,
       int targetWidth, int targetHeight) {
-    return !onlyScaleDown || inWidth > targetWidth || inHeight > targetHeight;
+    return !onlyScaleDown || (targetWidth != 0 && inWidth > targetWidth)
+            || (targetHeight != 0 && inHeight > targetHeight);
+  }
+
+  static int getExifRotation(int orientation) {
+    int rotation;
+    switch (orientation) {
+      case ORIENTATION_ROTATE_90:
+      case ORIENTATION_TRANSPOSE:
+        rotation = 90;
+        break;
+      case ORIENTATION_ROTATE_180:
+      case ORIENTATION_FLIP_VERTICAL:
+        rotation = 180;
+        break;
+      case ORIENTATION_ROTATE_270:
+      case ORIENTATION_TRANSVERSE:
+        rotation = 270;
+        break;
+      default:
+        rotation = 0;
+    }
+    return rotation;
+  }
+
+ static int getExifTranslation(int orientation)  {
+    int translation;
+    switch (orientation) {
+      case ORIENTATION_FLIP_HORIZONTAL:
+      case ORIENTATION_FLIP_VERTICAL:
+      case ORIENTATION_TRANSPOSE:
+      case ORIENTATION_TRANSVERSE:
+        translation = -1;
+        break;
+      default:
+        translation = 1;
+    }
+    return translation;
   }
 }
+

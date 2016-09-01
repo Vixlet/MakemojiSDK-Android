@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.squareup.picasso252.Utils.getService;
 
 abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTarget> {
   final RemoteViews remoteViews;
@@ -101,19 +102,21 @@ abstract class RemoteViewsAction extends Action<RemoteViewsAction.RemoteViewsTar
 
   static class NotificationAction extends RemoteViewsAction {
     private final int notificationId;
+    private final String notificationTag;
     private final Notification notification;
 
     NotificationAction(Picasso picasso, Request data, RemoteViews remoteViews, int viewId,
-        int notificationId, Notification notification, int memoryPolicy, int networkPolicy,
-        String key, Object tag, int errorResId) {
+        int notificationId, Notification notification, String notificationTag, int memoryPolicy,
+        int networkPolicy, String key, Object tag, int errorResId) {
       super(picasso, data, remoteViews, viewId, errorResId, memoryPolicy, networkPolicy, tag, key);
       this.notificationId = notificationId;
+      this.notificationTag = notificationTag;
       this.notification = notification;
     }
 
     @Override void update() {
-      NotificationManager manager = Utils.getService(picasso.context, NOTIFICATION_SERVICE);
-      manager.notify(notificationId, notification);
+      NotificationManager manager = getService(picasso.context, NOTIFICATION_SERVICE);
+      manager.notify(notificationTag, notificationId, notification);
     }
   }
 }

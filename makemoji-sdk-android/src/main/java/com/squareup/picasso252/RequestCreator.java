@@ -21,14 +21,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-//import org.jetbrains.annotations.TestOnly;
 
 import static com.squareup.picasso252.BitmapHunter.forRequest;
+import static com.squareup.picasso252.MemoryPolicy.NO_CACHE;
+import static com.squareup.picasso252.MemoryPolicy.NO_STORE;
+import static com.squareup.picasso252.MemoryPolicy.shouldReadFromMemoryCache;
 import static com.squareup.picasso252.Picasso.LoadedFrom.MEMORY;
 import static com.squareup.picasso252.Picasso.Priority;
 import static com.squareup.picasso252.PicassoDrawable.setBitmap;
@@ -72,7 +80,7 @@ public class RequestCreator {
     this.data = new Request.Builder(uri, resourceId, picasso.defaultBitmapConfig);
   }
 
-  RequestCreator() {
+  @VisibleForTesting RequestCreator() {
     this.picasso = null;
     this.data = new Request.Builder(null, 0, null);
   }
@@ -100,7 +108,7 @@ public class RequestCreator {
    * not immediately available in the memory cache then this resource will be set on the target
    * {@link ImageView}.
    */
-  public RequestCreator placeholder(int placeholderResId) {
+  public RequestCreator placeholder(@DrawableRes int placeholderResId) {
     if (!setPlaceholder) {
       throw new IllegalStateException("Already explicitly declared as no placeholder.");
     }
@@ -122,7 +130,7 @@ public class RequestCreator {
    * If you are not using a placeholder image but want to clear an existing image (such as when
    * used in an {@link android.widget.Adapter adapter}), pass in {@code null}.
    */
-  public RequestCreator placeholder(Drawable placeholderDrawable) {
+  public RequestCreator placeholder(@NonNull Drawable placeholderDrawable) {
     if (!setPlaceholder) {
       throw new IllegalStateException("Already explicitly declared as no placeholder.");
     }
@@ -134,7 +142,7 @@ public class RequestCreator {
   }
 
   /** An error drawable to be used if the request image could not be loaded. */
-  public RequestCreator error(int errorResId) {
+  public RequestCreator error(@DrawableRes int errorResId) {
     if (errorResId == 0) {
       throw new IllegalArgumentException("Error image resource invalid.");
     }
@@ -146,7 +154,7 @@ public class RequestCreator {
   }
 
   /** An error drawable to be used if the request image could not be loaded. */
-  public RequestCreator error(Drawable errorDrawable) {
+  public RequestCreator error(@NonNull Drawable errorDrawable) {
     if (errorDrawable == null) {
       throw new IllegalArgumentException("Error image may not be null.");
     }
@@ -175,7 +183,7 @@ public class RequestCreator {
    * @see Picasso#pauseTag(Object)
    * @see Picasso#resumeTag(Object)
    */
-  public RequestCreator tag(Object tag) {
+  public RequestCreator tag(@NonNull Object tag) {
     if (tag == null) {
       throw new IllegalArgumentException("Tag invalid.");
     }
@@ -203,6 +211,17 @@ public class RequestCreator {
     return this;
   }
 
+  /** Internal use only. Used by {@link DeferredRequestCreator}. */
+  RequestCreator clearTag() {
+    this.tag = null;
+    return this;
+  }
+
+  /** Internal use only. Used by {@link DeferredRequestCreator}. */
+  Object getTag() {
+    return tag;
+  }
+
   /** Resize the image to the specified dimension size. */
   public RequestCreator resizeDimen(int targetWidthResId, int targetHeightResId) {
     Resources resources = picasso.context.getResources();
@@ -223,7 +242,17 @@ public class RequestCreator {
    * requested bounds and then crops the extra.
    */
   public RequestCreator centerCrop() {
-    data.centerCrop();
+    data.centerCrop(Gravity.CENTER);
+    return this;
+  }
+
+  /**
+   * Crops an image inside of the bounds specified by {@link #resize(int, int)} rather than
+   * distorting the aspect ratio. This cropping technique scales the image so that it fills the
+   * requested bounds and then crops the extra, preferring the contents at {@code alignGravity}.
+   */
+  public RequestCreator centerCrop(int alignGravity) {
+    data.centerCrop(alignGravity);
     return this;
   }
 
@@ -263,7 +292,7 @@ public class RequestCreator {
    * Note: This value may be ignored by {@link BitmapFactory}. See
    * {@link BitmapFactory.Options#inPreferredConfig its documentation} for more details.
    */
-  public RequestCreator config(Bitmap.Config config) {
+  public RequestCreator config(@NonNull Bitmap.Config config) {
     data.config(config);
     return this;
   }
@@ -272,7 +301,7 @@ public class RequestCreator {
    * Sets the stable key for this request to be used instead of the URI or resource ID when
    * caching. Two requests with the same value are considered to be for the same resource.
    */
-  public RequestCreator stableKey(String stableKey) {
+  public RequestCreator stableKey(@NonNull String stableKey) {
     data.stableKey(stableKey);
     return this;
   }
@@ -284,7 +313,7 @@ public class RequestCreator {
    * By default, all requests have {@link Priority#NORMAL} priority, except for
    * {@link #fetch()} requests, which have {@link Priority#LOW} priority by default.
    */
-  public RequestCreator priority(Priority priority) {
+  public RequestCreator priority(@NonNull Priority priority) {
     data.priority(priority);
     return this;
   }
@@ -295,7 +324,7 @@ public class RequestCreator {
    * Custom transformations will always be run after the built-in transformations.
    */
   // TODO show example of calling resize after a transform in the javadoc
-  public RequestCreator transform(Transformation transformation) {
+  public RequestCreator transform(@NonNull Transformation transformation) {
     data.transform(transformation);
     return this;
   }
@@ -305,7 +334,7 @@ public class RequestCreator {
    * <p>
    * Custom transformations will always be run after the built-in transformations.
    */
-  public RequestCreator transform(List<? extends Transformation> transformations) {
+  public RequestCreator transform(@NonNull List<? extends Transformation> transformations) {
     data.transform(transformations);
     return this;
   }
@@ -314,14 +343,16 @@ public class RequestCreator {
    * @deprecated Use {@link #memoryPolicy(MemoryPolicy, MemoryPolicy...)} instead.
    */
   @Deprecated public RequestCreator skipMemoryCache() {
-    return memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+    return memoryPolicy(NO_CACHE, NO_STORE);
   }
 
   /**
    * Specifies the {@link MemoryPolicy} to use for this request. You may specify additional policy
    * options using the varargs parameter.
    */
-  public RequestCreator memoryPolicy(MemoryPolicy policy, MemoryPolicy... additional) {
+  public RequestCreator memoryPolicy(
+      @NonNull MemoryPolicy policy,
+      @NonNull MemoryPolicy... additional) {
     if (policy == null) {
       throw new IllegalArgumentException("Memory policy cannot be null.");
     }
@@ -344,7 +375,9 @@ public class RequestCreator {
    * Specifies the {@link NetworkPolicy} to use for this request. You may specify additional policy
    * options using the varargs parameter.
    */
-  public RequestCreator networkPolicy(NetworkPolicy policy, NetworkPolicy... additional) {
+  public RequestCreator networkPolicy(
+      @NonNull NetworkPolicy policy,
+      @NonNull NetworkPolicy... additional) {
     if (policy == null) {
       throw new IllegalArgumentException("Network policy cannot be null.");
     }
@@ -360,6 +393,17 @@ public class RequestCreator {
         this.networkPolicy |= networkPolicy.index;
       }
     }
+    return this;
+  }
+
+  /** Set inPurgeable and inInputShareable when decoding. This will force the bitmap to be decoded
+   * from a byte array instead of a stream, since inPurgeable only affects the former.
+   * <p>
+   * <em>Note</em>: as of API level 21 (Lollipop), the inPurgeable field is deprecated and will be
+   * ignored.
+   */
+  public RequestCreator purgeable() {
+    data.purgeable();
     return this;
   }
 
@@ -412,7 +456,7 @@ public class RequestCreator {
    * {@link android.app.Activity} or {@link android.app.Fragment} from being garbage collected
    * until the request is completed.
    */
-  public void fetch(Callback callback) {
+  public void fetch(@Nullable Callback callback) {
     long started = System.nanoTime();
 
     if (deferred) {
@@ -426,20 +470,23 @@ public class RequestCreator {
 
       Request request = createRequest(started);
       String key = createKey(request, new StringBuilder());
-      Bitmap bitmap = picasso.quickMemoryCacheCheck(key);
 
-      if (bitmap != null) {
-        if (picasso.loggingEnabled) {
-          log(OWNER_MAIN, VERB_COMPLETED, request.plainId(), "from " + MEMORY);
+      if (shouldReadFromMemoryCache(memoryPolicy)) {
+        Bitmap bitmap = picasso.quickMemoryCacheCheck(key);
+        if (bitmap != null) {
+          if (picasso.loggingEnabled) {
+            log(OWNER_MAIN, VERB_COMPLETED, request.plainId(), "from " + MEMORY);
+          }
+          if (callback != null) {
+            callback.onSuccess();
+          }
+          return;
         }
-        if (callback != null) {
-          callback.onSuccess();
-        }
-      } else {
-        Action action =
-            new FetchAction(picasso, request, memoryPolicy, networkPolicy, tag, key, callback);
-        picasso.submit(action);
       }
+
+      Action action =
+          new FetchAction(picasso, request, memoryPolicy, networkPolicy, tag, key, callback);
+      picasso.submit(action);
     }
   }
 
@@ -488,7 +535,7 @@ public class RequestCreator {
    * garbage collected if you do not keep a strong reference to it. To receive callbacks when an
    * image is loaded use {@link #into(android.widget.ImageView, Callback)}.
    */
-  public void into(Target target) {
+  public void into(@NonNull Target target) {
     long started = System.nanoTime();
     checkMain();
 
@@ -508,7 +555,7 @@ public class RequestCreator {
     Request request = createRequest(started);
     String requestKey = createKey(request);
 
-    if (MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)) {
+    if (shouldReadFromMemoryCache(memoryPolicy)) {
       Bitmap bitmap = picasso.quickMemoryCacheCheck(requestKey);
       if (bitmap != null) {
         picasso.cancelRequest(target);
@@ -529,8 +576,24 @@ public class RequestCreator {
    * Asynchronously fulfills the request into the specified {@link RemoteViews} object with the
    * given {@code viewId}. This is used for loading bitmaps into a {@link Notification}.
    */
-  public void into(RemoteViews remoteViews, int viewId, int notificationId,
-      Notification notification) {
+  public void into(
+      @NonNull RemoteViews remoteViews,
+      @IdRes int viewId,
+      int notificationId,
+      @NonNull Notification notification) {
+    into(remoteViews, viewId, notificationId, notification, null);
+  }
+
+  /**
+   * Asynchronously fulfills the request into the specified {@link RemoteViews} object with the
+   * given {@code viewId}. This is used for loading bitmaps into a {@link Notification}.
+   */
+  public void into(
+      @NonNull RemoteViews remoteViews,
+      @IdRes int viewId,
+      int notificationId,
+      @NonNull Notification notification,
+      @Nullable String notificationTag) {
     long started = System.nanoTime();
 
     if (remoteViews == null) {
@@ -552,7 +615,7 @@ public class RequestCreator {
 
     RemoteViewsAction action =
         new NotificationAction(picasso, request, remoteViews, viewId, notificationId, notification,
-            memoryPolicy, networkPolicy, key, tag, errorResId);
+            notificationTag, memoryPolicy, networkPolicy, key, tag, errorResId);
 
     performRemoteViewInto(action);
   }
@@ -561,7 +624,10 @@ public class RequestCreator {
    * Asynchronously fulfills the request into the specified {@link RemoteViews} object with the
    * given {@code viewId}. This is used for loading bitmaps into all instances of a widget.
    */
-  public void into(RemoteViews remoteViews, int viewId, int[] appWidgetIds) {
+  public void into(
+      @NonNull RemoteViews remoteViews,
+      @IdRes int viewId,
+      @NonNull int[] appWidgetIds) {
     long started = System.nanoTime();
 
     if (remoteViews == null) {
@@ -629,7 +695,7 @@ public class RequestCreator {
       }
       int width = target.getWidth();
       int height = target.getHeight();
-      if (width == 0 || height == 0) {
+      if (width == 0 || height == 0 || target.isLayoutRequested()) {
         if (setPlaceholder) {
           setPlaceholder(target, getPlaceholderDrawable());
         }
@@ -642,7 +708,7 @@ public class RequestCreator {
     Request request = createRequest(started);
     String requestKey = createKey(request);
 
-    if (MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)) {
+    if (shouldReadFromMemoryCache(memoryPolicy)) {
       Bitmap bitmap = picasso.quickMemoryCacheCheck(requestKey);
       if (bitmap != null) {
         picasso.cancelRequest(target);
@@ -704,7 +770,7 @@ public class RequestCreator {
   }
 
   private void performRemoteViewInto(RemoteViewsAction action) {
-    if (MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)) {
+    if (shouldReadFromMemoryCache(memoryPolicy)) {
       Bitmap bitmap = picasso.quickMemoryCacheCheck(action.getKey());
       if (bitmap != null) {
         action.complete(bitmap, MEMORY);

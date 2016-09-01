@@ -17,7 +17,12 @@ package com.squareup.picasso252;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.Px;
+import android.view.Gravity;
+import com.squareup.picasso252.Picasso.Priority;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -64,6 +69,8 @@ public final class Request {
    * This is mutually exclusive with {@link #centerInside}.
    */
   public final boolean centerCrop;
+  /** If centerCrop is set, controls alignment of centered image */
+  public final int centerCropGravity;
   /**
    * True if the final image should use the 'centerInside' scale technique.
    * <p>
@@ -79,15 +86,18 @@ public final class Request {
   public final float rotationPivotY;
   /** Whether or not {@link #rotationPivotX} and {@link #rotationPivotY} are set. */
   public final boolean hasRotationPivot;
+  /** True if image should be decoded with inPurgeable and inInputShareable. */
+  public final boolean purgeable;
   /** Target image config for decoding. */
   public final Bitmap.Config config;
   /** The priority of this request. */
-  public final Picasso.Priority priority;
+  public final Priority priority;
 
   private Request(Uri uri, int resourceId, String stableKey, List<Transformation> transformations,
       int targetWidth, int targetHeight, boolean centerCrop, boolean centerInside,
-      boolean onlyScaleDown, float rotationDegrees, float rotationPivotX, float rotationPivotY,
-      boolean hasRotationPivot, Bitmap.Config config, Picasso.Priority priority) {
+      int centerCropGravity, boolean onlyScaleDown, float rotationDegrees,
+      float rotationPivotX, float rotationPivotY, boolean hasRotationPivot,
+      boolean purgeable, Bitmap.Config config, Priority priority) {
     this.uri = uri;
     this.resourceId = resourceId;
     this.stableKey = stableKey;
@@ -100,52 +110,57 @@ public final class Request {
     this.targetHeight = targetHeight;
     this.centerCrop = centerCrop;
     this.centerInside = centerInside;
+    this.centerCropGravity = centerCropGravity;
     this.onlyScaleDown = onlyScaleDown;
     this.rotationDegrees = rotationDegrees;
     this.rotationPivotX = rotationPivotX;
     this.rotationPivotY = rotationPivotY;
     this.hasRotationPivot = hasRotationPivot;
+    this.purgeable = purgeable;
     this.config = config;
     this.priority = priority;
   }
 
   @Override public String toString() {
-    final StringBuilder sb = new StringBuilder("Request{");
+    final StringBuilder builder = new StringBuilder("Request{");
     if (resourceId > 0) {
-      sb.append(resourceId);
+      builder.append(resourceId);
     } else {
-      sb.append(uri);
+      builder.append(uri);
     }
     if (transformations != null && !transformations.isEmpty()) {
       for (Transformation transformation : transformations) {
-        sb.append(' ').append(transformation.key());
+        builder.append(' ').append(transformation.key());
       }
     }
     if (stableKey != null) {
-      sb.append(" stableKey(").append(stableKey).append(')');
+      builder.append(" stableKey(").append(stableKey).append(')');
     }
     if (targetWidth > 0) {
-      sb.append(" resize(").append(targetWidth).append(',').append(targetHeight).append(')');
+      builder.append(" resize(").append(targetWidth).append(',').append(targetHeight).append(')');
     }
     if (centerCrop) {
-      sb.append(" centerCrop");
+      builder.append(" centerCrop");
     }
     if (centerInside) {
-      sb.append(" centerInside");
+      builder.append(" centerInside");
     }
     if (rotationDegrees != 0) {
-      sb.append(" rotation(").append(rotationDegrees);
+      builder.append(" rotation(").append(rotationDegrees);
       if (hasRotationPivot) {
-        sb.append(" @ ").append(rotationPivotX).append(',').append(rotationPivotY);
+        builder.append(" @ ").append(rotationPivotX).append(',').append(rotationPivotY);
       }
-      sb.append(')');
+      builder.append(')');
+    }
+    if (purgeable) {
+      builder.append(" purgeable");
     }
     if (config != null) {
-      sb.append(' ').append(config);
+      builder.append(' ').append(config);
     }
-    sb.append('}');
+    builder.append('}');
 
-    return sb.toString();
+    return builder.toString();
   }
 
   String logId() {
@@ -195,23 +210,25 @@ public final class Request {
     private int targetWidth;
     private int targetHeight;
     private boolean centerCrop;
+    private int centerCropGravity;
     private boolean centerInside;
     private boolean onlyScaleDown;
     private float rotationDegrees;
     private float rotationPivotX;
     private float rotationPivotY;
     private boolean hasRotationPivot;
+    private boolean purgeable;
     private List<Transformation> transformations;
     private Bitmap.Config config;
-    private Picasso.Priority priority;
+    private Priority priority;
 
     /** Start building a request using the specified {@link Uri}. */
-    public Builder(Uri uri) {
+    public Builder(@NonNull Uri uri) {
       setUri(uri);
     }
 
     /** Start building a request using the specified resource ID. */
-    public Builder(int resourceId) {
+    public Builder(@DrawableRes int resourceId) {
       setResourceId(resourceId);
     }
 
@@ -229,10 +246,12 @@ public final class Request {
       targetHeight = request.targetHeight;
       centerCrop = request.centerCrop;
       centerInside = request.centerInside;
+      centerCropGravity = request.centerCropGravity;
       rotationDegrees = request.rotationDegrees;
       rotationPivotX = request.rotationPivotX;
       rotationPivotY = request.rotationPivotY;
       hasRotationPivot = request.hasRotationPivot;
+      purgeable = request.purgeable;
       onlyScaleDown = request.onlyScaleDown;
       if (request.transformations != null) {
         transformations = new ArrayList<Transformation>(request.transformations);
@@ -258,7 +277,7 @@ public final class Request {
      * <p>
      * This will clear an image resource ID if one is set.
      */
-    public Builder setUri(Uri uri) {
+    public Builder setUri(@NonNull Uri uri) {
       if (uri == null) {
         throw new IllegalArgumentException("Image URI may not be null.");
       }
@@ -272,7 +291,7 @@ public final class Request {
      * <p>
      * This will clear an image Uri if one is set.
      */
-    public Builder setResourceId(int resourceId) {
+    public Builder setResourceId(@DrawableRes int resourceId) {
       if (resourceId == 0) {
         throw new IllegalArgumentException("Image resource ID may not be 0.");
       }
@@ -285,7 +304,7 @@ public final class Request {
      * Set the stable key to be used instead of the URI or resource ID when caching.
      * Two requests with the same value are considered to be for the same resource.
      */
-    public Builder stableKey(String stableKey) {
+    public Builder stableKey(@Nullable String stableKey) {
       this.stableKey = stableKey;
       return this;
     }
@@ -294,7 +313,7 @@ public final class Request {
      * Resize the image to the specified size in pixels.
      * Use 0 as desired dimension to resize keeping aspect ratio.
      */
-    public Builder resize(int targetWidth, int targetHeight) {
+    public Builder resize(@Px int targetWidth, @Px int targetHeight) {
       if (targetWidth < 0) {
         throw new IllegalArgumentException("Width must be positive number or 0.");
       }
@@ -324,16 +343,27 @@ public final class Request {
      * requested bounds and then crops the extra.
      */
     public Builder centerCrop() {
+      return centerCrop(Gravity.CENTER);
+    }
+
+    /**
+     * Crops an image inside of the bounds specified by {@link #resize(int, int)} rather than
+     * distorting the aspect ratio. This cropping technique scales the image so that it fills the
+     * requested bounds, aligns it using provided gravity parameter and then crops the extra.
+     */
+    public Builder centerCrop(int alignGravity) {
       if (centerInside) {
         throw new IllegalStateException("Center crop can not be used after calling centerInside");
       }
       centerCrop = true;
+      centerCropGravity = alignGravity;
       return this;
     }
 
     /** Clear the center crop transformation flag, if set. */
     public Builder clearCenterCrop() {
       centerCrop = false;
+      centerCropGravity = Gravity.CENTER;
       return this;
     }
 
@@ -397,14 +427,22 @@ public final class Request {
       return this;
     }
 
+    public Builder purgeable() {
+      purgeable = true;
+      return this;
+    }
+
     /** Decode the image using the specified config. */
-    public Builder config(Bitmap.Config config) {
+    public Builder config(@NonNull Bitmap.Config config) {
+      if (config == null) {
+        throw new IllegalArgumentException("config == null");
+      }
       this.config = config;
       return this;
     }
 
     /** Execute request using the specified priority. */
-    public Builder priority(Picasso.Priority priority) {
+    public Builder priority(@NonNull Priority priority) {
       if (priority == null) {
         throw new IllegalArgumentException("Priority invalid.");
       }
@@ -420,7 +458,7 @@ public final class Request {
      * <p>
      * Custom transformations will always be run after the built-in transformations.
      */
-    public Builder transform(Transformation transformation) {
+    public Builder transform(@NonNull Transformation transformation) {
       if (transformation == null) {
         throw new IllegalArgumentException("Transformation must not be null.");
       }
@@ -439,7 +477,7 @@ public final class Request {
      * <p>
      * Custom transformations will always be run after the built-in transformations.
      */
-    public Builder transform(List<? extends Transformation> transformations) {
+    public Builder transform(@NonNull List<? extends Transformation> transformations) {
       if (transformations == null) {
         throw new IllegalArgumentException("Transformation list must not be null.");
       }
@@ -463,11 +501,11 @@ public final class Request {
             "Center inside requires calling resize with positive width and height.");
       }
       if (priority == null) {
-        priority = Picasso.Priority.NORMAL;
+        priority = Priority.NORMAL;
       }
       return new Request(uri, resourceId, stableKey, transformations, targetWidth, targetHeight,
-          centerCrop, centerInside, onlyScaleDown, rotationDegrees, rotationPivotX, rotationPivotY,
-          hasRotationPivot, config, priority);
+          centerCrop, centerInside, centerCropGravity, onlyScaleDown, rotationDegrees,
+          rotationPivotX, rotationPivotY, hasRotationPivot, purgeable, config, priority);
     }
   }
 }
