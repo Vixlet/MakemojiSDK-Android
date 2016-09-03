@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
@@ -95,14 +96,6 @@ public class InputActivity extends AppCompatActivity{
                 lockedCategoryClick(name);
             }
         });
-       /* ((EditText) findViewById(R.id._mm_edit_text)).setCompoundDrawablesWithIntrinsicBounds(null,null,
-                getResources().getDrawable(R.drawable.mm_backspace_grey600_24dp),null);
-        mojiInputLayout.setDrawableClickListener(new MojiEditText.IDrawableClick() {
-            @Override
-            public void onClick(int drawablePosition) {
-                mojiInputLayout.setInputText(""+drawablePosition);
-            }
-        });*/
 
 
     }

@@ -21,7 +21,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
 
-    libraryVersion = '0.9.749'
+    libraryVersion = '0.9.750'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'
@@ -34,7 +34,7 @@ ext {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '24.0.0'
 
     defaultConfig {
         minSdkVersion 15
