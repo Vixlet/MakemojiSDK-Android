@@ -32,9 +32,6 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     public static final int DRAWABLE_TOP = 1;
     public static final int DRAWABLE_RIGHT = 2;
     public static final int DRAWABLE_BOTTOM = 3;
-    public static boolean REACT_NATIVE = false;
-
-    boolean mIsJSSettingFocus =false;
 
     @Override
     public void specialInvalidate() {
@@ -263,33 +260,6 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     }
     protected void onSelectionChanged(int selStart, int selEnd) {
        // Log.d("met","selection " + selStart + " " +(selStart %3));
-    }
-    //react stuff
-    @Override
-    public void clearFocus() {
-        if (REACT_NATIVE)setFocusableInTouchMode(false);
-        super.clearFocus();
-    }
-
-    @Override
-    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
-        // Always return true if we are already focused. This is used by android in certain places,
-        // such as text selection.
-        if (!REACT_NATIVE)return super.requestFocus(direction,previouslyFocusedRect);
-        if (isFocused()) {
-            return true;
-        }
-        if (!mIsJSSettingFocus) {
-            return false;
-        }
-        setFocusableInTouchMode(true);
-        boolean focused = super.requestFocus(direction, previouslyFocusedRect);
-        return focused;
-    }
-    public void requestFocusFromJS() {
-        mIsJSSettingFocus = true;
-        requestFocus();
-        mIsJSSettingFocus = false;
     }
 
 

@@ -508,6 +508,9 @@ public class Moji {
             }
         });
     }
+    static boolean isMain(){
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
+    }
 
 
 }

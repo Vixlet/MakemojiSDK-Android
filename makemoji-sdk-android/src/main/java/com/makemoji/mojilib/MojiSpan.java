@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
+import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
@@ -118,11 +119,22 @@ import java.lang.ref.WeakReference;
 
         mViewRef = new WeakReference<>(refreshView);
         if (LOG) Log.d(TAG,"starting load " + name + " " +System.currentTimeMillis());
-        int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
-if (mSource!=null && !mSource.isEmpty())
+        final int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
+if (mSource!=null && !mSource.isEmpty()) {
+    if (Moji.isMain())
     Moji.picasso.load(mSource)
-                .resize(size,size)
-                .into(t);
+            .resize(size, size)
+            .into(t);
+    else
+        Moji.handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Moji.picasso.load(mSource)
+                        .resize(size, size)
+                        .into(t);
+            }
+        });
+}
     }
 
     public static int getDefaultSpanDimension(float textSize){
@@ -312,9 +324,21 @@ if (mSource!=null && !mSource.isEmpty())
         if (mDrawableRef!= null)
             mDrawable = mDrawableRef.get();
         if (mDrawable==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
+        {
+            if (Moji.isMain())
             Moji.picasso.load(mSource)
-                    .resize(mWidth,mHeight)
+                    .resize(mWidth, mHeight)
                     .into(t);
+            else
+                Moji.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Moji.picasso.load(mSource)
+                                .resize(mWidth, mHeight)
+                                .into(t);
+                    }
+                });
+        }
     }
     public void setTextView(TextView tv){
         mViewRef = new WeakReference<>(tv);

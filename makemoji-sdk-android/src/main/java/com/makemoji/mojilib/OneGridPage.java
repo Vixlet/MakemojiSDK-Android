@@ -28,6 +28,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     boolean gifs;
     MojiInputLayout mojiInputLayout;
     View footer;
+    public static int RNDELAY = 100;
 
     private int oldH;
     int height;
@@ -70,9 +71,9 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
                         public void run() {
                             onNewDataAvailable();
                         }
-                    },30);
+                    },RNDELAY);
                 }
-            }, 30);
+            }, RNDELAY);
 
 
     }
@@ -105,6 +106,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         if (mojiInputLayout.hasRnListener()) {
             rv.invalidate();
             rv.requestLayout();
+            rv.scrollBy(1,0);
             mojiInputLayout.requestRnUpdate();
         }
 
