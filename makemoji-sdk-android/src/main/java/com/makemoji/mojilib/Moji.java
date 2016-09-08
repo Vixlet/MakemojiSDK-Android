@@ -399,7 +399,7 @@ public class Moji {
             model.link_url = url;
             MojiSpan mojiSpan = MojiSpan.fromModel(model, null, null);
             spans.add(mojiSpan);
-            modifiedText = m.replaceFirst("" + MojiEditText.replacementChar);
+            modifiedText = m.replaceFirst(" " + MojiEditText.replacementChar+ " ");
             m = plainMojiRegex.matcher(modifiedText);
         }
         int spanCount = 0;
@@ -408,7 +408,9 @@ public class Moji {
             ssb.append(modifiedText.charAt(i));
             if (MojiEditText.replacementChar.equals(c) && spanCount < spans.size()) {
                 MojiSpan mojiSpan = spans.get(spanCount);
-                ssb.setSpan(mojiSpan, i, i + 1,
+                ++i;
+                ssb.append(modifiedText.charAt(i));
+                ssb.setSpan(mojiSpan, i-2, i+1,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 spanCount++;
                 final String link = mojiSpan.getLink();
@@ -422,7 +424,7 @@ public class Moji {
                             hyperMojiListener.onClick(link);
                         }
                     };
-                    ssb.setSpan(clickableSpan, i, i + 1,
+                    ssb.setSpan(clickableSpan, i-2, i+1,
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }

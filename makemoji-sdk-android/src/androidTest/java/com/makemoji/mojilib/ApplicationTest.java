@@ -56,33 +56,27 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void plainTestAndBack() throws Exception {
         String html = "Test <img src=\"http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png\" id=\"1034\" name=\"alien\" link=\"\">";
         String plainText = Moji.htmlToPlainText(html);
-        assertEquals(plainText,"Test [alien.gG]");
+        assertEquals(plainText,"Test [alien.Gg]");
 
     }
     @Test
-    public void spannedAndBack(){
-        MojiModel model = new MojiModel("moji","http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png");
-        model.id = 12;
-        MojiSpan span1 = MojiSpan.fromModel(model,null,null);
-        model.name= "roarke";
-        model.id=523;
-        model.link_url = "www.google.com";
-        MojiSpan span2 = MojiSpan.fromModel(model,null,null);
-        SpannableStringBuilder ssb = new SpannableStringBuilder("abc\uFFFC123\uFFFC");
-        ssb.setSpan(span1,3,4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ssb.setSpan(span2,7,8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ssb.setSpan(new MojiClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-
-            }
-        }, 7, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        String html = Moji.toHtml(ssb);
-        Spanned newSpanned = Moji.parseHtml(html,null,true).spanned;
-        assertTrue(SSBEquals(ssb,newSpanned));
+    public void htmlPlainConsistency(){
+        String plain = "[Avocado.2At][Cherry.5g] cool [Bowl of Cream.da]";
+        Spanned plainSpan = Moji.plainTextToSpanned(plain);
+        String html = Moji.plainTextToHtml(plain);
+        ParsedAttributes spaceParse = Moji.parseHtml(html,null,true,true);
+        Spanned htmlSpan = spaceParse.spanned;
+        assertTrue(SSBEquals((SpannableStringBuilder)htmlSpan,plainSpan));
+        String toPlain = Moji.htmlToPlainText(html);
+        assertEquals(toPlain,plain);
+        String htmlFromSpan = Moji.toHtml(htmlSpan);
+        assertEquals(htmlFromSpan,html);
+        ParsedAttributes noSpaceParse = Moji.parseHtml(html,null,true,false);
+        String noSpaceHtml = Moji.toHtml(noSpaceParse.spanned);
+        assertEquals(htmlFromSpan,noSpaceHtml);//html consistent no matter editText padding.
 
     }
+
     @Test
     public void htmlAndBack(){
         String originalHtml = "<p dir=\"auto\" style=\"margin-bottom:16px;font-family:'.Helvetica Neue Interface';font-size:16px;\">" +
@@ -98,7 +92,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public boolean SSBEquals(SpannableStringBuilder ssb, Object o){
         if (o instanceof Spanned &&
-                toString().equals(o.toString())) {
+                ssb.toString().equals(o.toString())) {
             Spanned other = (Spanned) o;
             // Check span data
             Object[] otherSpans = other.getSpans(0, other.length(), Object.class);

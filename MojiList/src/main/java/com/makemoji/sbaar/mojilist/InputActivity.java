@@ -25,6 +25,7 @@ import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.MojiUnlock;
+import com.makemoji.mojilib.ParsedAttributes;
 import com.makemoji.mojilib.model.MojiModel;
 import com.makemoji.mojilib.wall.MojiWallActivity;
 
@@ -75,6 +76,7 @@ public class InputActivity extends AppCompatActivity{
                     mAdapter.add(message2);
                     mAdapter.add(message3);
                 }
+
                 return true;
             }
         });

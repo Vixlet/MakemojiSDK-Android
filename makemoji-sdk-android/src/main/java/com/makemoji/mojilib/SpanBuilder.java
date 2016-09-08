@@ -503,7 +503,7 @@ class SpanBuilder implements ContentHandler {
             for (int i = 0; i < length; i++) {
                 char c = ch[i + start];
 
-                if (c == ' ' || c == '\n') {
+                if (/*c == ' ' ||*/ c == '\n') {
                     char pred;
                     int len = sb.length();
 
