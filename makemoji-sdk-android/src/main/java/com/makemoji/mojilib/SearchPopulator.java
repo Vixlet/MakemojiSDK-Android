@@ -7,6 +7,7 @@ import com.makemoji.mojilib.model.MojiModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Response;
 
@@ -20,9 +21,9 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
     public void setup(PopulatorObserver observer) {
         super.setup(observer);
         mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context);
-        Moji.mojiApi.getFlashtags().enqueue(new SmallCB<List<MojiModel>>() {
+        Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String,List<MojiModel>>>() {
             @Override
-            public void done(final Response<List<MojiModel>> response, @Nullable Throwable t) {
+            public void done(final Response<Map<String,List<MojiModel>>> response, @Nullable Throwable t) {
                 if (t!=null){
                     t.printStackTrace();
                     return;
@@ -30,8 +31,10 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
-                        mojiSQLHelper.insert(response.body());
+                        List<MojiModel> accumulated = new ArrayList<MojiModel>();
+                        for (Map.Entry<String,List<MojiModel>> entry:response.body().entrySet())
+                            accumulated.addAll(entry.getValue());
+                        mojiSQLHelper.insert(accumulated);
                     }
                 }).start();
             }
