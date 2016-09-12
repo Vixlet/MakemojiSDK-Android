@@ -49,7 +49,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
                 }
                 catch (JSONException je){
                     je.printStackTrace();
-                    sp.edit().putString("trending",null);//delete cache if bad
+                    sp.edit().putString("trending",null).apply();//delete cache if bad
                 }
 
             }
@@ -73,7 +73,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
         });
     }
 
-    private void saveInBackground(final List<MojiModel> models){
+    void saveInBackground(final List<MojiModel> models){
         new Thread(new Runnable() {
             @Override
             public void run() {

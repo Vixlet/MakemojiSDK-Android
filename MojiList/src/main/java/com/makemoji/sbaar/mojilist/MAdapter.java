@@ -80,7 +80,7 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
         mSimple = simple;
         notifyDataSetChanged();
     }
-    private static class Holder{
+    static class Holder{
         public TextView messageTV;
         public String id;
         public ImageView fromIV;

@@ -97,7 +97,7 @@ public class KBCategory {
             return returnTabs(tabLayout,cachedCategories,layoutRes);
         }
     }
-    private static List<TabLayout.Tab> returnTabs(TabLayout tabLayout, List<Category> categories, @LayoutRes int layoutRes){
+    static List<TabLayout.Tab> returnTabs(TabLayout tabLayout, List<Category> categories, @LayoutRes int layoutRes){
         return addTrendingAndKB(createTabs(tabLayout,mergeCategoriesDrawable(categories,true,true),layoutRes),tabLayout,layoutRes);
 
     }

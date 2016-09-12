@@ -39,8 +39,8 @@ public class ReactionsData {
     public Content content;
     public List<Reaction> reactions;
     public CurrentUser user;
-    private static Type ReactionsListType;
-    private boolean inFlight = false;
+    static Type ReactionsListType;
+    boolean inFlight = false;
     PagerPopulator.PopulatorObserver observer;
     public String id;
     static WeakReference<ReactionsData> selectedData;

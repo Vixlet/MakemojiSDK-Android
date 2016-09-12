@@ -43,6 +43,7 @@ public class InputActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Moji.setChannel("TennisChannel");
         setContentView(R.layout.activity_input);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

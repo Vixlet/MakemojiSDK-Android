@@ -33,7 +33,7 @@ public class CandidateView extends View {
     private int mColorOther;
     private int mVerticalPadding;
     private Paint mPaint;
-    private boolean mScrolled;
+    boolean mScrolled;
     private int mTargetScrollX;
 
     private int mTotalWidth;

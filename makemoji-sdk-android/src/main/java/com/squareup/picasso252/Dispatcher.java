@@ -468,7 +468,7 @@ class Dispatcher {
   }
 
   private static class DispatcherHandler extends Handler {
-    private final Dispatcher dispatcher;
+    final Dispatcher dispatcher;
 
     public DispatcherHandler(Looper looper, Dispatcher dispatcher) {
       super(looper);

@@ -51,7 +51,7 @@ public class ReactionsAdapter extends ArrayAdapter<MojiMessage> {
         return convertView;
     }
 
-    private static class Holder{
+    static class Holder{
         public TextView message;
         public String id;
         public ReactionsLayout reactionsLayout;

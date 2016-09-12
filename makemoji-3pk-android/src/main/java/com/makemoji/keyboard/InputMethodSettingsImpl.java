@@ -45,7 +45,7 @@ import java.util.List;
     private int mSubtypeEnablerIconRes;
     private Drawable mSubtypeEnablerIcon;
     private InputMethodManager mImm;
-    private InputMethodInfo mImi;
+     InputMethodInfo mImi;
     private Context mContext;
 
     /**
@@ -169,7 +169,7 @@ import java.util.List;
         updateSubtypeEnabler();
     }
 
-    private CharSequence getSubtypeEnablerTitle(Context context) {
+    CharSequence getSubtypeEnablerTitle(Context context) {
         if (mSubtypeEnablerTitleRes != 0) {
             return context.getString(mSubtypeEnablerTitleRes);
         } else {

@@ -24,13 +24,13 @@ import android.os.Message;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 class Stats {
-  private static final int CACHE_HIT = 0;
-  private static final int CACHE_MISS = 1;
-  private static final int BITMAP_DECODE_FINISHED = 2;
-  private static final int BITMAP_TRANSFORMED_FINISHED = 3;
-  private static final int DOWNLOAD_FINISHED = 4;
+  static final int CACHE_HIT = 0;
+  static final int CACHE_MISS = 1;
+  static final int BITMAP_DECODE_FINISHED = 2;
+  static final int BITMAP_TRANSFORMED_FINISHED = 3;
+  static final int DOWNLOAD_FINISHED = 4;
 
-  private static final String STATS_THREAD_NAME = Utils.THREAD_PREFIX + "Stats";
+  static final String STATS_THREAD_NAME = Utils.THREAD_PREFIX + "Stats";
 
   final HandlerThread statsThread;
   final Cache cache;

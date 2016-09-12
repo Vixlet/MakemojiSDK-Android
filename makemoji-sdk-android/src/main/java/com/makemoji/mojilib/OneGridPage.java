@@ -30,9 +30,9 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     View footer;
     public static int RNDELAY = 100;
 
-    private int oldH;
+    int oldH;
     int height;
-    public OneGridPage(String title, MojiInputLayout mil, PagerPopulator p) {
+    public OneGridPage(String title, MojiInputLayout mil, PagerPopulator<MojiModel> p) {
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
         this.mojiInputLayout = mil;
         if ("gifs".equalsIgnoreCase(title)) {

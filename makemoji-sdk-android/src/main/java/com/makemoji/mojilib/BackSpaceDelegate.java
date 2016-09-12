@@ -7,7 +7,7 @@ import android.view.View;
  * Created by DouglasW on 4/5/2016.
  */
 public class BackSpaceDelegate {
-    private boolean isPressed;
+    boolean isPressed;
     public BackSpaceDelegate(final View backspace, final Runnable action){
         backspace.setOnClickListener(new View.OnClickListener() {
             @Override

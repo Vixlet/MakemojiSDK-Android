@@ -19,7 +19,7 @@ public abstract class SmallCB<T> implements Callback<T>{
         }
         else
         {
-            Log.e("retrofit cb error ",""+ response.message()+ response.code());
+            Log.e("retrofit cb error ",""+ response.message()+ response.code()+" "+call.request().url());
             done(null, new Throwable("moji retrofit error "+response.message()));
         }
     }

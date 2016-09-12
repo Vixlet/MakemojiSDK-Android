@@ -29,17 +29,17 @@ import retrofit2.Response;
  * Created by Scott Baar on 2/2/2016.
  */
 public class Mojilytics {
-    private static Map<Integer,Data> viewed = new ConcurrentHashMap<>();
-    private static final List<MojiModel> clickList = new ArrayList<>();
-    private static Handler handler = new Handler(Looper.getMainLooper());
-    private static boolean runnablePosted;
+    static Map<Integer,Data> viewed = new ConcurrentHashMap<>();
+    static final List<MojiModel> clickList = new ArrayList<>();
+    static Handler handler = new Handler(Looper.getMainLooper());
+    static boolean runnablePosted;
 
-    private static int MAX_SIZE = 200;
-    private static int MAX_CLICK_SIZE = 25;
-    private static int TRACK_INTERVAL = 30;
+    static int MAX_SIZE = 200;
+    static int MAX_CLICK_SIZE = 25;
+    static int TRACK_INTERVAL = 30;
 
-    private static DateFormat sdf = SimpleDateFormat.getInstance();
-    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    static DateFormat sdf = SimpleDateFormat.getInstance();
+    static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     public static void trackView(int id) {
         Data d = viewed.get(id);

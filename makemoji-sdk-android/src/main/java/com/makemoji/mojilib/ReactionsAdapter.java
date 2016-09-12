@@ -49,8 +49,8 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
                // ReactionsData.Reaction reaction = null;
               //  for (ReactionsData.Reaction r : data.getReactions())
                //     if (r.selected) reaction = r;
-                data.onClick(position);
-                notifyItemMoved(position,0);
+                data.onClick(holder.getAdapterPosition());
+                notifyItemMoved(holder.getAdapterPosition(),0);
                 notifyItemRangeChanged(0,getItemCount());
                 onItemClick.scrollNeeded();
 

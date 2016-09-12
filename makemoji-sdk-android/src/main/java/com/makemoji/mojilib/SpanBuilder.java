@@ -539,17 +539,17 @@ class SpanBuilder implements ContentHandler {
         public void skippedEntity(String name) throws SAXException {
         }
 
-        private static class Bold { }
-        private static class Italic { }
-        private static class Underline { }
-        private static class Big { }
-        private static class Small { }
-        private static class Monospace { }
-        private static class Blockquote { }
-        private static class Super { }
-        private static class Sub { }
+        static class Bold { }
+        static class Italic { }
+        static class Underline { }
+        static class Big { }
+        static class Small { }
+        static class Monospace { }
+        static class Blockquote { }
+        static class Super { }
+        static class Sub { }
 
-        private static class Font {
+        static class Font {
             public String mColor;
             public String mFace;
 
@@ -559,7 +559,7 @@ class SpanBuilder implements ContentHandler {
             }
         }
 
-        private static class Href {
+        static class Href {
             public String mHref;
 
             public Href(String href) {
@@ -567,7 +567,7 @@ class SpanBuilder implements ContentHandler {
             }
         }
 
-        private static class Header {
+        static class Header {
             private int mLevel;
 
             public Header(int level) {

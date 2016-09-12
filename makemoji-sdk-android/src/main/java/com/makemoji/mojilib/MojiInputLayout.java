@@ -798,10 +798,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     }
     public static boolean keepCharForAnalytics(char c){
         int type = Character.getType(c);
-        if (c==MojiEditText.replacementChar||
-                Character.isHighSurrogate(c)||Character.isLowSurrogate(c)||
-                type == 28 ||type==25 ||type==27 || type ==6 )return true;//symbol, math,modifier,mark nonspacing
-        return false;
+        return c == MojiEditText.replacementChar ||
+                Character.isHighSurrogate(c) || Character.isLowSurrogate(c) ||
+                type == 28 || type == 25 || type == 27 || type == 6;//symbol, math,modifier,mark nonspacing
 
     }
     public void manualSaveInputToRecentsAndBackend(){

@@ -48,7 +48,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
         holder.image.forceDimen(holder.dimen);
         holder.image.setModel(m);
-        holder.pos = position;
+        holder.pos = holder.getAdapterPosition();
     }
 
 
