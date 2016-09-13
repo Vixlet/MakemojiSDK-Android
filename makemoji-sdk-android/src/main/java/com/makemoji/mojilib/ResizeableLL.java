@@ -71,7 +71,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         //leftView.setOnTouchListener(this);
         setOnTouchListener(this);
 
-        minSize = (int)(50 *Moji.density);
+        minSize = (int)(45 *Moji.density);
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();
