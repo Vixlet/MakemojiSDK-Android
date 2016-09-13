@@ -10,6 +10,7 @@
     android:background="@drawable/mm_left_page_gradient"
     android:layout_height="match_parent" android:gravity="right">
     <FrameLayout
+        android:id="@+id/_mm_spacer_left"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_gravity="center_vertical"
@@ -51,6 +52,7 @@
         android:id="@+id/_mm_flashtag_button"
         android:src="@drawable/mm_flashtag_icon"/>
     <View
+        android:id="@+id/_mm_spacer_right"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"

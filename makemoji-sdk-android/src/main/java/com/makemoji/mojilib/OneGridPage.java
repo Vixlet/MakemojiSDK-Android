@@ -31,6 +31,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     MojiInputLayout mojiInputLayout;
     View footer;
     public static int RNDELAY = 100;
+    boolean useSpanSizes;
 
     int oldH;
     int height;
@@ -38,7 +39,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
         this.mojiInputLayout = mil;
         ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_emoji_rows);
-        COLS = mojiInputLayout.getResources().getInteger(R.integer._mm_emoji_cols);
+        useSpanSizes = mojiInputLayout.getResources().getBoolean(R.bool.mmUseSpanSizeForSdkImages);
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
             ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_gif_rows);
@@ -96,12 +97,13 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         int h = rv.getHeight();
         if (h ==0)
             h = (int) (height*.75f);
-        int size = h / DEFAULT_ROWS;
+        int size = h / ROWS;
         int vSpace = (h - (size * ROWS)) / ROWS;
-        int hSpace = (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
+        int hSpace = vSpace;// (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
         //heading.setPadding(hSpace,heading.getPaddingTop(),heading.getPaddingRight(),heading.getPaddingBottom());
 
         MojiGridAdapter adapter = new MojiGridAdapter(mojiModelList, mMojiInput, false, size);
+        adapter.setImagesSizedtoSpan(useSpanSizes);
         if (itemDecoration!=null) rv.removeItemDecoration(itemDecoration);
        // if (!gifs){
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);

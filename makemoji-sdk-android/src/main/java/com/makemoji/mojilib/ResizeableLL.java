@@ -47,6 +47,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     ImageView flashButton;
     boolean enableScroll = true;
     boolean showLeft = true;
+    View leftSpacer, rightSpacer;
     public void setEnableScroll(boolean enable){
         enableScroll = enable;
     }
@@ -56,8 +57,14 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
     }
     public static int SNAP_DURATION = 200;
+    float lastRightWeight;
     void setMaxSize(int max){
         maxSize = max - (int)(Moji.density *45);
+        int buttonWidth =(int) (45*4 * Moji.density);
+        float minusContentEachSide = (max - buttonWidth)/2f;
+        float rightWeight = (minusContentEachSide - (45*Moji.density))/minusContentEachSide;
+        if (rightWeight!=lastRightWeight)rightSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,0,rightWeight));
+        lastRightWeight = rightWeight;
     }
 
     void setRnUpdateListener(MojiInputLayout.RNUpdateListener listener){
@@ -68,10 +75,12 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         super.onFinishInflate();
         leftView = findViewById(R.id._mm_left_buttons);
         recyclerView = (RecyclerView) findViewById(R.id._mm_recylcer_view);
+        leftSpacer = findViewById(R.id._mm_spacer_left);
+        rightSpacer = findViewById(R.id._mm_spacer_right);
         //leftView.setOnTouchListener(this);
         setOnTouchListener(this);
 
-        minSize = (int)(45 *Moji.density);
+        minSize = (int)(46 *Moji.density);
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();

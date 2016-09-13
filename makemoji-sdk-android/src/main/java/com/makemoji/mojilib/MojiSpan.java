@@ -68,8 +68,8 @@ import java.lang.ref.WeakReference;
     protected String mLink = "";
     boolean shouldAnimate;
     protected Drawable mPlaceHolder;
-    static final String TAG = "MojiSpan";
-    static boolean LOG = false;
+    private static final String TAG = "MojiSpan";
+    private static boolean LOG = false;
     protected String name;
     int id = -1;
 
