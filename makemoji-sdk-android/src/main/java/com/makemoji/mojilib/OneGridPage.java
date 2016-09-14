@@ -21,28 +21,27 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     PagerPopulator<MojiModel> mPopulator;
     TextView heading;
     int count;
-    public int ROWS = DEFAULT_ROWS;
-    public int COLS = DEFAULT_COLS;
-    public static int DEFAULT_ROWS = 4;
-    public static int DEFAULT_COLS = 7;
+    public static int ROWS;
+    public static int GIFROWS;
+    public static int VIDEOROWS;
+    public static int hSpacing;
+    public static int vSpacing;
     RecyclerView rv;
     RecyclerView.ItemDecoration itemDecoration;
     boolean gifs;
     MojiInputLayout mojiInputLayout;
     View footer;
     public static int RNDELAY = 100;
-    boolean useSpanSizes;
+    public static boolean useSpanSizes;
 
     int oldH;
     int height;
     public OneGridPage(String title, MojiInputLayout mil, PagerPopulator<MojiModel> p) {
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
         this.mojiInputLayout = mil;
-        ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_emoji_rows);
-        useSpanSizes = mojiInputLayout.getResources().getBoolean(R.bool.mmUseSpanSizeForSdkImages);
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
-            ROWS = mojiInputLayout.getResources().getInteger(R.integer._mm_gif_rows);
+            ROWS = GIFROWS;
         }
         mPopulator = p;
         heading = (TextView) mView.findViewById(R.id._mm_page_heading);
@@ -91,15 +90,15 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         count = mPopulator.getTotalCount();
         List<MojiModel> mojiModelList = mPopulator.populatePage(count,0);
         if (hasVideo(mojiModelList)){
-                ROWS = rv.getResources().getInteger(R.integer._mm_video_rows);
+                ROWS = VIDEOROWS;
                 rv.setLayoutManager(new GridLayoutManager(rv.getContext(), ROWS, LinearLayoutManager.HORIZONTAL, false));
         }
         int h = rv.getHeight();
         if (h ==0)
             h = (int) (height*.75f);
         int size = h / ROWS;
-        int vSpace = (h - (size * ROWS)) / ROWS;
-        int hSpace = vSpace;// (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
+        int vSpace = vSpacing;
+        int hSpace = hSpacing;// (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
         //heading.setPadding(hSpace,heading.getPaddingTop(),heading.getPaddingRight(),heading.getPaddingBottom());
 
         MojiGridAdapter adapter = new MojiGridAdapter(mojiModelList, mMojiInput, false, size);

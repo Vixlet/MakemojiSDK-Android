@@ -113,7 +113,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
         try {
             String s = sp.getString("data", null);
             Map<String, List<MojiModel>> data =
-                    MojiModel.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
+                    Moji.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
                     }.getType());
             List<Category> cats = Category.getCategories();
             if (data != null && cats!=null) {
@@ -132,7 +132,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     t.printStackTrace();
                     return;
                 }
-                sp.edit().putString("data",MojiModel.gson.toJson(wallResponse.body())).apply();
+                sp.edit().putString("data",Moji.gson.toJson(wallResponse.body())).apply();
                 Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
                     @Override
                     public void done(Response<List<Category>> response, @Nullable Throwable t) {

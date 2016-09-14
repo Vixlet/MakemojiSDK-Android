@@ -519,8 +519,18 @@ public class Picasso {
     dispatcher.dispatchSubmit(action);
   }
 
-  Bitmap quickMemoryCacheCheck(String key) {
+  public Bitmap quickMemoryCacheCheck(String key) {
     Bitmap cached = cache.get(key);
+    if (cached != null) {
+      stats.dispatchCacheHit();
+    } else {
+      stats.dispatchCacheMiss();
+    }
+    return cached;
+  }
+  public Bitmap quickMemoryCacheCheckStartsWith(String key) {
+    LruCache lru  = (LruCache) cache;
+    Bitmap cached = lru.getStartsWith(key);
     if (cached != null) {
       stats.dispatchCacheHit();
     } else {

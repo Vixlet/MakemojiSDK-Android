@@ -82,7 +82,7 @@ public class KBCategory {
             try {
                 String s = sp.getString("data", null);
                 Map<String, List<MojiModel>> data =
-                        MojiModel.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
+                        Moji.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
                         }.getType());
                 if (data != null) {
                     for (Category c : cachedCategories)

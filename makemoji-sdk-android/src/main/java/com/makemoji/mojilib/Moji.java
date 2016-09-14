@@ -31,6 +31,10 @@ import android.widget.TextView;
 import android.app.Application;
 import android.widget.Toast;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.LruCache;
@@ -41,6 +45,7 @@ import org.ccil.cowan.tagsoup2.Parser;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +94,7 @@ public class Moji {
     public static final String ACTION_LOCKED_CATEGORY_CLICK = "com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED";
     static String userId;
     static String channel;
+    public static Gson gson;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
@@ -100,6 +106,12 @@ public class Moji {
         context = app.getApplicationContext();
         resources = context.getResources();
         density = resources.getDisplayMetrics().density;
+        OneGridPage.ROWS = resources.getInteger(R.integer._mm_emoji_rows);
+        OneGridPage.GIFROWS = resources.getInteger(R.integer._mm_gif_rows);
+        OneGridPage.VIDEOROWS = resources.getInteger(R.integer._mm_video_rows);
+        OneGridPage.useSpanSizes = resources.getBoolean(R.bool.mmUseSpanSizeForSdkImages);
+        OneGridPage.vSpacing = resources.getDimensionPixelSize(R.dimen.mm_grid_page_vert_spacing);
+        OneGridPage.hSpacing = resources.getDimensionPixelSize(R.dimen.mm_grid_page_horiz_spacing);
         MojiSpan.BASE_TEXT_PX_SCALED = MojiSpan.BASE_TEXT_PT*density;
 
         handler = new Handler(Looper.getMainLooper());
@@ -157,9 +169,31 @@ public class Moji {
         })
                // .addInterceptor(interceptor)
                 .build();
+        gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return false;
+            }
 
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                if (clazz.equals(WeakReference.class)) return true;
+                return false;
+            }
+        }).addDeserializationExclusionStrategy(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return false;
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                if (clazz.equals(WeakReference.class)) return true;
+                return false;
+            }
+        }).create();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(MojiApi.BASE_URL).client(okHttpClient).
-                addConverterFactory(GsonConverterFactory.create()).build();
+                addConverterFactory(GsonConverterFactory.create(gson)).build();
         mojiApi = retrofit.create(MojiApi.class);
     }
     //calls initialize with the default cache size, 5%

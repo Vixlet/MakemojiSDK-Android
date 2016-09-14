@@ -4,5 +4,5 @@
     <integer name="_mm_moji_input_max_lines">5</integer>
     <integer name="_mm_gif_rows">2</integer>
     <integer name="_mm_video_rows">2</integer>
-    <integer name="_mm_emoji_rows">5</integer>
+    <integer name="_mm_emoji_rows">4</integer>
 </resources>

@@ -74,9 +74,9 @@ public class ReactionsData {
     static void fromJson(ReactionsData data, JsonObject jo){
         if (ReactionsListType==null)ReactionsListType = new TypeToken<List<Reaction>>() {}.getType();
         try{
-            data.content = MojiModel.gson.fromJson(jo.getAsJsonObject("content").toString(),Content.class);
-            data.reactions = MojiModel.gson.fromJson(jo.getAsJsonArray("reactions").toString(),ReactionsListType);
-            if (jo.get("currentUser").isJsonObject())data.user = MojiModel.gson.fromJson(jo.getAsJsonObject("currentUser").toString(),CurrentUser.class);
+            data.content = Moji.gson.fromJson(jo.getAsJsonObject("content").toString(),Content.class);
+            data.reactions = Moji.gson.fromJson(jo.getAsJsonArray("reactions").toString(),ReactionsListType);
+            if (jo.get("currentUser").isJsonObject())data.user = Moji.gson.fromJson(jo.getAsJsonObject("currentUser").toString(),CurrentUser.class);
 
             if (data.user!=null){
                 for (Reaction r: data.reactions)

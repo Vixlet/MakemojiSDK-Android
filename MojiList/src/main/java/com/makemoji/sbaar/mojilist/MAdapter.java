@@ -48,7 +48,7 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
                 }
             });
 
-            if (mTextSize== -1) mTextSize = holder.messageTV.getTextSize()/getContext().getResources().getDisplayMetrics().density;
+            if (mTextSize== -1) mTextSize = holder.messageTV.getTextSize();
         }
         holder = (Holder) convertView.getTag();
         if (holder.simple!=mSimple){//simple has changed, destroy cached spanned

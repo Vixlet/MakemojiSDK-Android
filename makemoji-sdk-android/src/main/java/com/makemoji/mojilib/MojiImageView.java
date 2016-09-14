@@ -14,6 +14,9 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.makemoji.mojilib.model.MojiModel;
+import com.squareup.picasso252.Callback;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Don't use this outsid
@@ -74,7 +77,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
         canvas.drawText(s,-bounds.left + (dimen-bounds.width())/2, -bounds.top +getPaddingBottom()/2,paint);
         return image;
     }
-    public void setModel(MojiModel m){
+    public void setModel(final MojiModel m){
         if (m.equals(model))return;
         model = m;
         Moji.picasso.cancelRequest(this);
@@ -88,6 +91,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                             .placeholder(d).into(this);
                 else
                     Moji.picasso.load(m.image_url)
+                            .resize(forceDimen,forceDimen)
                             .placeholder(d).into(this);
 
             } else if (m.character!=null){

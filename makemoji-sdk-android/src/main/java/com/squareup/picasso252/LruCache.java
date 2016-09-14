@@ -67,6 +67,28 @@ public class LruCache implements Cache {
 
     return null;
   }
+  public Bitmap getStartsWith(@NonNull String key){
+    if (key == null) {
+      throw new NullPointerException("key == null");
+    }
+
+    Bitmap mapValue = null;
+    synchronized (this) {
+      for (Map.Entry<String,Bitmap> e : map.entrySet()){
+        if (e.getKey().startsWith(key)){
+          mapValue = e.getValue();
+          break;
+        }
+      }
+      if (mapValue != null) {
+        hitCount++;
+        return mapValue;
+      }
+      missCount++;
+    }
+
+    return null;
+  }
 
   @Override public void set(@NonNull String key, @NonNull Bitmap bitmap) {
     if (key == null || bitmap == null) {

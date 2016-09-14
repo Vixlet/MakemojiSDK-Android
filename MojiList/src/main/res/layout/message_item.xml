@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         tools:text="message"
         android:gravity="left"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:id="@+id/item_message_tv"
         android:layout_height="wrap_content" />
     <ImageView

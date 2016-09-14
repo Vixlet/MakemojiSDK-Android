@@ -19,6 +19,8 @@ import android.widget.TextView;
 import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.okhttp.internal.Util;
+import com.squareup.picasso252.MemoryPolicy;
+import com.squareup.picasso252.NetworkPolicy;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
@@ -77,11 +79,11 @@ import java.lang.ref.WeakReference;
     }
 
     public static MojiSpan createMojiSpan
-            (@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView){
+            (@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView,Bitmap b){
         if (source!=null && source.toLowerCase().endsWith(".gif")){
             return new GifSpan(d,source,w,h,fontSize,simple,link,refreshView);
         }
-        else return new MojiSpan(d,source,w,h,fontSize,simple,link,refreshView);
+        else return new MojiSpan(d,source,w,h,fontSize,simple,link,refreshView,b);
     }
 
     /**
@@ -94,47 +96,57 @@ import java.lang.ref.WeakReference;
      * @param simple if true, scale based on fontSize, otherwise refreshView's size
      * @param link URL to callback when clicked.
      * @param refreshView view to size against and invalidate after image load.
+     * @param b bitmap to use instead of picasso load
      */
-    public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
+    public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView,Bitmap b) {
         //scale based on font size
-        if (simple){ //scale based on current text size
-          if (refreshView!=null)  mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
+        if (simple) { //scale based on current text size
+            if (refreshView != null) mFontRatio = refreshView.getTextSize() / BASE_TEXT_PX_SCALED;
             else mFontRatio = 1;
-        }
-        else{//scale based on font size to be set
-            mFontRatio = (fontSize*Moji.density)/BASE_TEXT_PX_SCALED;
+        } else {//scale based on font size to be set
+            mFontRatio = (fontSize * Moji.density) / BASE_TEXT_PX_SCALED;
         }
 
-        mWidth = (int) (w * Moji.density *BASE_SIZE_MULT * mFontRatio);
+        mWidth = (int) (w * Moji.density * BASE_SIZE_MULT * mFontRatio);
         mHeight = (int) (h * Moji.density * BASE_SIZE_MULT * mFontRatio);
 
         mDrawable = d;
         mPlaceHolder = d;
         mSource = source;
-        if (link!=null)mLink = link;
-        shouldAnimate = (link!=null && !link.isEmpty());
-        if (shouldAnimate){
+        if (link != null) mLink = link;
+        shouldAnimate = (link != null && !link.isEmpty());
+        if (shouldAnimate) {
             currentAnimationScale = Spanimator.getValue(Spanimator.HYPER_PULSE);
         }
 
         mViewRef = new WeakReference<>(refreshView);
-        if (LOG) Log.d(TAG,"starting load " + name + " " +System.currentTimeMillis());
+        if (LOG) Log.d(TAG, "starting load " + name + " " + System.currentTimeMillis());
         final int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
-if (mSource!=null && !mSource.isEmpty()) {
-    if (Moji.isMain())
-    Moji.picasso.load(mSource)
-            .resize(size, size)
-            .into(t);
-    else
-        Moji.handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Moji.picasso.load(mSource)
-                        .resize(size, size)
-                        .into(t);
+        if (b != null && b.getWidth() >= size) {
+            t.onBitmapLoaded(b, null);
+            return;
+        }
+        if (mSource != null && !mSource.isEmpty()) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+
+                    Bitmap cache = Moji.picasso.quickMemoryCacheCheckStartsWith(mSource);
+                    if (cache != null && cache.getWidth() >= size) {
+                        t.onBitmapLoaded(cache, null);
+                        return;
+                    }
+                    Moji.picasso.load(mSource)
+                            .resize(size, size)
+                            .into(t);
+                }
+            };
+            if (Moji.isMain()) {
+                runnable.run();
+            } else {
+                Moji.handler.post(runnable);
             }
-        });
-}
+        }
     }
 
     public static int getDefaultSpanDimension(float textSize){
@@ -144,7 +156,7 @@ if (mSource!=null && !mSource.isEmpty()) {
     public static MojiSpan fromModel(MojiModel model, @Nullable TextView tv, @Nullable BitmapDrawable bitmapDrawable){
         Drawable d = bitmapDrawable!=null? bitmapDrawable: Moji.resources.getDrawable(R.drawable.mm_placeholder);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        MojiSpan span = createMojiSpan(d,extractImageUrl(model),20,20,14,true,model.link_url,tv);
+        MojiSpan span = createMojiSpan(d,extractImageUrl(model),20,20,14,true,model.link_url,tv,model.bitmapRef!=null? model.bitmapRef.get():null);
         if (GifSpan.USE_SMALL_GIFS && model.fourtyX40Url!=null && !model.fourtyX40Url.isEmpty() && span instanceof GifSpan)
             ((GifSpan)span).isSmallGif=true;
         span.name = model.name;

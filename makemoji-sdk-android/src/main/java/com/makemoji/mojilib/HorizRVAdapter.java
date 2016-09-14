@@ -21,8 +21,10 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     MojiInputLayout mil;
     List<MojiModel> list = new ArrayList<>();
     boolean showNames = false;
+    boolean useSpanSizes;
     public HorizRVAdapter(MojiInputLayout mojiInputLayout){
         mil = mojiInputLayout;
+        useSpanSizes = OneGridPage.useSpanSizes;
     }
     @Override
     public RVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -82,6 +84,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             name.setTextColor(mil.getHeaderTextColor());
             image = (MojiImageView) v.findViewById(R.id.pic);
             int h = (int)(45.0*Moji.density *.85);
+            image.sizeImagesToSpanSize(useSpanSizes);
             dimen =h;
 
         }

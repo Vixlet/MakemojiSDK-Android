@@ -2,8 +2,11 @@ package com.makemoji.mojilib.model;
 
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.annotation.WorkerThread;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
@@ -12,6 +15,8 @@ import com.makemoji.mojilib.Moji;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +25,6 @@ import java.util.List;
  * Created by Scott Baar on 1/9/2016.
  */
 public class MojiModel {
-    public static Gson gson = new Gson();//new GsonBuilder().enableComplexMapKeySerialization().create();
     public int id;
  //   public String user_id;
  //   public String origin_id;
@@ -40,6 +44,8 @@ public class MojiModel {
     public String character;
     public int video;
     public String video_url;
+
+    public WeakReference<Bitmap> bitmapRef;
 
 
     @SerializedName("native")
@@ -68,7 +74,7 @@ public class MojiModel {
     public static JSONObject toJson(MojiModel m){
         if ( m.image_url==null||m.name==null)return null;//invalid object
         try{
-            return new JSONObject(gson.toJson(m));
+            return new JSONObject(Moji.gson.toJson(m));
         }
         catch (Exception e){
             e.printStackTrace();
@@ -77,7 +83,7 @@ public class MojiModel {
 
     }
     public static MojiModel fromJson(JSONObject jo){
-       return gson.fromJson(jo.toString(),MojiModel.class);
+       return Moji.gson.fromJson(jo.toString(),MojiModel.class);
     }
     public static JSONArray toJsonArray(Collection<MojiModel> models){
         JSONArray ja = new JSONArray();
