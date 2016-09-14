@@ -61,7 +61,6 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         if (link!=null)mLink = link;
 
         mViewRef = new WeakReference<>(refreshView);
-        int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
         options = new BitmapFactory.Options();
         load();
 

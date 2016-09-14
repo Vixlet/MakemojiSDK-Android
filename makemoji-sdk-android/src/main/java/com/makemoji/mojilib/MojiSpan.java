@@ -121,7 +121,7 @@ import java.lang.ref.WeakReference;
 
         mViewRef = new WeakReference<>(refreshView);
         if (LOG) Log.d(TAG, "starting load " + name + " " + System.currentTimeMillis());
-        final int size = getDefaultSpanDimension(BASE_TEXT_PX_SCALED);
+        final int size = mWidth;
         if (b != null && b.getWidth() >= size) {
             t.onBitmapLoaded(b, null);
             return;
