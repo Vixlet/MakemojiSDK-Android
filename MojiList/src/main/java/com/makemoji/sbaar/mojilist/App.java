@@ -22,13 +22,14 @@ public class App extends Application {
     public void onCreate(){
         super.onCreate();
         context=this;
-        Moji.initialize(this,"8e707167ff772613a58af6ec86022575980fd895");
+        Moji.initialize(this,"bfd3eea60abad87d378f87939ef3a116e8b23a35");
         //LeakCanary.install(this);
         //Moji.setChannel("TennisChannel");
 
 //bow moji 6b503d6ba664bdb2565a6421f0a8fda1791b3e49
         //Yt bfd3eea60abad87d378f87939ef3a116e8b23a35
         //sdk 940ced93abf2ca4175a4a865b38f1009d8848a58
+        //tennis 8e707167ff772613a58af6ec86022575980fd895
         //a custom listener that will display a view (ie to prompt a purchase), when a locked category is clicked
         MMKB.setLockedListener(new MMKB.ILockedCategorySelected() {
             @Override

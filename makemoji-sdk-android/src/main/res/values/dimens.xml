@@ -3,7 +3,7 @@
     <dimen name="mm_cat_width">90dp</dimen>
     <dimen name="mm_reaction_cell_height">30dp</dimen>
     <dimen name="mm_video_moji_item_text_size">12sp</dimen>
-    <dimen name="mm_grid_page_horiz_spacing">3dp</dimen>
+    <dimen name="mm_grid_page_horiz_spacing">4dp</dimen>
     <dimen name="mm_grid_page_vert_spacing">0dp</dimen>
     <dimen name="mm_edit_text_size">16sp</dimen>
 </resources>
