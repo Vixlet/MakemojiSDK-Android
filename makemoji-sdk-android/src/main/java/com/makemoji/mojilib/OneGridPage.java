@@ -21,7 +21,8 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     PagerPopulator<MojiModel> mPopulator;
     TextView heading;
     int count;
-    public static int ROWS;
+    public int ROWS;
+    public static int DEFAULT_ROWS;
     public static int GIFROWS;
     public static int VIDEOROWS;
     public static int hSpacing;
@@ -39,6 +40,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     public OneGridPage(String title, MojiInputLayout mil, PagerPopulator<MojiModel> p) {
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
         this.mojiInputLayout = mil;
+        ROWS = DEFAULT_ROWS;
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
             ROWS = GIFROWS;

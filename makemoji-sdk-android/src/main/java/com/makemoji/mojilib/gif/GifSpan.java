@@ -47,7 +47,7 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     public GifSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView) {
         if (simple){ //scale based on current text size
             if (refreshView!=null)  mFontRatio = refreshView.getTextSize()/BASE_TEXT_PX_SCALED;
-            else mFontRatio = BASE_TEXT_PX_SCALED;
+            else mFontRatio = 1;
         }
         else{//scale based on font size to be set
             mFontRatio = (fontSize*Moji.density)/BASE_TEXT_PX_SCALED;

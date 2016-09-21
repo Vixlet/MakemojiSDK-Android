@@ -106,7 +106,7 @@ public class Moji {
         context = app.getApplicationContext();
         resources = context.getResources();
         density = resources.getDisplayMetrics().density;
-        OneGridPage.ROWS = resources.getInteger(R.integer._mm_emoji_rows);
+        OneGridPage.DEFAULT_ROWS = resources.getInteger(R.integer._mm_emoji_rows);
         OneGridPage.GIFROWS = resources.getInteger(R.integer._mm_gif_rows);
         OneGridPage.VIDEOROWS = resources.getInteger(R.integer._mm_video_rows);
         OneGridPage.useSpanSizes = resources.getBoolean(R.bool.mmUseSpanSizeForSdkImages);
