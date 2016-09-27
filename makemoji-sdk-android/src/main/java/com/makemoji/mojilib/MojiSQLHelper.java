@@ -20,7 +20,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
 
 
     public static MojiSQLHelper mInstance;
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "makemoji.db";
 
     private static final String FTS_VIRTUAL_TABLE = "FTS";
@@ -32,6 +32,10 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public static final  String COL_LINK_URL = "LINK_URL";
     public static final  String COL_FLASHTAG = "FLASHTAG";
     public static final  String COL_CHARACTER = "CHARACTER";
+    public static final  String COL_GIF = "GIF";
+    public static final  String COL_GIF_40 = "GIF_40";
+    public static final  String COL_VIDEO = "VIDEO";
+    public static final  String COL_VIDEO_URL = "VIDEO_URL";
 
     private static final String DATABASE_CREATE = "create table "
             + TABLE_MM + "(" + COL_ID + " integer primary key AUTOINCREMENT, "
@@ -40,7 +44,11 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             + COL_IMG_URL+ " TEXT, "
             + COL_LINK_URL + " TEXT, "
             + COL_FLASHTAG + " TEXT, "
-            + COL_CHARACTER + " TEXT "
+            + COL_CHARACTER + " TEXT, "
+            + COL_GIF + " INT, "
+            + COL_GIF_40 + " TEXT, "
+            + COL_VIDEO + " INT, "
+            + COL_VIDEO_URL + " TEXT "
             +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
             + ");";
 
@@ -60,7 +68,8 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_MM);
+        onCreate(db);
     }
     private ContentValues addValues(MojiModel model){
         ContentValues values = new ContentValues();
@@ -70,6 +79,10 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
         values.put(COL_LINK_URL, model.link_url);
         values.put(COL_FLASHTAG, model.flashtag);
         values.put(COL_CHARACTER, model.character);
+        values.put(COL_GIF, model.gif);
+        values.put(COL_GIF_40, model.fourtyX40Url);
+        values.put(COL_VIDEO, model.video);
+        values.put(COL_VIDEO_URL, model.video_url);
         return values;
     }
     public synchronized void insert(List<MojiModel> models){
@@ -99,6 +112,10 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             mm.link_url = c.getString(4);
             mm.flashtag = c.getString(5);
             mm.character = c.getString(6);
+            mm.gif = c.getInt(7);
+            mm.fourtyX40Url = c.getString(8);
+            mm.video = c.getInt(9);
+            mm.video_url = c.getString(10);
         }
         catch (Exception e){
             mm = null;
@@ -123,6 +140,10 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
                 mm.link_url = c.getString(4);
                 mm.flashtag = c.getString(5);
                 mm.character = c.getString(6);
+                mm.gif = c.getInt(7);
+                mm.fourtyX40Url = c.getString(8);
+                mm.video = c.getInt(9);
+                mm.video_url = c.getString(10);
                 models.add(mm);
             }
 

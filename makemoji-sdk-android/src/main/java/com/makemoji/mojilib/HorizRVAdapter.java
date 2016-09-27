@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.makemoji.mojilib.gif.GifImageView;
 import com.makemoji.mojilib.model.MojiModel;
 
 import java.util.ArrayList;
@@ -26,10 +27,21 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         mil = mojiInputLayout;
         useSpanSizes = OneGridPage.useSpanSizes;
     }
+    @Override public int getItemViewType(int position){
+        if (list.get(position).gif==1)return MojiGridAdapter.ITEM_GIF;
+        return 0;
+    }
     @Override
     public RVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.mm_horiz_moji_item, parent, false);
+        View v;
+        if (viewType==MojiGridAdapter.ITEM_GIF){
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.mm_horiz_gif_item,parent,false);
+        }
+        else {
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.mm_horiz_moji_item, parent, false);
+        }
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,8 +60,13 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         Mojilytics.trackView(m.id);
         holder.name.setText(m.name);
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
-        holder.image.forceDimen(holder.dimen);
-        holder.image.setModel(m);
+        if (holder.image!=null){
+            holder.image.forceDimen(holder.dimen);
+            holder.image.setModel(m);
+        }
+        else{
+            holder.gifImageView.getFromUrl(m.image_url);
+        }
         holder.pos = holder.getAdapterPosition();
     }
 
@@ -73,6 +90,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     {
         TextView name;
         MojiImageView image;
+        GifImageView gifImageView;
         View v;
         int dimen;
         int pos;
@@ -82,10 +100,15 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             v.setTag(this);
             name = (TextView) v.findViewById(R.id.tv);
             name.setTextColor(mil.getHeaderTextColor());
-            image = (MojiImageView) v.findViewById(R.id.pic);
-            int h = (int)(45.0*Moji.density *.85);
-            image.sizeImagesToSpanSize(useSpanSizes);
-            dimen =h;
+            View view = v.findViewById(R.id.pic);
+            if (view instanceof GifImageView){
+                gifImageView = (GifImageView) view;
+            }else {
+                image = (MojiImageView) v.findViewById(R.id.pic);
+                int h = (int) (45.0 * Moji.density * .85);
+                image.sizeImagesToSpanSize(useSpanSizes);
+                dimen =h;
+            }
 
         }
     }
