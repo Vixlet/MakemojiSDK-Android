@@ -84,7 +84,7 @@ public class Spanimator {
                 Set<Spanimatable> set = subscribers.keySet();
                 //Log.d("Spanimator","spanimator subscruber size "+ set.size());
                 synchronized (subscribers) {
-                    if (set.size() == 0 && animation.getAnimatedFraction() != 0f)
+                    if (set.size() == 0 && animation.getAnimatedFraction() != 1f)
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {

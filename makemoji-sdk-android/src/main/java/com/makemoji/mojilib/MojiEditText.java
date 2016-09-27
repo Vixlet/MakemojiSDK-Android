@@ -22,6 +22,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -86,8 +89,17 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
         setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_FLAG_NO_FULLSCREEN);
         addTextChangedListener(new TextWatcher() {
             CharSequence before;
+            List<MojiSpan> beforeSpans = new ArrayList<>();
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {before =s;}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {before =s;
+            //Moji.unsubSpanimatable(before);
+                beforeSpans.clear();
+                if (before instanceof Spanned){
+                    MojiSpan spans[] = ((Spanned) before).getSpans(0,before.length(),MojiSpan.class);
+                    Collections.addAll(beforeSpans, spans);
+
+                }
+            }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
@@ -109,13 +121,17 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                         int spanLength = end-start;
                         if (spanLength==3) {//valid emoji, add it
                             builder.append(ssb.subSequence(start, end));
+                            beforeSpans.remove(span);
                         }
                             i+=spanLength;//invalid emoji, skip
                         }
                     }
+                for (MojiSpan span : beforeSpans)
+                    Spanimator.unsubscribe(Spanimator.HYPER_PULSE,span);
+
                 if (ssb.length()>builder.length()){//mojis have been deleted
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
-                    Moji.unsubSpanimatable(before);
+                   // Moji.unsubSpanimatable(before);
                     setText(builder);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));
                 }

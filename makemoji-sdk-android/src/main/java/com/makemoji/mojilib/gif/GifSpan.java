@@ -83,7 +83,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
+               if (response.isSuccessful()) producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
+                response.body().close();
                 if (producer!=null){
                     if (!USE_SMALL_GIFS && !isSmallGif) {
                         mWidth = Math.max(mWidth,producer.getWidth());

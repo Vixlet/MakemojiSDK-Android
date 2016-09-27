@@ -124,7 +124,7 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
             @Override
             public void onResponse(Call call2, Response response) throws IOException {
-                Log.d(TAG,"gif time "+loadingUrl+ " " + (response.receivedResponseAtMillis()-response.sentRequestAtMillis()));
+               // Log.d(TAG,"gif time "+loadingUrl+ " " + (response.receivedResponseAtMillis()-response.sentRequestAtMillis()));
                 if (!loadingUrl.equals(url) || isCleared){
                     response.body().close();
                     return;//no longer loading the url we were
