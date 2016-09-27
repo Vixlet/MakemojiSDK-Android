@@ -85,8 +85,9 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
         //If any mojispans span less than three characters, remove them because a backspace has happened.
         setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_FLAG_NO_FULLSCREEN);
         addTextChangedListener(new TextWatcher() {
+            CharSequence before;
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {before =s;}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
@@ -114,6 +115,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                     }
                 if (ssb.length()>builder.length()){//mojis have been deleted
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
+                    Moji.unsubSpanimatable(before);
                     setText(builder);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));
                 }

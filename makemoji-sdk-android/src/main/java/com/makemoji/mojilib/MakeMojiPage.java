@@ -7,7 +7,10 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.makemoji.mojilib.gif.GifImageView;
 
 /**
  * A page selected with one of the three control buttons on the left.
@@ -49,6 +52,15 @@ public class MakeMojiPage implements PagerPopulator.PopulatorObserver{
     }
     public void detatch(){
         mMojiInput.getPageFrame().removeView(mView);
+        if (mView instanceof LinearLayout) {
+            LinearLayout layout = (LinearLayout) mView;
+            for (int i = 0; i < layout.getChildCount(); i++) {
+                View v = layout.getChildAt(i);
+                if (v instanceof GifImageView) {
+                    ((GifImageView) v).clear();
+                }
+            }
+        }
     }
 
     /**

@@ -527,6 +527,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         while (!pages.empty()){
             MakeMojiPage page = pages.pop();
             page.hide();
+            page.detatch();
         }
         backButton.setVisibility(View.GONE);
         getPageFrame().setVisibility(View.GONE);

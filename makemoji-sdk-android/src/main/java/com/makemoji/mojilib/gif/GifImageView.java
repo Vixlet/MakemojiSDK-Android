@@ -38,11 +38,10 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     public GifImageView(final Context context) {
         super(context);
     }
-
     GifProducer producer;
     public void setBytes(String url,final byte[] bytes) {
         clear();
-        Spanimator.subscribe(Spanimator.HYPER_PULSE,this);
+        //Spanimator.subscribe(Spanimator.HYPER_PULSE,this);
         producer = GifProducer.getProducerAndSub(this,bytes,url);
 
     }
@@ -85,8 +84,9 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
         if (visibility==View.GONE) clear();
     }
 
+    boolean isCleared=false;
     public synchronized void clear(){
-       // Log.d(TAG,"gif clear "+toString());
+        isCleared = true;
         if (producer!=null){
             producer.unsubscribe(this);
             producer=null;
@@ -109,9 +109,9 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
     Call call;
     public void load(){
-
-        //Log.d(TAG,"gif load "+toString());
+        isCleared = false;
         if (url==null) return;
+        final String loadingUrl = url;
         producer = GifProducer.getProducerAndSub(this,null,url);
         if (producer!=null)return;
         call =Moji.okHttpClient.newCall(new Request.Builder().url(url).build());
@@ -124,8 +124,14 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
 
             @Override
             public void onResponse(Call call2, Response response) throws IOException {
+                Log.d(TAG,"gif time "+loadingUrl+ " " + (response.receivedResponseAtMillis()-response.sentRequestAtMillis()));
+                if (!loadingUrl.equals(url) || isCleared){
+                    response.body().close();
+                    return;//no longer loading the url we were
+                }
                 call = null;
-                setBytes(url,response.body().bytes());
+                if (response.isSuccessful())setBytes(url,response.body().bytes());
+                response.body().close();
             }
         });
     }
@@ -170,12 +176,5 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
        if (useKbLifecycle) clear();
     }
 
-    @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
-        super.onVisibilityChanged(changedView, visibility);
-        if (visibility==GONE)
-            clear();
-        if (visibility==VISIBLE)
-            load();
-    }
+
 }

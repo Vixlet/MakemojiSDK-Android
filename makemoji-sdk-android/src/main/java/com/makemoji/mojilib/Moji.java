@@ -257,8 +257,9 @@ public class Moji {
      * are going to be calling TextView.setText manually.
      * @param spanned All moji spans in spanned will be unsubscribed
      */
-    public static void unsubSpanimatable(Spanned spanned){
-        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
+    public static void unsubSpanimatable(CharSequence spanned){
+        if (spanned == null || !(spanned instanceof Spanned))return;
+        MojiSpan[] mojiSpans = ((Spanned)spanned).getSpans(0, spanned.length(), MojiSpan.class);
         for (MojiSpan mojiSpan : mojiSpans) {
                 Spanimator.unsubscribe(Spanimator.HYPER_PULSE, mojiSpan);
         }
@@ -268,8 +269,9 @@ public class Moji {
      * are going to be calling TextView.setText  manually.
      * @param spanned All moji spans in spanned will be subscribed to @Spanimator
      */
-    public static void subSpanimatable(Spanned spanned, TextView tv){
-        MojiSpan[] mojiSpans = spanned.getSpans(0, spanned.length(), MojiSpan.class);
+    public static void subSpanimatable(CharSequence spanned, TextView tv){
+        if (spanned == null || !(spanned instanceof Spanned))return;
+        MojiSpan[] mojiSpans = ((Spanned) spanned).getSpans(0, spanned.length(), MojiSpan.class);
         for (MojiSpan mojiSpan : mojiSpans) {
                 Spanimator.subscribe(Spanimator.HYPER_PULSE, mojiSpan);
                 mojiSpan.setTextView(tv);
