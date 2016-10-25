@@ -768,9 +768,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             public void run() {
                 MojiSpan [] spans = ssb.getSpans(0,ssb.length(),MojiSpan.class);
                 for (int i = 0; i< spans.length; i++){
-                    MojiModel model = new MojiModel(spans[i].name,spans[i].getSource());
-                    model.id = spans[i].id;
-                    model.link_url = spans[i].getLink();
+                    MojiModel model = spans[i].model;
                     RecentPopulator.addRecent(model);
                 }
                 List<Integer> removals = new ArrayList<>();

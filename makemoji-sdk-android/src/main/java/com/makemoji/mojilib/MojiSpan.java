@@ -73,6 +73,7 @@ import java.lang.ref.WeakReference;
     private static final String TAG = "MojiSpan";
     private static boolean LOG = false;
     protected String name;
+    public MojiModel model;
     int id = -1;
 
     public MojiSpan() {
@@ -161,6 +162,7 @@ import java.lang.ref.WeakReference;
             ((GifSpan)span).isSmallGif=true;
         span.name = model.name;
         span.id = model.id;
+        span.model = model;
         return span;
     }
     public static String extractImageUrl(MojiModel model){
