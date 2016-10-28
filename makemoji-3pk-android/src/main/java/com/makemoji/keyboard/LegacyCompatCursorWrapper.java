@@ -16,6 +16,8 @@ package com.makemoji.keyboard;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
+import android.net.Uri;
+
 import java.util.Arrays;
 import static android.provider.MediaStore.MediaColumns.DATA;
 import static android.provider.MediaStore.MediaColumns.MIME_TYPE;
@@ -39,7 +41,7 @@ public class LegacyCompatCursorWrapper extends CursorWrapper {
      * @param cursor the Cursor to be wrapped
      */
     public LegacyCompatCursorWrapper(Cursor cursor) {
-        this(cursor, null);
+        this(cursor, null,null);
     }
 
     /**
@@ -50,8 +52,10 @@ public class LegacyCompatCursorWrapper extends CursorWrapper {
      *                 by the Uri that generated this Cursor, should
      *                 we need it
      */
-    public LegacyCompatCursorWrapper(Cursor cursor, String mimeType) {
+    Uri uri;
+    public LegacyCompatCursorWrapper(Cursor cursor, String mimeType,Uri uri) {
         super(cursor);
+        this.uri = uri;
 
         if (cursor.getColumnIndex(DATA)>=0) {
             fakeDataColumn=-1;
@@ -154,7 +158,7 @@ public class LegacyCompatCursorWrapper extends CursorWrapper {
     @Override
     public String getString(int columnIndex) {
         if (!cursorHasDataColumn() && columnIndex==fakeDataColumn) {
-            return(null); // yes, we have no _data, we have no _data today
+            return(uri.toString()); // yes, we have no _data, we have no _data today
         }
 
         if (!cursorHasMimeTypeColumn() && columnIndex==fakeMimeTypeColumn) {
