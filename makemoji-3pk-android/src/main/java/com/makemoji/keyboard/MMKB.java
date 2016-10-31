@@ -67,8 +67,12 @@ import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.Target;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -903,10 +907,9 @@ public class MMKB extends InputMethodService
             pageFrame.setVisibility(View.VISIBLE);
         }
 
-        if ("trending".equals(tab.getContentDescription()))
-            populator = new TrendingPopulator();
-        else if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-
+        //if ("trending".equals(tab.getContentDescription()))
+        //    populator = new TrendingPopulator();
+         if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
             lockedListener.categorySelected(tab.getContentDescription().toString(),inputView);
             tabLayout.getTabAt(currentTab).select();//go back to last tab
             return;
@@ -1005,9 +1008,37 @@ public class MMKB extends InputMethodService
         isDownloading = false;
         spb.progressiveStop();
     }
+    public void copy(InputStream in, File dst) throws IOException {
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
     public void getOther(final MojiModel model){
         if (model.isVideo())onDownloadStart();
         final String url = (model.isVideo()?model.video_url:model.image_url);
+        if (!Moji.enableUpdates){
+            File path = new File(getCacheDir(),"images");
+            path.mkdir();
+            String extension = ".png";
+            if (url.lastIndexOf('.')!=-1) extension = url.substring(url.lastIndexOf('.')-1,url.length());
+            final File cacheFile = new File(path,""+model.name+extension);
+            try{
+                copy(getAssets().open("makemoji/sdkimages/"+url),cacheFile);
+                share(model,cacheFile);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            onDownloadFinish();
+            return;
+        }
         Moji.okHttpClient.newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -1117,7 +1148,25 @@ public class MMKB extends InputMethodService
         t = getTarget(model);
         if (model.image_url!=null && model.image_url.toLowerCase().endsWith(".gif")|| model.isVideo())
             getOther(model);
-        else if (model.image_url!=null && !model.image_url.isEmpty())Moji.picasso.load(model.image_url).into(t);
+        else if (model.image_url!=null && !model.image_url.isEmpty()){
+            if (!Moji.enableUpdates){
+                if (!Moji.enableUpdates){
+                    File path = new File(getCacheDir(),"images");
+                    path.mkdir();
+                    String extension = ".png";
+                    final File cacheFile = new File(path,""+model.name+extension);
+                    try{
+                        copy(getAssets().open("makemoji/sdkimages/"+model.image_url),cacheFile);
+                        share(model,cacheFile);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
+            Moji.picasso.load(model.image_url).into(t);
+        }
     }
 
 

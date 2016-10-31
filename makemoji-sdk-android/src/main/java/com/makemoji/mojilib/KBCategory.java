@@ -45,30 +45,31 @@ public class KBCategory {
     public static List<TabLayout.Tab> getTabs(final TabLayout tabLayout, final KBTAbListener kbtAbListener, @LayoutRes final int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         List<Category> cachedCategories = Category.getCategories();
-        Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
-            @Override
-            public void done(final Response<Map<String, List<MojiModel>>> wallData, @Nullable Throwable t) {
-                if (t!=null){
-                    t.printStackTrace();
-                    return;
-                }
-                Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
-                    @Override
-                    public void done(final Response<List<Category>> categories, @Nullable Throwable t) {
-                        if (t!=null){
-                            t.printStackTrace();
-                            return;
-                        }
-                        Category.saveCategories(categories.body());
-                        for (Category c : categories.body())
-                            if (wallData.body().containsKey(c.name))
-                                c.models = wallData.body().get(c.name);
-                        kbtAbListener.onNewTabs(returnTabs(tabLayout,categories.body(),layoutRes));
-
+        if (Moji.enableUpdates)
+            Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
+                @Override
+                public void done(final Response<Map<String, List<MojiModel>>> wallData, @Nullable Throwable t) {
+                    if (t!=null){
+                        t.printStackTrace();
+                        return;
                     }
-                });
-            }
-        });
+                    Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
+                        @Override
+                        public void done(final Response<List<Category>> categories, @Nullable Throwable t) {
+                            if (t!=null){
+                                t.printStackTrace();
+                                return;
+                            }
+                            Category.saveCategories(categories.body());
+                            for (Category c : categories.body())
+                                if (wallData.body().containsKey(c.name))
+                                    c.models = wallData.body().get(c.name);
+                            kbtAbListener.onNewTabs(returnTabs(tabLayout,categories.body(),layoutRes));
+
+                        }
+                    });
+                }
+            });
 
         if (cachedCategories.isEmpty()) {
             for (int i = 0; i < defaultCategories.length; i++) {
@@ -89,6 +90,10 @@ public class KBCategory {
                         if (data.containsKey(c.name))
                             c.models = data.get(c.name);
                 }
+                Category trending = new Category("trending",null);
+                if (data.containsKey("Trending"))trending.models = data.get("Trending");
+                trending.drawableRes = R.drawable.mm_trending;
+                cachedCategories.add(0,trending);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -126,7 +131,7 @@ public class KBCategory {
                 tab.getCustomView().setSelected(false);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
                 tab.getCustomView().setTag(R.id._makemoji_category_tag_id,c);
-               if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(c.image_url).into(iv);
+               if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(Moji.uriImage(c.image_url)).into(iv);
                 tabs.add(tab);
 
             }
@@ -160,15 +165,11 @@ public class KBCategory {
     }
     @SuppressWarnings("ConstantConditions")
     private static List<TabLayout.Tab> addTrendingAndKB(List<TabLayout.Tab> tabs, TabLayout tabLayout, @LayoutRes int layoutRes){
-        tabs.add(0,tabLayout.newTab().setCustomView(layoutRes).
-                setContentDescription(defaultCategories[0]).setIcon(icons[0]));
+
         tabs.add(tabs.size(),tabLayout.newTab().setCustomView(layoutRes).
                 setContentDescription(defaultCategories[defaultCategories.length-1]).setIcon(icons[defaultCategories.length-1]));
 
-        View v = tabs.get(0).getCustomView().findViewWithTag("iv");
-        if ((v!=null) && v instanceof ImageView)
-            ((ImageView) v).setColorFilter(tabLayout.getContext().getResources().getColor(R.color.mmKBIconColor));
-         v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
+         View v = tabs.get(tabs.size()-1).getCustomView().findViewWithTag("iv");
         if ((v!=null) && v instanceof ImageView)
             ((ImageView) v).setColorFilter(tabLayout.getContext().getResources().getColor(R.color.mmKBIconColor));
 

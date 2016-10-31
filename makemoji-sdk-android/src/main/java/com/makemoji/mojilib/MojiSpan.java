@@ -137,7 +137,7 @@ import java.lang.ref.WeakReference;
                         t.onBitmapLoaded(cache, null);
                         return;
                     }
-                    Moji.picasso.load(mSource)
+                    Moji.picasso.load(Moji.uriImage(mSource))
                             .resize(size, size)
                             .into(t);
                 }
@@ -340,14 +340,14 @@ import java.lang.ref.WeakReference;
         if (mDrawable==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
         {
             if (Moji.isMain())
-            Moji.picasso.load(mSource)
+            Moji.picasso.load(Moji.uriImage(mSource))
                     .resize(mWidth, mHeight)
                     .into(t);
             else
                 Moji.handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Moji.picasso.load(mSource)
+                        Moji.picasso.load(Moji.uriImage(mSource))
                                 .resize(mWidth, mHeight)
                                 .into(t);
                     }

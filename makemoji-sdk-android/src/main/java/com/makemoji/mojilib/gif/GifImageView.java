@@ -17,6 +17,7 @@ package com.makemoji.mojilib.gif;
         import com.makemoji.mojilib.Spanimator;
 
         import java.io.IOException;
+        import java.io.InputStream;
 
         import okhttp3.Call;
         import okhttp3.Callback;
@@ -114,6 +115,19 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
         final String loadingUrl = url;
         producer = GifProducer.getProducerAndSub(this,null,url);
         if (producer!=null)return;
+        if (!Moji.enableUpdates){
+            try {
+                InputStream is = Moji.context.getAssets().open("makemoji/sdkimages/" + url);
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                is.close();
+                setBytes(url,buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         call =Moji.okHttpClient.newCall(new Request.Builder().url(url).build());
         call.enqueue(new Callback() {
             @Override

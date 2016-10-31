@@ -17,6 +17,7 @@ import com.makemoji.mojilib.R;
 import com.makemoji.mojilib.Spanimator;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 import okhttp3.Call;
@@ -66,33 +67,58 @@ public class GifSpan extends MojiSpan implements GifConsumer {
 
 
     }
-    private synchronized void load(){
-        producer = GifProducer.getProducerAndSub(this,null,mSource);
-        if (producer!=null){
+    private synchronized void load() {
+        producer = GifProducer.getProducerAndSub(this, null, mSource);
+        if (producer != null) {
             if (!USE_SMALL_GIFS && !isSmallGif) {
-                mWidth = Math.max(mWidth,producer.getWidth());
-                mHeight = Math.max(mHeight,producer.getHeight());
+                mWidth = Math.max(mWidth, producer.getWidth());
+                mHeight = Math.max(mHeight, producer.getHeight());
             }
             return;
         }
-        Moji.okHttpClient.newCall(new Request.Builder().url(mSource).build()).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-               if (response.isSuccessful()) producer = GifProducer.getProducerAndSub(GifSpan.this,response.body().bytes(),mSource);
-                response.body().close();
-                if (producer!=null){
-                    if (!USE_SMALL_GIFS && !isSmallGif) {
-                        mWidth = Math.max(mWidth,producer.getWidth());
-                        mHeight = Math.max(mHeight,producer.getHeight());
+            if (!Moji.enableUpdates) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            InputStream is = Moji.context.getAssets().open("makemoji/sdkimages/" + mSource);
+                            int size = is.available();
+                            byte[] buffer = new byte[size];
+                            is.read(buffer);
+                            is.close();
+                            GifProducer.getProducerAndSub(GifSpan.this, buffer, mSource);
+                            if (producer != null) {
+                                if (!USE_SMALL_GIFS && !isSmallGif) {
+                                    mWidth = Math.max(mWidth, producer.getWidth());
+                                    mHeight = Math.max(mHeight, producer.getHeight());
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }
-        });
+                }).run();
+            } else
+                Moji.okHttpClient.newCall(new Request.Builder().url(mSource).build()).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful())
+                            producer = GifProducer.getProducerAndSub(GifSpan.this, response.body().bytes(), mSource);
+                        response.body().close();
+                        if (producer != null) {
+                            if (!USE_SMALL_GIFS && !isSmallGif) {
+                                mWidth = Math.max(mWidth, producer.getWidth());
+                                mHeight = Math.max(mHeight, producer.getHeight());
+                            }
+                        }
+                    }
+                });
     }
 
     @Override

@@ -49,5 +49,8 @@ public class App extends Application {
                 parent.addView(v);
             }
         });
+        Moji.setEnableUpdates(false);
+        Moji.loadOfflineFromAssets();//call only when new assets are in the app after an update
     }
+
 }

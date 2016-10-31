@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,15 +36,21 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.makemoji.mojilib.gif.GifSpan;
+import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.LruCache;
 import com.squareup.picasso252.Picasso;
 
 import org.ccil.cowan.tagsoup2.HTMLSchema;
 import org.ccil.cowan.tagsoup2.Parser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -95,6 +102,7 @@ public class Moji {
     static String userId;
     static String channel;
     public static Gson gson;
+    public static boolean enableUpdates=true;
     /**
      * Initialize the library. Required to set in {@link Application#onCreate()}  so that the library can load resources.
      * and activity lifecycle callbacks.
@@ -338,6 +346,7 @@ public class Moji {
         // Target ~x% of the available heap.
         return 1024 * 1024 * memoryClass / 12;
     }
+
     @TargetApi(HONEYCOMB)
     private static class ActivityManagerHoneycomb {
         static int getLargeMemoryClass(ActivityManager activityManager) {
@@ -548,6 +557,61 @@ public class Moji {
     }
     static boolean isMain(){
         return Looper.getMainLooper().getThread() == Thread.currentThread();
+    }
+
+
+
+    public static void setEnableUpdates(boolean enableUpdates) {
+        Moji.enableUpdates = enableUpdates;
+    }
+    public static void loadOfflineFromAssets(){
+
+        MojiSQLHelper mojiSQLHelper = MojiSQLHelper.getInstance(context);
+        try {
+
+            String wallString = loadJSONFromAsset("emojiwall.json");
+            context.getSharedPreferences("emojiWall",0).edit().putString("data", wallString).apply();
+            String categoriesString = loadJSONFromAsset("categories.json");
+            context.getSharedPreferences("_mm_categories",0).edit().putString("categories",categoriesString).apply();
+            Map<String, List<MojiModel>> data =
+                    Moji.gson.fromJson(wallString, new TypeToken<Map<String, List<MojiModel>>>() {
+                    }.getType());
+
+            List<MojiModel> accumulated = new ArrayList<MojiModel>();
+            for (Map.Entry<String,List<MojiModel>> entry:data.entrySet()) {
+                accumulated.addAll(entry.getValue());
+                MojiModel.saveList(entry.getValue(),entry.getKey());
+            }
+            mojiSQLHelper.insert(accumulated);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static Uri uriImage(String s){
+        if (enableUpdates){
+            return Uri.parse(s);
+        }
+        else{
+            return Uri.parse("file:///android_asset/makemoji/sdkimages/"+s);
+        }
+    }
+    static String loadJSONFromAsset(String name) {
+        String s = null;
+        //JSONObject jo = null;
+        try {
+            InputStream is = context.getAssets().open("makemoji/"+name);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            s = new String(buffer, "UTF-8");
+            //jo = new JSONObject(s);
+        } catch (Exception ex ) {
+            ex.printStackTrace();
+            return null;
+        }
+        return s;
     }
 
 

@@ -24,7 +24,7 @@ public class TrendingPopulator extends PagerPopulator<MojiModel> {
     boolean cachedResponseServed;
     public TrendingPopulator(){
         mojiApi = Moji.mojiApi;
-        sp = Moji.context.getSharedPreferences("_mm_trending",0);
+        sp = Moji.context.getSharedPreferences("_mm_categories",0);
     }
 
     @Override

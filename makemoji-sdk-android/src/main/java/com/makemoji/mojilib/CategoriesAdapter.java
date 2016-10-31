@@ -51,7 +51,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Ho
             //Moji.loadImage(holder.image,category.image_url);
             int width = (int)(holder.view.getResources().getDimension(R.dimen.mm_cat_width) *Moji.density * 1);
             if (!category.image_url.equals(holder.image.getTag())) {
-                Picasso.with(Moji.context).load(category.image_url).
+                Picasso.with(Moji.context).load(Moji.uriImage(category.image_url)).
                         resize(width, width).placeholder(R.drawable.mm_placeholder).into(holder.image);
                 holder.image.setTag(category.image_url);
             }
