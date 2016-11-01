@@ -60,7 +60,6 @@ import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
-import com.makemoji.mojilib.TrendingPopulator;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.Picasso;
@@ -907,8 +906,6 @@ public class MMKB extends InputMethodService
             pageFrame.setVisibility(View.VISIBLE);
         }
 
-        //if ("trending".equals(tab.getContentDescription()))
-        //    populator = new TrendingPopulator();
          if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
             lockedListener.categorySelected(tab.getContentDescription().toString(),inputView);
             tabLayout.getTabAt(currentTab).select();//go back to last tab

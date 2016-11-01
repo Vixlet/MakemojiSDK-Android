@@ -132,7 +132,7 @@ import java.lang.ref.WeakReference;
                 @Override
                 public void run() {
 
-                    Bitmap cache = Moji.picasso.quickMemoryCacheCheckStartsWith(mSource);
+                    Bitmap cache = Moji.picasso.quickMemoryCacheCheckStartsWith(Moji.uriImage(mSource).toString());
                     if (cache != null && cache.getWidth() >= size) {
                         t.onBitmapLoaded(cache, null);
                         return;

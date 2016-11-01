@@ -94,6 +94,7 @@ public class Mojilytics {
             }
             viewed.clear();
             sb.append("data=").append(sdf.format(new Date()));
+            if (Moji.enableUpdates)
             Moji.mojiApi.trackViews(RequestBody.create(MediaType.parse("text/plain"),sb.toString())).enqueue(new SmallCB<Void>() {
                 @Override
                 public void done(Response<Void> response, @Nullable Throwable t) {
@@ -116,6 +117,7 @@ public class Mojilytics {
                 }
                 String s = ja.toString();
                 //Log.d("click","click "+s);
+                if (Moji.enableUpdates)
                 Moji.mojiApi.trackClicks(s).enqueue(new SmallCB<Void>() {
                     @Override
                     public void done(Response<Void> response, @Nullable Throwable t) {

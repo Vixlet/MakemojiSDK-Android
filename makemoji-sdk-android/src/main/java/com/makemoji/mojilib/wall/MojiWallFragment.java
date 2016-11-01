@@ -125,6 +125,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             e.printStackTrace();
         }
         final int cacheSize = cachedSize;
+        if (Moji.enableUpdates)
         Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
             @Override
             public void done(final Response<Map<String, List<MojiModel>>> wallResponse, @Nullable Throwable t) {

@@ -31,6 +31,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
         adapter.setCategories(categories);
         mojiInputLayout.requestRnUpdate();
 
+        if (Moji.enableUpdates)
         api.getCategories().enqueue(new SmallCB<List<Category>>() {
             @Override
             public void done(Response<List<Category>> response, @Nullable Throwable t) {

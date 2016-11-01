@@ -88,6 +88,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     @Override
     public void onNewDataAvailable() {
         height = (mojiInputLayout.getPageFrame().getHeight() - heading.getHeight() - footer.getHeight());
+        mPopulator.reload();
         if (height==0 || mPopulator.getTotalCount()==0)return;
         count = mPopulator.getTotalCount();
         List<MojiModel> mojiModelList = mPopulator.populatePage(count,0);

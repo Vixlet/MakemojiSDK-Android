@@ -34,4 +34,7 @@ public abstract class PagerPopulator<T> {
     public void teardown(){
         obs = null;
     }
+    public void reload(){
+
+    }
 }

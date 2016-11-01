@@ -106,7 +106,7 @@ public class MojiModel {
     }
     @Override
     public String toString(){
-        return ""+name;
+        return ""+name +(gif==1?" gif":"");
     }
     @WorkerThread
     public static void saveList(List<MojiModel> list,String name){

@@ -45,6 +45,7 @@ public class KBCategory {
     public static List<TabLayout.Tab> getTabs(final TabLayout tabLayout, final KBTAbListener kbtAbListener, @LayoutRes final int layoutRes){
         List<TabLayout.Tab> tabs = new ArrayList<>();
         List<Category> cachedCategories = Category.getCategories();
+        cachedCategories.add(0,new Category("Trending",null));
         if (Moji.enableUpdates)
             Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
                 @Override
@@ -61,6 +62,7 @@ public class KBCategory {
                                 return;
                             }
                             Category.saveCategories(categories.body());
+                            categories.body().add(0,new Category("Trending",null));
                             for (Category c : categories.body())
                                 if (wallData.body().containsKey(c.name))
                                     c.models = wallData.body().get(c.name);
@@ -90,10 +92,6 @@ public class KBCategory {
                         if (data.containsKey(c.name))
                             c.models = data.get(c.name);
                 }
-                Category trending = new Category("trending",null);
-                if (data.containsKey("Trending"))trending.models = data.get("Trending");
-                trending.drawableRes = R.drawable.mm_trending;
-                cachedCategories.add(0,trending);
             }
             catch (Exception e){
                 e.printStackTrace();

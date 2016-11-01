@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 
 import org.json.JSONObject;
@@ -77,7 +78,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
     ImageView trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
-    TrendingPopulator trendingPopulator;
+    CategoryPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
     Drawable bottomPageBg;
@@ -264,7 +265,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         if (showKbOnInflate)
                 grabFocusShowKb();
 
-        trendingPopulator = new TrendingPopulator();
+        trendingPopulator = new CategoryPopulator(new Category("Trending",null));
         trendingPopulator.setup(trendingObserver);
         searchPopulator = new SearchPopulator();
         searchPopulator.setup(searchObserver);
@@ -345,7 +346,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                if (query.length()>1)Moji.offHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (query.equals(currentSearchQuery)) {
+                        if (query.equals(currentSearchQuery) && Moji.enableUpdates) {
                             Moji.mojiApi.flashtagSearchAnalytics(query).enqueue(new SmallCB<Void>() {
                                 @Override
                                 public void done(Response<Void> response, @Nullable Throwable t) {
@@ -381,6 +382,9 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     PagerPopulator.PopulatorObserver searchObserver = new PagerPopulator.PopulatorObserver() {
         @Override
         public void onNewDataAvailable() {
+            MakeMojiPage page = pages.empty()?null:pages.peek();
+            if (page!=null)page.onNewDataAvailable();
+            trendingPopulator.onNewDataAvailable();
             if (!usingTrendingAdapter){
                 adapter.showNames(true);
                 adapter.setMojiModels(searchPopulator.populatePage(50,0));
@@ -455,7 +459,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         hideKeyboard();
         deactiveButtons();
         if (trendingPage==null)
-            trendingPage = new OneGridPage(getContext().getString(R.string._mm_trending),this,new TrendingPopulator());
+            trendingPage = new OneGridPage(getContext().getString(R.string._mm_trending),this,new CategoryPopulator(new Category("Trending",null)));
 
         if (trendingPage.isVisible()){
             onLeftClosed();
@@ -782,6 +786,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                     ssb.replace(i,i+1,"");
                 }
                 String html = Moji.toHtml(ssb);
+                if (Moji.enableUpdates)
                 Moji.mojiApi.sendPressed(html).enqueue(new SmallCB<JsonObject>() {
                     @Override
                     public void done(Response<JsonObject> response, @Nullable Throwable t) {

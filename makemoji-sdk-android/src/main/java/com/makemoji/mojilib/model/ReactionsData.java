@@ -46,6 +46,7 @@ public class ReactionsData {
     static WeakReference<ReactionsData> selectedData;
     public ReactionsData(@NonNull String id){
         this.id = id;
+        if (Moji.enableUpdates)
         Moji.mojiApi.getReactionData(getHash(id)).enqueue(new SmallCB<JsonObject>() {
             @Override
             public void done(Response<JsonObject> response, @Nullable Throwable t) {

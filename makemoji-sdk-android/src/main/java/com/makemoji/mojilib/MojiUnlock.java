@@ -49,6 +49,7 @@ public class MojiUnlock {
     public static void unlockCategory(final String name){
 
         addGroup(name);
+        if (Moji.enableUpdates)
         Moji.mojiApi.unlockGroup(name).enqueue(new SmallCB<JsonObject>() {
             @Override
             public void done(Response<JsonObject> response, @Nullable Throwable t) {
