@@ -117,6 +117,9 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     }.getType());
             List<Category> cats = Category.getCategories();
             if (data != null && cats!=null) {
+                for (Map.Entry<String,List<MojiModel>> entry:data.entrySet()) {
+                    MojiModel.saveList(entry.getValue(), entry.getKey());
+                }
                 cachedSize = data.size();
                 handleData(data,cats);
             }

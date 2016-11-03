@@ -54,6 +54,9 @@ public class KBCategory {
                         t.printStackTrace();
                         return;
                     }
+                    for (Map.Entry<String,List<MojiModel>> entry:wallData.body().entrySet()) {
+                        MojiModel.saveList(entry.getValue(), entry.getKey());
+                    }
                     Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
                         @Override
                         public void done(final Response<List<Category>> categories, @Nullable Throwable t) {
@@ -87,7 +90,9 @@ public class KBCategory {
                 Map<String, List<MojiModel>> data =
                         Moji.gson.fromJson(s, new TypeToken<Map<String, List<MojiModel>>>() {
                         }.getType());
+
                 if (data != null) {
+
                     for (Category c : cachedCategories)
                         if (data.containsKey(c.name))
                             c.models = data.get(c.name);
