@@ -91,7 +91,7 @@ class MojiImageView extends ImageView  implements Spanimatable{
                             .placeholder(d).into(this);
                 else
                     Moji.picasso.load(Moji.uriImage(m.image_url))
-                            .resize(forceDimen,forceDimen)
+                            .resize(Math.max(forceDimen,1),Math.max(forceDimen,1))//fix rare crash
                             .placeholder(d).into(this);
 
             } else if (m.character!=null){
