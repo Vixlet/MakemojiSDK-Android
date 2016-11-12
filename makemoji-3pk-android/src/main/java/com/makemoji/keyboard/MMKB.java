@@ -481,6 +481,7 @@ public class MMKB extends InputMethodService
         }
         int idx = Math.max(before.lastIndexOf(' '),0);
         String query = before.substring(idx, before.length());
+        useTrending = false;
         searchPopulator.search(query.trim());
     }
     /**
@@ -933,13 +934,14 @@ public class MMKB extends InputMethodService
             trendingPopulator.setup(new PagerPopulator.PopulatorObserver() {
                 @Override
                 public void onNewDataAvailable() {
+                    if (useTrending)
                     adapter.setMojiModels(trendingPopulator.populatePage(trendingPopulator.getTotalCount(),0));
                 }
             });
             searchPopulator.setup(new PagerPopulator.PopulatorObserver() {
                 @Override
                 public void onNewDataAvailable() {
-                    if (searchPopulator.getTotalCount()>0)
+                    if (searchPopulator.getTotalCount()>0 && !useTrending)
                     adapter.setMojiModels(searchPopulator.populatePage(searchPopulator.getTotalCount(),0));
                 }
             });
