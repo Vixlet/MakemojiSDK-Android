@@ -63,7 +63,7 @@
                 android:layout_height="match_parent"
                 />
             <android.support.v7.widget.RecyclerView
-                android:paddingLeft="4dp"
+                android:paddingLeft="0dp"
             android:id="@+id/_mm_recylcer_view"
             tools:listitem="@layout/mm_horiz_moji_item"
             android:background="@color/_mm_horiz_rv_bg"

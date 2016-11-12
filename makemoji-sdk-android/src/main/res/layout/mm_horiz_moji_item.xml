@@ -3,7 +3,8 @@
     android:orientation="horizontal" android:layout_width="wrap_content"
     android:gravity="center"
     android:layout_gravity="center"
-    android:paddingRight="4dp"
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp"
     android:layout_height="match_parent">
     <com.makemoji.mojilib.MojiImageView
         android:layout_width="wrap_content"

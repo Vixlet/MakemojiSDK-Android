@@ -54,9 +54,18 @@ public class KBCategory {
                         t.printStackTrace();
                         return;
                     }
+
+                    final List<MojiModel> accumulated = new ArrayList<MojiModel>();
                     for (Map.Entry<String,List<MojiModel>> entry:wallData.body().entrySet()) {
+                        if (!"osemoji".equalsIgnoreCase(entry.getKey()))accumulated.addAll(wallData.body().get(entry.getKey()));
                         MojiModel.saveList(entry.getValue(), entry.getKey());
                     }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MojiSQLHelper.getInstance(Moji.context).insert(accumulated);
+                        }
+                    }).start();
                     Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
                         @Override
                         public void done(final Response<List<Category>> categories, @Nullable Throwable t) {

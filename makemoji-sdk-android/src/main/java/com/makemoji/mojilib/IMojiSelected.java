@@ -11,6 +11,5 @@ import com.makemoji.mojilib.model.MojiModel;
 public interface IMojiSelected {
     public static final int REQUEST_MOJI_MODEL = 2341;
     void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd);
-    void mojiSelectionCanceled();
     void lockedCategoryClick(String name);
 }

@@ -68,13 +68,15 @@
     </Row>
     
     <Row android:rowEdgeFlags="bottom">
-        <Key android:codes="-2" android:keyLabel=".?123" android:keyWidth="20%p"/>
+        <Key android:codes="-2" android:keyLabel=".?123" android:keyWidth="15%p"/>
+        <Key android:codes="300" android:keyLabel="☺"
+            android:keyWidth="15%p"/>
         <Key android:codes="44" android:keyLabel=","
-            android:keyWidth="10%p"/>
+            android:keyWidth="8%p"/>
         <Key android:codes="32" android:keyLabel="space"
                 android:keyWidth="40%p" android:isRepeatable="true"/>
         <Key android:codes="46" android:keyLabel="."
-            android:keyWidth="10%p"/>
+            android:keyWidth="8%p"/>
         <Key android:codes="10" android:keyLabel="return"
                 android:keyWidth="20%p" android:keyEdgeFlags="right"/>
     </Row>

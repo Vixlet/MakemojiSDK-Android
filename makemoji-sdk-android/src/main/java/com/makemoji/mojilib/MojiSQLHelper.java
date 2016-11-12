@@ -88,6 +88,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public synchronized void insert(List<MojiModel> models){
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
+        db.delete(TABLE_MM,null,null);
         for (MojiModel m : models) {
             ContentValues cv = addValues(m);
             long row = db.insert(TABLE_MM, null,cv);

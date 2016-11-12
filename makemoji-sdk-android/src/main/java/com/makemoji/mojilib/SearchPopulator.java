@@ -18,11 +18,15 @@ import retrofit2.Response;
 public class SearchPopulator extends PagerPopulator<MojiModel> {
     MojiSQLHelper mojiSQLHelper;
     String currentQuery = "";
+    boolean getWallData;
+    public SearchPopulator(boolean getWallData){
+        this.getWallData = getWallData;
+    }
     @Override
     public void setup(final PopulatorObserver observer) {
         super.setup(observer);
         mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context);
-        if (Moji.enableUpdates)
+        if (Moji.enableUpdates && getWallData)
             Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String,List<MojiModel>>>() {
                 @Override
                 public void done(final Response<Map<String,List<MojiModel>>> response, @Nullable Throwable t) {
@@ -35,7 +39,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                         public void run() {
                             List<MojiModel> accumulated = new ArrayList<MojiModel>();
                             for (Map.Entry<String,List<MojiModel>> entry:response.body().entrySet()) {
-                                accumulated.addAll(entry.getValue());
+                                if (!"osemoji".equalsIgnoreCase(entry.getKey()))accumulated.addAll(entry.getValue());
                                 MojiModel.saveList(entry.getValue(),entry.getKey());
                             }
                             Moji.handler.post(new Runnable() {
@@ -59,37 +63,21 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
         return mojiModels.subList(offset,offset+count);
     }
     //search off thread. If query is still relevant then return results.
-    public void search(@NonNull String query){
+    public void search(@NonNull String query) {
         final String runQuery = query;
         currentQuery = query;
 
-        if (query.isEmpty() && Moji.enableUpdates){
-            Moji.mojiApi.getTrendingFlashtags().enqueue(new SmallCB<List<MojiModel>>() {
-                @Override
-                public void done(Response<List<MojiModel>> response, @Nullable Throwable t) {
-                    if (t!=null){
-                        t.printStackTrace();
-                        return;
-                    }
-                    if (runQuery.equals(currentQuery)){
-                        mojiModels = response.body();
-                        if (obs!=null)obs.onNewDataAvailable();
-
-                    }
-                }
-            });
-        }
-        else
+        if (!query.isEmpty() && query.length() > 1) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final List<MojiModel> models = mojiSQLHelper.search(runQuery,50);
+                    final List<MojiModel> models = mojiSQLHelper.search(runQuery, 50);
                     Moji.handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (runQuery.equals(currentQuery)){
+                            if (runQuery.equals(currentQuery)) {
                                 mojiModels = models;
-                                if (obs!=null) obs.onNewDataAvailable();
+                                if (obs != null) obs.onNewDataAvailable();
                             }
                         }
                     });
@@ -97,5 +85,6 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                 }
             }).start();
 
+        }
     }
 }

@@ -29,20 +29,8 @@ public interface MojiApi {
     @GET("emoji/index/trending")
     Call<List<MojiModel>> getTrending();
 
-    @GET("emoji/index/{category}")
-    Call<List<MojiModel>> getByCategory(@Path("category") String category);
-
     @GET("emoji/categories")
     Call<List<Category>> getCategories();
-
-    @GET("emoji/index/used/1/255/{deviceId}")
-    Call<List<MojiModel>> getRecentlyUsed(@Path("deviceId") String deviceId);
-
-    @GET("emoji/allflashtags")
-    Call<List<MojiModel>> getFlashtags();
-
-    @GET("emoji/index/trendingflashtags")
-    Call<List<MojiModel>> getTrendingFlashtags();
 
     @FormUrlEncoded
     @POST("messages/create")

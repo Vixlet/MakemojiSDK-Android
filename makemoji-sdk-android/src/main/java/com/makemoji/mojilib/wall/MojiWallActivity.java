@@ -57,11 +57,6 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     }
 
     @Override
-    public void mojiSelectionCanceled() {
-        finish();
-    }
-
-    @Override
     public void lockedCategoryClick(String name) {
         MojiUnlock.addGroup(name);
         fragment.refresh();

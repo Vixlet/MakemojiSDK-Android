@@ -61,7 +61,7 @@ import retrofit2.Response;
  *
  * Created by Scott Baar on 1/4/2016.
  */
-public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener, MojiGridAdapter.ClickAndStyler{
+public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener, IMojiSelected, MojiGridAdapter.ClickAndStyler{
     ImageButton cameraImageButton;
     EditText editText;//active
     EditText myEditText;
@@ -97,6 +97,16 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             alwaysShowBar = tryAlwaysShowBar;
         else
             alwaysShowBar = true;
+    }
+
+    @Override
+    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
+        addMojiModel(model,bd);
+    }
+
+    @Override
+    public void lockedCategoryClick(String name) {
+
     }
 
     public interface SendClickListener{
@@ -267,7 +277,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
 
         trendingPopulator = new CategoryPopulator(new Category("Trending",null));
         trendingPopulator.setup(trendingObserver);
-        searchPopulator = new SearchPopulator();
+        searchPopulator = new SearchPopulator(true);
         searchPopulator.setup(searchObserver);
         editText.addTextChangedListener(editTextWatcher);
         flashtagButton.setOnClickListener(new OnClickListener() {
@@ -340,10 +350,14 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 return;
             }
             final String query = text.substring(lastBang+1,selectionEnd);
+            if (query.length()<=1){
+                useTrendingAdapter(true);
+                return;
+            }
             currentSearchQuery = query;
                 useTrendingAdapter(false);
                 searchPopulator.search(query);
-               if (query.length()>1)Moji.offHandler.postDelayed(new Runnable() {
+               Moji.offHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (query.equals(currentSearchQuery) && Moji.enableUpdates) {

@@ -79,6 +79,9 @@ class MojiImageView extends ImageView  implements Spanimatable{
     }
     public void setModel(final MojiModel m){
         if (m.equals(model))return;
+        if (model!=null){
+            Moji.picasso.cancelRequest(this);
+        }
         model = m;
         Moji.picasso.cancelRequest(this);
         setContentDescription(""+model.name);

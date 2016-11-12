@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v7.view.ContextThemeWrapper;
@@ -49,6 +50,8 @@ import android.widget.Toast;
 
 import com.makemoji.mojilib.BackSpaceDelegate;
 import com.makemoji.mojilib.CategoryPopulator;
+import com.makemoji.mojilib.HorizRVAdapter;
+import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.LocalPopulator;
 import com.makemoji.mojilib.Moji;
@@ -58,6 +61,7 @@ import com.makemoji.mojilib.MojiSpan;
 import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
+import com.makemoji.mojilib.SearchPopulator;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
 import com.makemoji.mojilib.model.Category;
@@ -82,8 +86,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MMKB extends InputMethodService
-        implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler,
+        implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler, IMojiSelected,
         PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener, MojiUnlock.ICategoryUnlock {
+
+
     public interface ILockedCategorySelected{
         void categorySelected(String category, FrameLayout parent);
     }
@@ -114,11 +120,11 @@ public class MMKB extends InputMethodService
     private LatinKeyboard mSymbolsKeyboard;
     private LatinKeyboard mSymbolsShiftedKeyboard;
     private LatinKeyboard mQwertyKeyboard;
+    RecyclerView horizRv;
 
     private LatinKeyboard mCurKeyboard;
 
     private String mWordSeparators;
-
 
     FrameLayout inputView;
     String packageName;
@@ -133,7 +139,10 @@ public class MMKB extends InputMethodService
     View pageFrame;
     static CharSequence shareMessage;
     int rows, cols, gifRows,videoRows;
-
+    CategoryPopulator trendingPopulator;
+    SearchPopulator searchPopulator;
+    boolean useTrending = true;
+    View kbBottomNav;
     /**
      * Main initialization of the input method component.  Be sure to call
      * to super class.
@@ -200,7 +209,9 @@ public class MMKB extends InputMethodService
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
         pageFrame = inputView.findViewById(R.id._mm_kb_pageframe);
         spb = (SmoothProgressBar)inputView.findViewById(R.id._mm_spb);
+        horizRv = (RecyclerView) inputView.findViewById(R.id._mm_recylcer_view);
         spb.progressiveStop();
+        kbBottomNav = inputView.findViewById(R.id.kb_bottom_nav);
 
         if (shareMessage==null)shareMessage = getString(R.string._mm_kb_share_message);
         if (shareMessage!=null && shareMessage.length()>0){
@@ -228,6 +239,9 @@ public class MMKB extends InputMethodService
         MojiUnlock.addListener(this);
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this,R.layout.kb_tab);
         onNewTabs(tabs);
+
+        trendingPopulator = new CategoryPopulator(new Category("Trending",null));
+        searchPopulator = new SearchPopulator(false);
 
 
         Runnable backSpaceRunnable = new Runnable() {
@@ -260,6 +274,12 @@ public class MMKB extends InputMethodService
             public void onClick(View v) {
                 InputMethodManager imm = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
+                IBinder token = getToken();
+                if (Build.VERSION.SDK_INT>=19 && token!=null){
+                    if (imm.shouldOfferSwitchingToNextInputMethod(token))
+                        imm.switchToNextInputMethod(token,false);
+                    return;
+                }
                 imm.showInputMethodPicker();
             }
         });
@@ -451,18 +471,17 @@ public class MMKB extends InputMethodService
                                             int candidatesStart, int candidatesEnd) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
-
-        // If the current selection in the text view changes, we should
-        // clear whatever candidate text we have.
-        if (mComposing.length() > 0 && (newSelStart != candidatesEnd
-                || newSelEnd != candidatesEnd)) {
-            mComposing.setLength(0);
-            updateCandidates();
-            InputConnection ic = getCurrentInputConnection();
-            if (ic != null) {
-                ic.finishComposingText();
-            }
+            //deleted some candidate code here
+        CharSequence cs = getCurrentInputConnection().getTextBeforeCursor(15,0);
+        String before = cs==null?null:cs.toString();
+        if (before==null || before.isEmpty() || before.endsWith(" ")){
+            useTrending = true;
+            trendingPopulator.onNewDataAvailable();
+            return;
         }
+        int idx = Math.max(before.lastIndexOf(' '),0);
+        String query = before.substring(idx, before.length());
+        searchPopulator.search(query.trim());
     }
     /**
      * This tells us about completions that the editor has determined based
@@ -700,7 +719,14 @@ public class MMKB extends InputMethodService
                 setLatinKeyboard(mSymbolsKeyboard);
                 mSymbolsKeyboard.setShifted(false);
             }
-        } else {
+        } else if (primaryCode == 300){
+            kbBottomNav.setVisibility(View.VISIBLE);
+            mInputView.setVisibility(View.GONE);
+            pageFrame.setVisibility(View.VISIBLE);
+            horizRv.setVisibility(View.GONE);
+            tabLayout.getTabAt(0).select();
+        }
+        else {
             handleCharacter(primaryCode, keyCodes);
         }
     }
@@ -898,12 +924,32 @@ public class MMKB extends InputMethodService
         if ("keyboard".equals(tab.getContentDescription())){
             mInputView.setVisibility(View.VISIBLE);
             pageFrame.setVisibility(View.GONE);
+            kbBottomNav.setVisibility(View.GONE);
+            horizRv.setVisibility(View.VISIBLE);
+            horizRv.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
+            final HorizRVAdapter adapter = new HorizRVAdapter(this);
+            horizRv.setAdapter(adapter);
+            trendingPopulator.reload();
+            trendingPopulator.setup(new PagerPopulator.PopulatorObserver() {
+                @Override
+                public void onNewDataAvailable() {
+                    adapter.setMojiModels(trendingPopulator.populatePage(trendingPopulator.getTotalCount(),0));
+                }
+            });
+            searchPopulator.setup(new PagerPopulator.PopulatorObserver() {
+                @Override
+                public void onNewDataAvailable() {
+                    if (searchPopulator.getTotalCount()>0)
+                    adapter.setMojiModels(searchPopulator.populatePage(searchPopulator.getTotalCount(),0));
+                }
+            });
             return;
         }
         else
         {
             mInputView.setVisibility(View.GONE);
             pageFrame.setVisibility(View.VISIBLE);
+            horizRv.setAdapter(null);
         }
 
          if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
@@ -1211,6 +1257,15 @@ public class MMKB extends InputMethodService
                 }
             }
         });
+
+    }
+    @Override
+    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
+        addMojiModel(model,bd);
+    }
+
+    @Override
+    public void lockedCategoryClick(String name) {
 
     }
 }

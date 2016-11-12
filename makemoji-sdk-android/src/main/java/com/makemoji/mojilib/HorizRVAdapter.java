@@ -19,11 +19,11 @@ import java.util.List;
  */
 public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
 
-    MojiInputLayout mil;
+    IMojiSelected mil;
     List<MojiModel> list = new ArrayList<>();
     boolean showNames = false;
     boolean useSpanSizes;
-    public HorizRVAdapter(MojiInputLayout mojiInputLayout){
+    public HorizRVAdapter(IMojiSelected mojiInputLayout){
         mil = mojiInputLayout;
         useSpanSizes = OneGridPage.useSpanSizes;
     }
@@ -47,8 +47,8 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             public void onClick(View v) {
                 RVHolder rvHolder = ((RVHolder)v.getTag());
                 MojiModel model = list.get(rvHolder.pos);
-                mil.removeSuggestion();
-                mil.addMojiModel(model, null);
+                if (mil instanceof MojiInputLayout)((MojiInputLayout) mil).removeSuggestion();
+                mil.mojiSelected(model, null);
             }
         });
         return new RVHolder(v,parent);
@@ -60,6 +60,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         Mojilytics.trackView(m.id);
         holder.name.setText(m.name);
         holder.name.setVisibility(showNames?View.VISIBLE:View.GONE);
+        holder.v.setPadding((int)Moji.density*(position==0?6:2),0,(int)Moji.density*2,0);
         if (holder.image!=null){
             holder.image.forceDimen(holder.dimen);
             holder.image.setModel(m);
@@ -99,7 +100,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             this.v = v;
             v.setTag(this);
             name = (TextView) v.findViewById(R.id.tv);
-            name.setTextColor(mil.getHeaderTextColor());
+            if (mil instanceof MojiInputLayout)name.setTextColor(((MojiInputLayout) mil).getHeaderTextColor());
             View view = v.findViewById(R.id.pic);
             if (view instanceof GifImageView){
                 gifImageView = (GifImageView) view;
