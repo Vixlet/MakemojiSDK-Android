@@ -20,11 +20,16 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
 
 
     public static MojiSQLHelper mInstance;
-    private static final int DATABASE_VERSION = 3;
+    public static MojiSQLHelper m3pkInstance;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "makemoji.db";
 
     private static final String FTS_VIRTUAL_TABLE = "FTS";
     public static final String TABLE_MM = "makemoji";
+    public static final String TABLE_3PK = "makemoji3pk";
+
+    String table = TABLE_MM;
+
     public static final String COL_ID = "_ID";
     public static final String COL_ID_INT = "ID";
     public static final  String COL_NAME = "NAME";
@@ -37,38 +42,48 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public static final  String COL_VIDEO = "VIDEO";
     public static final  String COL_VIDEO_URL = "VIDEO_URL";
 
-    private static final String DATABASE_CREATE = "create table "
-            + TABLE_MM + "(" + COL_ID + " integer primary key AUTOINCREMENT, "
-            + COL_ID_INT + " INT, "
-            + COL_NAME + " TEXT, "
-            + COL_IMG_URL+ " TEXT, "
-            + COL_LINK_URL + " TEXT, "
-            + COL_FLASHTAG + " TEXT, "
-            + COL_CHARACTER + " TEXT, "
-            + COL_GIF + " INT, "
-            + COL_GIF_40 + " TEXT, "
-            + COL_VIDEO + " INT, "
-            + COL_VIDEO_URL + " TEXT "
-            +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
-            + ");";
 
+    private static String getCreateString(String tableName){
+       return "create table "
+                + tableName + "(" + COL_ID + " integer primary key AUTOINCREMENT, "
+                + COL_ID_INT + " INT, "
+                + COL_NAME + " TEXT, "
+                + COL_IMG_URL+ " TEXT, "
+                + COL_LINK_URL + " TEXT, "
+                + COL_FLASHTAG + " TEXT, "
+                + COL_CHARACTER + " TEXT, "
+                + COL_GIF + " INT, "
+                + COL_GIF_40 + " TEXT, "
+                + COL_VIDEO + " INT, "
+                + COL_VIDEO_URL + " TEXT "
+                +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
+                + ");";
+    }
     private MojiSQLHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);
 
     }
-    public static synchronized MojiSQLHelper getInstance(Context context){
+    public static synchronized MojiSQLHelper getInstance(Context context,boolean table3pk){
+        if (table3pk){
+            if (m3pkInstance == null)
+                m3pkInstance =  new MojiSQLHelper(context.getApplicationContext());
+            m3pkInstance.table = TABLE_3PK;
+            return m3pkInstance;
+        }
         if (mInstance == null)
             mInstance =  new MojiSQLHelper(context.getApplicationContext());
         return mInstance;
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE);
+        db.execSQL(getCreateString(TABLE_MM));
+        db.execSQL(getCreateString(TABLE_3PK));
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_MM);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_3PK);
         onCreate(db);
     }
     private ContentValues addValues(MojiModel model){
@@ -88,10 +103,10 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public synchronized void insert(List<MojiModel> models){
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
-        db.delete(TABLE_MM,null,null);
+        db.delete(table,null,null);
         for (MojiModel m : models) {
             ContentValues cv = addValues(m);
-            long row = db.insert(TABLE_MM, null,cv);
+            long row = db.insert(table, null,cv);
         }
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -102,7 +117,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public @Nullable MojiModel get(int id){
         SQLiteDatabase db = this.getReadableDatabase();
         MojiModel mm = null;
-        String raw = "SELECT * FROM "+TABLE_MM + " WHERE "+COL_ID_INT + " = "+id +" AND "+ COL_CHARACTER +" IS NULL";
+        String raw = "SELECT * FROM "+table + " WHERE "+COL_ID_INT + " = "+id +" AND "+ COL_CHARACTER +" IS NULL";
         Cursor c = db.rawQuery(raw,null);
         try{
             c.moveToFirst();
@@ -130,7 +145,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public List<MojiModel> search(String query, int limit){
         SQLiteDatabase db = this.getReadableDatabase();
         List<MojiModel> models = new ArrayList<>();
-        String raw = "SELECT * FROM "+TABLE_MM + " WHERE "+COL_NAME + " LIKE '" +query + "%' LIMIT "+ limit + " COLLATE NOCASE";
+        String raw = "SELECT * FROM "+table + " WHERE "+COL_NAME + " LIKE '" +query + "%' LIMIT "+ limit + " COLLATE NOCASE";
         Cursor c = db.rawQuery(raw,null);
         try{
             while (c.moveToNext()) {

@@ -21,8 +21,10 @@ import android.inputmethodservice.KeyboardView;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Px;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v7.view.ContextThemeWrapper;
@@ -67,6 +69,7 @@ import com.makemoji.mojilib.Spanimator;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
 import com.squareup.picasso252.Picasso;
+import com.squareup.picasso252.RequestCreator;
 import com.squareup.picasso252.Target;
 
 import java.io.File;
@@ -143,6 +146,11 @@ public class MMKB extends InputMethodService
     SearchPopulator searchPopulator;
     boolean useTrending = true;
     View kbBottomNav;
+
+    static int forceDimen;
+    public static void forceSizeDp(@Dimension(unit = Dimension.DP) int dimen){
+        forceDimen = dimen;
+    }
     /**
      * Main initialization of the input method component.  Be sure to call
      * to super class.
@@ -238,10 +246,14 @@ public class MMKB extends InputMethodService
         }
         MojiUnlock.addListener(this);
         List<TabLayout.Tab> tabs = KBCategory.getTabs(tabLayout,this,R.layout.kb_tab);
+
         onNewTabs(tabs);
 
+
         trendingPopulator = new CategoryPopulator(new Category("Trending",null));
+        trendingPopulator.use3pk = true;
         searchPopulator = new SearchPopulator(false);
+        searchPopulator.use3pk=true;
 
 
         Runnable backSpaceRunnable = new Runnable() {
@@ -929,6 +941,7 @@ public class MMKB extends InputMethodService
             horizRv.setVisibility(View.VISIBLE);
             horizRv.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
             final HorizRVAdapter adapter = new HorizRVAdapter(this);
+            adapter.enablePulse = false;
             horizRv.setAdapter(adapter);
             trendingPopulator.reload();
             trendingPopulator.setup(new PagerPopulator.PopulatorObserver() {
@@ -963,10 +976,12 @@ public class MMKB extends InputMethodService
             Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
            if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
             else populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));//should not happen
+
         }
 
         currentTab = tab.getPosition();
         gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
+        populator.use3pk = true;
         populator.setup(this);
     }
 
@@ -1128,6 +1143,7 @@ public class MMKB extends InputMethodService
         }
     });
     }
+
     public Target getTarget(final MojiModel model) {
         //onDownloadStart();
         return new Target() {
@@ -1210,7 +1226,9 @@ public class MMKB extends InputMethodService
                 }
                 return;
             }
-            Moji.picasso.load(model.image_url).into(t);
+            RequestCreator requestCreator = Moji.picasso.load(model.image_url);
+            if (forceDimen>0) requestCreator.resize((int)(forceDimen*Moji.density),(int)(forceDimen*Moji.density));
+            requestCreator.into(t);
         }
     }
 

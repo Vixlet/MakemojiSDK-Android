@@ -13,6 +13,7 @@ import java.util.List;
 public abstract class PagerPopulator<T> {
     protected List<T> mojiModels = new ArrayList<>();
     protected PopulatorObserver obs;
+    public boolean use3pk;
 
     public interface PopulatorObserver{
        @UiThread void onNewDataAvailable();

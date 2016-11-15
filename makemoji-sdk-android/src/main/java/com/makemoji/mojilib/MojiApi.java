@@ -46,6 +46,9 @@ public interface MojiApi {
     @GET("emoji/emojiwall")
     Call<Map<String,List<MojiModel>>> getEmojiWallData();
 
+    @GET("emoji/emojiwall/3pk")
+    Call<Map<String,List<MojiModel>>> getEmojiWallData3pk();
+
     @FormUrlEncoded
     @POST("emoji/unlockGroup")
     Call<JsonObject> unlockGroup(@Field("category_name")String categoryName);

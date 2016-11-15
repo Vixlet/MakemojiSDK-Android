@@ -25,7 +25,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
     @Override
     public void setup(final PopulatorObserver observer) {
         super.setup(observer);
-        mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context);
+        mojiSQLHelper = MojiSQLHelper.getInstance(Moji.context,use3pk);
         if (Moji.enableUpdates && getWallData)
             Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String,List<MojiModel>>>() {
                 @Override
@@ -48,7 +48,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                                     observer.onNewDataAvailable();
                                 }
                             });
-                            mojiSQLHelper.insert(accumulated);
+                           if (!use3pk) mojiSQLHelper.insert(accumulated);
                             Moji.context.getSharedPreferences("emojiWall",0).edit().putString("data",Moji.gson.toJson(response.body())).apply();
                         }
                     }).start();

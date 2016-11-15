@@ -23,6 +23,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
     List<MojiModel> list = new ArrayList<>();
     boolean showNames = false;
     boolean useSpanSizes;
+    public boolean enablePulse = true;
     public HorizRVAdapter(IMojiSelected mojiInputLayout){
         mil = mojiInputLayout;
         useSpanSizes = OneGridPage.useSpanSizes;
@@ -63,6 +64,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
         holder.v.setPadding((int)Moji.density*(position==0?6:2),0,(int)Moji.density*2,0);
         if (holder.image!=null){
             holder.image.forceDimen(holder.dimen);
+            holder.image.setPulseEnabled(enablePulse);
             holder.image.setModel(m);
         }
         else{

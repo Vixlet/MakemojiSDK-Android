@@ -28,7 +28,7 @@ public class CategoryPopulator extends PagerPopulator<MojiModel>  {
         onNewDataAvailable();
     }
     public void onNewDataAvailable(){
-        mojiModels = MojiModel.getList(category.name);
+        mojiModels = MojiModel.getList(category.name + (use3pk?"3pk":""));
         if (!mojiModels.isEmpty()) {
             if (obs != null) obs.onNewDataAvailable();
         }

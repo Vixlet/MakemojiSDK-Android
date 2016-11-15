@@ -566,11 +566,13 @@ public class Moji {
     }
     public static void loadOfflineFromAssets(){
 
-        MojiSQLHelper mojiSQLHelper = MojiSQLHelper.getInstance(context);
+        MojiSQLHelper mojiSQLHelper = MojiSQLHelper.getInstance(context,false);
+        MojiSQLHelper mojiSQLHelper3pk = MojiSQLHelper.getInstance(context,true);
         try {
 
             String wallString = loadJSONFromAsset("emojiwall.json");
             context.getSharedPreferences("emojiWall",0).edit().putString("data", wallString).apply();
+            context.getSharedPreferences("emojiWall3pk",0).edit().putString("data", wallString).apply();
             String categoriesString = loadJSONFromAsset("categories.json");
             context.getSharedPreferences("_mm_categories",0).edit().putString("categories",categoriesString).apply();
             Map<String, List<MojiModel>> data =
@@ -583,6 +585,7 @@ public class Moji {
                 MojiModel.saveList(entry.getValue(),entry.getKey());
             }
             mojiSQLHelper.insert(accumulated);
+            mojiSQLHelper3pk.insert(accumulated);
         }
         catch (Exception e){
             e.printStackTrace();

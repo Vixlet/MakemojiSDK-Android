@@ -46,8 +46,9 @@ public class KBCategory {
         List<TabLayout.Tab> tabs = new ArrayList<>();
         List<Category> cachedCategories = Category.getCategories();
         cachedCategories.add(0,new Category("Trending",null));
+        final SharedPreferences sp = Moji.context.getSharedPreferences("emojiWall3pk",0);
         if (Moji.enableUpdates)
-            Moji.mojiApi.getEmojiWallData().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
+            Moji.mojiApi.getEmojiWallData3pk().enqueue(new SmallCB<Map<String, List<MojiModel>>>() {
                 @Override
                 public void done(final Response<Map<String, List<MojiModel>>> wallData, @Nullable Throwable t) {
                     if (t!=null){
@@ -55,15 +56,16 @@ public class KBCategory {
                         return;
                     }
 
-                    final List<MojiModel> accumulated = new ArrayList<MojiModel>();
-                    for (Map.Entry<String,List<MojiModel>> entry:wallData.body().entrySet()) {
-                        if (!"osemoji".equalsIgnoreCase(entry.getKey()))accumulated.addAll(wallData.body().get(entry.getKey()));
-                        MojiModel.saveList(entry.getValue(), entry.getKey());
-                    }
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            MojiSQLHelper.getInstance(Moji.context).insert(accumulated);
+                            final List<MojiModel> accumulated = new ArrayList<MojiModel>();
+                            for (Map.Entry<String,List<MojiModel>> entry:wallData.body().entrySet()) {
+                                if (!"osemoji".equalsIgnoreCase(entry.getKey()))accumulated.addAll(wallData.body().get(entry.getKey()));
+                                MojiModel.saveList(entry.getValue(), entry.getKey()+"3pk");
+                            }
+                            sp.edit().putString("data",Moji.gson.toJson(wallData.body())).apply();
+                            MojiSQLHelper.getInstance(Moji.context,true).insert(accumulated);
                         }
                     }).start();
                     Moji.mojiApi.getCategories().enqueue(new SmallCB<List<Category>>() {
@@ -93,7 +95,6 @@ public class KBCategory {
             return tabs;
         }
         else {
-            final SharedPreferences sp = Moji.context.getSharedPreferences("emojiWall",0);
             try {
                 String s = sp.getString("data", null);
                 Map<String, List<MojiModel>> data =
