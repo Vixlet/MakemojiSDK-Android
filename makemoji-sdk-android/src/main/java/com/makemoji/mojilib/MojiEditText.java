@@ -7,6 +7,10 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
+import android.support.v13.view.inputmethod.EditorInfoCompat;
+import android.support.v13.view.inputmethod.InputConnectionCompat;
+import android.support.v13.view.inputmethod.InputContentInfoCompat;
+import android.support.v4.os.BuildCompat;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -16,7 +20,12 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
+
+import com.makemoji.mojilib.model.MojiModel;
+
+import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,6 +44,14 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     public static final int DRAWABLE_TOP = 1;
     public static final int DRAWABLE_RIGHT = 2;
     public static final int DRAWABLE_BOTTOM = 3;
+
+    public IInputConnectionCreator connectionCreator;
+
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+        InputConnection connection =super.onCreateInputConnection(outAttrs);
+        if (connectionCreator!=null) connection =connectionCreator.onCreateInputConnection(outAttrs,connection);
+        return connection;
+    }
 
     @Override
     public void specialInvalidate() {
@@ -278,6 +295,57 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     }
     protected void onSelectionChanged(int selStart, int selEnd) {
        // Log.d("met","selection " + selStart + " " +(selStart %3));
+    }
+
+    /**
+     * Will
+     */
+    public static class MakemojiAwareConnectionCreator implements IInputConnectionCreator{
+        IMojiSelected iMojiSelected;
+        public  MakemojiAwareConnectionCreator(IMojiSelected iMojiSelected){
+            this.iMojiSelected = iMojiSelected;
+        }
+
+        public boolean allowPackageName(String packageName){
+            return  (Moji.context.getPackageName().equals(packageName));
+        }
+        @Override
+        public InputConnection onCreateInputConnection(final EditorInfo editorInfo, InputConnection superConnection) {
+            EditorInfoCompat.setContentMimeTypes(editorInfo,
+                    new String [] {"makemoji/*"});
+
+            final InputConnectionCompat.OnCommitContentListener callback =
+                    new InputConnectionCompat.OnCommitContentListener() {
+                        @Override
+                        public boolean onCommitContent(InputContentInfoCompat inputContentInfo,
+                                                       int flags, Bundle opts) {
+                            if (BuildCompat.isAtLeastNMR1() && (flags &
+                                    InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+                                try {
+                                    inputContentInfo.requestPermission();
+                                }
+                                catch (Exception e) {
+                                    return false; // return false if failed
+                                }
+                            }
+                            if (allowPackageName(editorInfo.packageName) && opts!=null && opts.getBoolean("makemoji")
+                                    && opts.getString(Moji.EXTRA_JSON)!=null){
+                                try {
+                                    MojiModel model = MojiModel.fromJson(new JSONObject(opts.getString(Moji.EXTRA_JSON)));
+                                    iMojiSelected.mojiSelected(model,null);
+                                    return true;
+                                }
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                    return false;
+                                }
+                            }
+
+                            return false;  // return true if succeeded
+                        }
+                    };
+            return InputConnectionCompat.createWrapper(superConnection, editorInfo, callback);
+        }
     }
 
 

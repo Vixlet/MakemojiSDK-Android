@@ -51,7 +51,7 @@ import retrofit2.Response;
 /**
  * Created by DouglasW on 4/16/2016.
  */
-public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListener,MojiGridAdapter.ClickAndStyler {
+public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListener, IMojiSelected {
     View view;
     TabLayout tabLayout;
     ViewPager pager;
@@ -224,7 +224,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
             public void onPageSelected(int position) {
                 TabLayout.Tab tab = tabLayout.getTabAt(position);
                 if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-                    mojiSelected.lockedCategoryClick(tab.getContentDescription().toString());
+                    ((MojiUnlock.ILockedCategoryClicked)getActivity()).lockedCategoryClick(tab.getContentDescription().toString());
                     tabLayout.getTabAt(selectedPosition).select();
                     return;
                 }
@@ -242,13 +242,8 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
     }
 
     @Override
-    public void addMojiModel(MojiModel model, BitmapDrawable d) {
+    public void mojiSelected(MojiModel model, BitmapDrawable d) {
         if (mojiSelected!=null) mojiSelected.mojiSelected(model,d);
-    }
-
-    @Override
-    public int getPhraseBgColor() {
-        return getResources().getColor(R.color._mm_default_phrase_bg_color);
     }
 
     @Override
@@ -338,7 +333,7 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
                     else
                parentWidth = ((View) rv.getParent()).getWidth();
             int size = (int)(parentWidth-(10*10*Moji.density))/5;
-            mojiGridAdapter = new MojiGridAdapter(models,(MojiGridAdapter.ClickAndStyler)getParentFragment(),true,
+            mojiGridAdapter = new MojiGridAdapter(models,(IMojiSelected) getParentFragment(),true,
                     size);
                     mojiGridAdapter.setEnablePulse(false);
             mojiGridAdapter.setImagesSizedtoSpan(false);

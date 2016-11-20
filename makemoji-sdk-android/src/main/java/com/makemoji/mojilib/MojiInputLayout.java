@@ -61,7 +61,8 @@ import retrofit2.Response;
  *
  * Created by Scott Baar on 1/4/2016.
  */
-public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.OnGlobalLayoutListener, IMojiSelected, MojiGridAdapter.ClickAndStyler{
+public class MojiInputLayout extends LinearLayout implements
+        ViewTreeObserver.OnGlobalLayoutListener, IMojiSelected{
     ImageButton cameraImageButton;
     EditText editText;//active
     EditText myEditText;
@@ -97,16 +98,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             alwaysShowBar = tryAlwaysShowBar;
         else
             alwaysShowBar = true;
-    }
-
-    @Override
-    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
-        addMojiModel(model,bd);
-    }
-
-    @Override
-    public void lockedCategoryClick(String name) {
-
     }
 
     public interface SendClickListener{
@@ -652,7 +643,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         editText.setSelection(Math.min(lastBang,ssb.length()));
     }
     @Override
-    public void addMojiModel(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
+    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
         Mojilytics.trackClick(model);
         int selectionStart = editText.getSelectionStart();
@@ -685,11 +676,6 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
         }
         Moji.setText(ssb,editText);
         editText.setSelection(Math.min(selectionStart+3,editText.length()));
-    }
-
-    @Override
-    public int getPhraseBgColor() {
-        return phraseBgColor;
     }
 
     void onLeftClosed(){
@@ -835,7 +821,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
                 JSONObject jo = new JSONObject(s);
                 MojiModel model = MojiModel.fromJson(jo);
                 if (model==null) return false;
-                addMojiModel(model,null);
+                mojiSelected(model,null);
             }
         }
         catch (Exception e){
@@ -856,7 +842,7 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
             Toast.makeText(getContext(),"use setLockedCategoryClicked to listen for this event",Toast.LENGTH_LONG).show();
             return;
         }
-        iLockedCategoryClicked.onClick(name);
+        iLockedCategoryClicked.lockedCategoryClick(name);
 
     }
     public void refreshCategories(){
@@ -903,5 +889,8 @@ public class MojiInputLayout extends LinearLayout implements ViewTreeObserver.On
     protected MojiEditText.IDrawableClick drawableClick;
     public void setDrawableClickListener(MojiEditText.IDrawableClick drawableClick){
         this.drawableClick = drawableClick;
+    }
+    public void setInputConnectionCreator(IInputConnectionCreator creator){
+        if (editText instanceof MojiEditText) ((MojiEditText) editText).connectionCreator = creator;
     }
 }

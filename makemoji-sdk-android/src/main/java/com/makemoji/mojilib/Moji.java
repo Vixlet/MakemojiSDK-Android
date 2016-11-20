@@ -214,6 +214,9 @@ public class Moji {
         sp.edit().putString("id",id).apply();
         userId=id;
     }
+    public static String getUserId(){
+        return userId;
+    }
     public static void setChannel(String channel){
         Moji.channel= channel;
     }

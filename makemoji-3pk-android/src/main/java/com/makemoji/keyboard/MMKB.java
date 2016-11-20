@@ -2,6 +2,7 @@ package com.makemoji.keyboard;
 
 import android.app.Dialog;
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -20,12 +21,16 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.design.widget.TabLayout;
+import android.support.v13.view.inputmethod.EditorInfoCompat;
+import android.support.v13.view.inputmethod.InputConnectionCompat;
+import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
@@ -64,6 +69,7 @@ import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SearchPopulator;
+import com.makemoji.mojilib.SmallCB;
 import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
 import com.makemoji.mojilib.model.Category;
@@ -89,7 +95,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MMKB extends InputMethodService
-        implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener,MojiGridAdapter.ClickAndStyler, IMojiSelected,
+        implements KeyboardView.OnKeyboardActionListener, TabLayout.OnTabSelectedListener, IMojiSelected,
         PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener, MojiUnlock.ICategoryUnlock {
 
 
@@ -336,9 +342,33 @@ public class MMKB extends InputMethodService
      * bound to the client, and are now receiving all of the detailed information
      * about the target of our edits.
      */
+
+    boolean gifSupported = false;
+    boolean pngSupported = false;
+    boolean mp4Supported = false;
+    boolean makemojiSupported = false;
     @Override public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         packageName = attribute.packageName;
+
+        String[] mimeTypes = EditorInfoCompat.getContentMimeTypes(attribute);
+        gifSupported = false;
+        pngSupported = false;
+        mp4Supported = false;
+        for (String mimeType : mimeTypes) {
+            if (ClipDescription.compareMimeTypes(mimeType, "image/gif")) {
+                gifSupported = true;
+            }
+            if (ClipDescription.compareMimeTypes(mimeType, "image/png")) {
+                pngSupported = true;
+            }
+            if (ClipDescription.compareMimeTypes(mimeType, "video/mp4")) {
+                mp4Supported = true;
+            }
+            if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*")) {
+                makemojiSupported = true;
+            }
+        }
 
         // Reset our state.  We want to do this even if restarting, because
         // the underlying state of the text editor could have changed in any way.
@@ -1031,6 +1061,34 @@ public class MMKB extends InputMethodService
 
     public void share(MojiModel model, File cacheFile){
         Uri uri = MMFileProvider.getUriForFile(getContext(),getContext().getString(R.string._mm_provider_authority),cacheFile);
+        String mime = getContentResolver().getType(uri);
+        Moji.mojiApi.trackShare(Moji.getUserId(),String.valueOf(model.id)).enqueue(new SmallCB<Void>() {
+            @Override
+            public void done(retrofit2.Response<Void> response, @Nullable Throwable t) {
+                if (t!=null) t.printStackTrace();
+            }
+        });
+        if ((pngSupported && cacheFile.getName().toLowerCase().endsWith(".png")) ||
+                (gifSupported && cacheFile.getName().toLowerCase().endsWith(".gif"))
+        || (mp4Supported && cacheFile.getName().toLowerCase().endsWith(".mp4")) || makemojiSupported){
+            InputContentInfoCompat inputContentInfo = new InputContentInfoCompat(
+                    uri, new ClipDescription(model.name, new String[]{mime,"makemoji/*"}),model.link_url!=null?Uri.parse(model.link_url):null);
+            InputConnection inputConnection = getCurrentInputConnection();
+            EditorInfo editorInfo = getCurrentInputEditorInfo();
+            int flags = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 25) {
+                flags |= InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION;
+            }
+            grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("emoji",true);
+            bundle.putBoolean("makemoji",true);
+            bundle.putString(Moji.EXTRA_JSON,MojiModel.toJson(model).toString());
+            InputConnectionCompat.commitContent(
+                    inputConnection, editorInfo, inputContentInfo, flags, bundle);
+            return;
+        }
+
         PackageManager pm = getPackageManager();
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setPackage(packageName);
@@ -1197,7 +1255,7 @@ public class MMKB extends InputMethodService
     }
     Target t;
     @Override
-    public void addMojiModel(MojiModel model, BitmapDrawable d) {
+    public void mojiSelected(MojiModel model, BitmapDrawable d) {
 
         if (model.character!=null && !model.character.isEmpty()){
             getCurrentInputConnection().finishComposingText();
@@ -1232,16 +1290,10 @@ public class MMKB extends InputMethodService
         }
     }
 
-
-    @Override
     public Context getContext() {
         return Moji.context;
     }
 
-    @Override
-    public int getPhraseBgColor() {
-        return getResources().getColor(R.color._mm_default_phrase_bg_color);
-    }
 
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
@@ -1277,15 +1329,6 @@ public class MMKB extends InputMethodService
                 }
             }
         });
-
-    }
-    @Override
-    public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
-        addMojiModel(model,bd);
-    }
-
-    @Override
-    public void lockedCategoryClick(String name) {
 
     }
 }

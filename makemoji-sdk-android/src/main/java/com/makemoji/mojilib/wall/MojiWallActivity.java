@@ -11,6 +11,7 @@ import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.R;
 import com.makemoji.mojilib.RecentPopulator;
+import com.makemoji.mojilib.SmallCB;
 import com.makemoji.mojilib.model.MojiModel;
 
 import org.json.JSONObject;
@@ -18,7 +19,7 @@ import org.json.JSONObject;
 /**
  * Created by Scott Baar on 4/16/2016.
  */
-public class MojiWallActivity extends AppCompatActivity implements IMojiSelected{
+public class MojiWallActivity extends AppCompatActivity implements IMojiSelected,MojiUnlock.ILockedCategoryClicked{
     boolean selected =false;
     public static final String EXTRA_THEME = "com.makemoji.mojilib.wall.MojiWallActivity.THEME";
     public static final String EXTRA_SHOWRECENT = "com.makemoji.mojilib.wall.MojiWallActivity.SHOWRECENT";
@@ -43,6 +44,12 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
         Intent intent = new Intent();
         JSONObject jo = MojiModel.toJson(model);
         RecentPopulator.addRecent(model);
+        Moji.mojiApi.trackShare(Moji.getUserId(),String.valueOf(model.id)).enqueue(new SmallCB<Void>() {
+            @Override
+            public void done(retrofit2.Response<Void> response, @Nullable Throwable t) {
+                if (t!=null) t.printStackTrace();
+            }
+        });
         if (jo!=null) {
             intent.putExtra(Moji.EXTRA_JSON, jo.toString());
             intent.putExtra(EXTRA_REACTION_ID,reactionId);

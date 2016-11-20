@@ -95,10 +95,13 @@ public class InputActivity extends AppCompatActivity{
         });
         mojiInputLayout.setLockedCategoryClicked(new MojiUnlock.ILockedCategoryClicked() {
             @Override
-            public void onClick(String name) {
+            public void lockedCategoryClick(String name) {
                 lockedCategoryClick(name);
             }
         });
+
+        mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
+        outsideMojiEdit.connectionCreator =new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout);
 
 
     }
@@ -184,7 +187,7 @@ public class InputActivity extends AppCompatActivity{
             try{
                 String json = data.getStringExtra(Moji.EXTRA_JSON);
                 MojiModel model = MojiModel.fromJson(new JSONObject(json));
-                mojiInputLayout.addMojiModel(model,null);
+                mojiInputLayout.mojiSelected(model,null);
             }
             catch (Exception e){
                 e.printStackTrace();

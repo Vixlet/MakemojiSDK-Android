@@ -22,7 +22,7 @@ public class App extends Application {
     public void onCreate(){
         super.onCreate();
         context=this;
-        Moji.initialize(this,"940ced93abf2ca4175a4a865b38f1009d8848a58");
+        Moji.initialize(this,"bfd3eea60abad87d378f87939ef3a116e8b23a35");
         //LeakCanary.install(this);
         //Moji.setChannel("TennisChannel");
 

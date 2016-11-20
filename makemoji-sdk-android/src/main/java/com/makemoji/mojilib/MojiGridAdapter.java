@@ -34,7 +34,6 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     boolean vertical;
     int spanSize;
     Drawable phraseBg;
-    ClickAndStyler clickAndStyler;
     boolean enablePulse = true;
     boolean imaagesSizedToSpan = true;
     boolean useKbLifecycle;
@@ -48,13 +47,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({ITEM_NORMAL,ITEM_GIF,ITEM_PHRASE,ITEM_VIDEO})
     public @interface ItemType {}
+    IMojiSelected iMojiSelected;
 
 
-    public interface ClickAndStyler{
-        void addMojiModel(MojiModel model,BitmapDrawable d);
-        Context getContext();
-        int getPhraseBgColor();
-    }
     public void setEnablePulse(boolean enable){
         enablePulse = enable;
     }
@@ -64,13 +59,12 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
 
     }
 
-    public MojiGridAdapter (List<MojiModel> models, ClickAndStyler clickAndStyler,boolean vertical, int spanSize) {
+    public MojiGridAdapter (List<MojiModel> models, IMojiSelected iMojiSelected,boolean vertical, int spanSize) {
         mojiModels = models;
-        this.clickAndStyler = clickAndStyler;
+        this.iMojiSelected = iMojiSelected;
         this.spanSize = spanSize;
         this.vertical =vertical;
-        phraseBg = ContextCompat.getDrawable(clickAndStyler.getContext(),R.drawable.mm_phrase_bg);
-        phraseBg.setColorFilter(clickAndStyler.getPhraseBgColor(), PorterDuff.Mode.SRC);
+        phraseBg = ContextCompat.getDrawable(Moji.context,R.drawable.mm_phrase_bg);
     }
 
     public void setMojiModels(List<MojiModel> models){
@@ -129,7 +123,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
         public void onClick(View v) {
-            clickAndStyler.addMojiModel(model, null);
+            iMojiSelected.mojiSelected(model, null);
                 }
             });
         }
@@ -138,7 +132,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             holder.gifImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clickAndStyler.addMojiModel(model, null);
+                    iMojiSelected.mojiSelected(model, null);
                 }
             });
         }
@@ -147,7 +141,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clickAndStyler.addMojiModel(model, null);
+                    iMojiSelected.mojiSelected(model, null);
                 }
             });
             holder.title.setText(model.name);
@@ -162,7 +156,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 @Override
                 public void onClick(View v) {
                     for (MojiModel emoji : model.emoji)
-                        clickAndStyler.addMojiModel(emoji,null);
+                        iMojiSelected.mojiSelected(model, null);
                 }
             });
             while (holder.mojiImageViews.size()<model.emoji.size()) {

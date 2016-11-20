@@ -24,7 +24,7 @@ public class MojiUnlock {
         void unlockChange();
     }
     public interface ILockedCategoryClicked{
-        void onClick(String name);
+        void lockedCategoryClick(String name);
     }
     public static Set<String> getUnlockedGroups(){
         if (unlocked == null)

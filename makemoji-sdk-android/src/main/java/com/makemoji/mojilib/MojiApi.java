@@ -26,9 +26,6 @@ import retrofit2.http.Path;
 public interface MojiApi {
     String BASE_URL = "https://api.makemoji.com/sdk/";
 
-    @GET("emoji/index/trending")
-    Call<List<MojiModel>> getTrending();
-
     @GET("emoji/categories")
     Call<List<Category>> getCategories();
 
@@ -42,6 +39,9 @@ public interface MojiApi {
     @FormUrlEncoded
     @POST("emoji/clickTrackBatch")
     Call<Void> trackClicks(@Field("emoji") String emoji);
+
+    @POST("emoji/share/{device-id}/{emoji-id}")
+    Call<Void> trackShare(@Path("device-id")String deviceId, @Path("emoji-id")String emojiId);
 
     @GET("emoji/emojiwall")
     Call<Map<String,List<MojiModel>>> getEmojiWallData();
