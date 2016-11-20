@@ -143,11 +143,11 @@ public class KBCategory {
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
                 tab.getCustomView().setSelected(false);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
-                tab.getCustomView().setTag(R.id._makemoji_category_tag_id,c);
                if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(Moji.uriImage(c.image_url)).into(iv);
                 tabs.add(tab);
 
             }
+            tab.getCustomView().setTag(R.id._makemoji_category_tag_id,c);
             //if ("Animals".equals(c.name))c.locked=1;
             if (tab!=null && c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name)){
                 tab.getCustomView().setTag(R.id._makemoji_locked_tag_id,true);
