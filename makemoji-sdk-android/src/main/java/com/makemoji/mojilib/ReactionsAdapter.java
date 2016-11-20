@@ -36,6 +36,7 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
         return new CellHolder(v,parent);
     }
 
+    @SuppressWarnings("ResourceType")
     @Override
     public void onBindViewHolder(final CellHolder holder, final int position) {
         final ReactionsData.Reaction r = list.get(position);
@@ -43,6 +44,7 @@ class ReactionsAdapter extends Adapter<ReactionsAdapter.CellHolder>{
         holder.left.setTag(R.id._makemoji_request_layout_id,true);
         holder.right.setText(getTotalString(r.total));
         holder.right.setVisibility(r.total>0?View.VISIBLE:View.GONE);
+        holder.left.setPadding(0,0, (r.total > 0) ? (int) (Moji.density * 8) : 0,0);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

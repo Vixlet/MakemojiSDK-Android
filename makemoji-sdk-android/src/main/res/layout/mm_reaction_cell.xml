@@ -13,7 +13,7 @@
     <TextView
         android:id="@+id/_mm_reaction_left_tv"
         android:textColor="@android:color/black"
-        android:layout_marginRight="8dp"
+        android:paddingRight="8dp"
         android:layout_gravity="center_vertical"
         android:textSize="14sp"
         tools:text="asfdsadf"
