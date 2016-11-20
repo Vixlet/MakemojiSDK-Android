@@ -67,7 +67,7 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
         final String runQuery = query;
         currentQuery = query;
 
-        if (!query.isEmpty() && query.length() > 1) {
+        if (!query.isEmpty() && query.length() > 1 && mojiSQLHelper!=null) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {

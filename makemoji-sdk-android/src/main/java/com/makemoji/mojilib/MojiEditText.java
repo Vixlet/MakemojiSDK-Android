@@ -306,11 +306,8 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
             this.iMojiSelected = iMojiSelected;
         }
 
-        public boolean allowPackageName(String packageName){
-            return  (Moji.context.getPackageName().equals(packageName));
-        }
         @Override
-        public InputConnection onCreateInputConnection(final EditorInfo editorInfo, InputConnection superConnection) {
+        public InputConnection onCreateInputConnection(final EditorInfo editorInfo, final InputConnection superConnection) {
             EditorInfoCompat.setContentMimeTypes(editorInfo,
                     new String [] {"makemoji/*"});
 
@@ -327,9 +324,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                                 catch (Exception e) {
                                     return false; // return false if failed
                                 }
-                            }
-                            if (allowPackageName(editorInfo.packageName) && opts!=null && opts.getBoolean("makemoji")
-                                    && opts.getString(Moji.EXTRA_JSON)!=null){
+
                                 try {
                                     MojiModel model = MojiModel.fromJson(new JSONObject(opts.getString(Moji.EXTRA_JSON)));
                                     iMojiSelected.mojiSelected(model,null);

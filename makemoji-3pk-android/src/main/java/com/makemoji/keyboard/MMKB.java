@@ -365,7 +365,7 @@ public class MMKB extends InputMethodService
             if (ClipDescription.compareMimeTypes(mimeType, "video/mp4")) {
                 mp4Supported = true;
             }
-            if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*")) {
+            if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*") && Moji.context.getPackageName().equals(attribute.packageName)) {
                 makemojiSupported = true;
             }
         }

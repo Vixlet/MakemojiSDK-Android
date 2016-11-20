@@ -100,7 +100,7 @@ public class InputActivity extends AppCompatActivity{
             }
         });
 
-       // mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
+        //mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
         //outsideMojiEdit.connectionCreator =new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout);
 
 
