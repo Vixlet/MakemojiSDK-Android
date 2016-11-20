@@ -43,13 +43,6 @@ public class MojiWallActivity extends AppCompatActivity implements IMojiSelected
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bd) {
         Intent intent = new Intent();
         JSONObject jo = MojiModel.toJson(model);
-        RecentPopulator.addRecent(model);
-        Moji.mojiApi.trackShare(Moji.getUserId(),String.valueOf(model.id)).enqueue(new SmallCB<Void>() {
-            @Override
-            public void done(retrofit2.Response<Void> response, @Nullable Throwable t) {
-                if (t!=null) t.printStackTrace();
-            }
-        });
         if (jo!=null) {
             intent.putExtra(Moji.EXTRA_JSON, jo.toString());
             intent.putExtra(EXTRA_REACTION_ID,reactionId);

@@ -243,6 +243,13 @@ public class MojiWallFragment extends Fragment implements KBCategory.KBTAbListen
 
     @Override
     public void mojiSelected(MojiModel model, BitmapDrawable d) {
+        Moji.mojiApi.trackShare(Moji.getUserId(),String.valueOf(model.id)).enqueue(new SmallCB<Void>() {
+            @Override
+            public void done(retrofit2.Response<Void> response, @Nullable Throwable t) {
+                if (t!=null) t.printStackTrace();
+            }
+        });
+        RecentPopulator.addRecent(model);
         if (mojiSelected!=null) mojiSelected.mojiSelected(model,d);
     }
 
