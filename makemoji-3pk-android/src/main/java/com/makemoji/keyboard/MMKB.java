@@ -355,6 +355,7 @@ public class MMKB extends InputMethodService
         gifSupported = false;
         pngSupported = false;
         mp4Supported = false;
+        makemojiSupported = false;
         for (String mimeType : mimeTypes) {
             if (ClipDescription.compareMimeTypes(mimeType, "image/gif")) {
                 gifSupported = true;

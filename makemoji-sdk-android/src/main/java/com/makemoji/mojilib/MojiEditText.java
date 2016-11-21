@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
@@ -46,6 +47,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     public static final int DRAWABLE_BOTTOM = 3;
 
     public IInputConnectionCreator connectionCreator;
+    IMojiSelected iMojiSelected;
 
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         InputConnection connection =super.onCreateInputConnection(outAttrs);
@@ -306,6 +308,9 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
             this.iMojiSelected = iMojiSelected;
         }
 
+        public boolean allowPackageName(String packageName){
+            return  (Moji.context.getPackageName().equals(packageName));
+        }
         @Override
         public InputConnection onCreateInputConnection(final EditorInfo editorInfo, final InputConnection superConnection) {
             EditorInfoCompat.setContentMimeTypes(editorInfo,
@@ -324,7 +329,15 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                                 catch (Exception e) {
                                     return false; // return false if failed
                                 }
+                            }
 
+                            String id = Settings.Secure.getString(
+                                    Moji.context.getContentResolver(),
+                                    Settings.Secure.DEFAULT_INPUT_METHOD
+                            );
+                            if (id==null)return false;
+                            if (id.contains("/")) id = id.split("/")[0];
+                            if (!allowPackageName(id))return false;
                                 try {
                                     MojiModel model = MojiModel.fromJson(new JSONObject(opts.getString(Moji.EXTRA_JSON)));
                                     iMojiSelected.mojiSelected(model,null);
@@ -334,9 +347,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                                     e.printStackTrace();
                                     return false;
                                 }
-                            }
 
-                            return false;  // return true if succeeded
                         }
                     };
             return InputConnectionCompat.createWrapper(superConnection, editorInfo, callback);

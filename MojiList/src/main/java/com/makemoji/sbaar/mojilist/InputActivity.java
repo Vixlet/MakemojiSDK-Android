@@ -100,7 +100,8 @@ public class InputActivity extends AppCompatActivity{
             }
         });
 
-        //mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
+        //to intercept 3pk selections without having to listen to a picture intent
+        mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
         //outsideMojiEdit.connectionCreator =new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout);
 
 
