@@ -51,7 +51,7 @@
                 app:tabIndicatorColor="@android:color/transparent"
                 app:tabPaddingStart="-1dp"
                 app:tabPaddingEnd="-1dp"
-                app:tabMaxWidth="38dp"
+                app:tabMaxWidth="@dimen/mmKBMaxTabWidth"
                 />
             <ImageView
                 android:id="@+id/kb_backspace_button"

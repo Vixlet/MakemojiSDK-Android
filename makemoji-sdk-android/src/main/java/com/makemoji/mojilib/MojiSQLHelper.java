@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
@@ -145,7 +146,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public List<MojiModel> search(String query, int limit){
         SQLiteDatabase db = this.getReadableDatabase();
         List<MojiModel> models = new ArrayList<>();
-        String raw = "SELECT * FROM "+table + " WHERE "+COL_NAME + " LIKE '" +query + "%' LIMIT "+ limit + " COLLATE NOCASE";
+        String raw = "SELECT * FROM "+table + " WHERE "+COL_NAME + " LIKE '" + query.replaceAll("'", "''") + "%' LIMIT "+ limit + " COLLATE NOCASE";
         Cursor c = db.rawQuery(raw,null);
         try{
             while (c.moveToNext()) {
