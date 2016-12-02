@@ -519,13 +519,13 @@ public class MMKB extends InputMethodService
         String before = cs==null?null:cs.toString();
         if (before==null || before.isEmpty() || before.endsWith(" ")){
             useTrending = true;
-            trendingPopulator.onNewDataAvailable();
+           if (trendingPopulator!=null) trendingPopulator.onNewDataAvailable();
             return;
         }
         int idx = Math.max(before.lastIndexOf(' '),0);
         String query = before.substring(idx, before.length());
         useTrending = false;
-        searchPopulator.search(query.trim());
+       if (searchPopulator!=null) searchPopulator.search(query.trim());
     }
     /**
      * This tells us about completions that the editor has determined based
@@ -822,6 +822,7 @@ public class MMKB extends InputMethodService
         final int length = mComposing.length();
         if (length > 1) {
             CharSequence text = getCurrentInputConnection().getTextBeforeCursor(2, InputConnection.GET_TEXT_WITH_STYLES);
+            if (text ==null) return;
             int deleteLength =1;
             if (text.length()>1 && Character.isSurrogatePair(text.charAt(0),text.charAt(1)))
                 deleteLength =2;
@@ -875,6 +876,7 @@ public class MMKB extends InputMethodService
             updateShiftKeyState(getCurrentInputEditorInfo());
             updateCandidates();
         } else {
+            commitTyped(getCurrentInputConnection());
             getCurrentInputConnection().commitText(
                     String.valueOf((char) primaryCode), 1);
         }

@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
 import com.makemoji.mojilib.IMojiSelected;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiEditText;
+import com.makemoji.mojilib.MojiInputLayout;
 import com.makemoji.mojilib.MojiSpan;
 import com.makemoji.mojilib.PagerPopulator;
 import com.makemoji.mojilib.SmallCB;
@@ -44,6 +45,7 @@ public class ReactionsData {
     PagerPopulator.PopulatorObserver observer;
     public String id;
     static WeakReference<ReactionsData> selectedData;
+    public MojiInputLayout.RNUpdateListener rnUpdateListener;
     public ReactionsData(@NonNull String id){
         this.id = id;
         if (Moji.enableUpdates)
@@ -95,7 +97,6 @@ public class ReactionsData {
                 Reaction r = reactions.get(i);
                 if (user.emoji_id == r.emoji_id) {
                     r.total--;
-                    user.emoji_id = 0;
                     if (i==position){
                         Moji.mojiApi.createReaction(getHash(id),user.emoji_id,user.emoji_type).
                                 enqueue(new SmallCB<JsonObject>() {
@@ -108,6 +109,8 @@ public class ReactionsData {
                                 });
 
                         r.selected = false;
+                        user.emoji_id = 0;
+                        if (rnUpdateListener!=null) rnUpdateListener.needsUpdate();
                         return;
                     }
                 }
@@ -134,6 +137,7 @@ public class ReactionsData {
                 }
             }
         });
+        if (rnUpdateListener!=null) rnUpdateListener.needsUpdate();
     }
     public class Content{
         public int id;
