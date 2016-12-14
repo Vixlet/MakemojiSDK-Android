@@ -21,7 +21,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
 
-    libraryVersion = '0.9.778'
+    libraryVersion = '0.9.779'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'
@@ -56,13 +56,13 @@ android {
 }
 dependencies {
     testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support:support-annotations:25.0.1'
+    androidTestCompile 'com.android.support:support-annotations:25.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:support-v13:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-v13:25.1.0'
     compile 'com.squareup.okhttp:okhttp:2.7.0'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'

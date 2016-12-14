@@ -31,29 +31,30 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        Holder holder;
-        MojiMessage message = getItem(position);
+
+        final MojiMessage message = getItem(position);
         if (convertView==null){
            convertView = LayoutInflater.from(context).inflate(R.layout.message_item,parent,false);
-            holder = new Holder();
-            holder.messageTV = (TextView)convertView.findViewById(R.id.item_message_tv);
-            holder.fromIV = (ImageView) convertView.findViewById(R.id.from_iv);
-            holder.toIV = (ImageView) convertView.findViewById(R.id.to_iv);
-            convertView.setTag(holder);
+            Holder h = new Holder();
+            h.messageTV = (TextView)convertView.findViewById(R.id.item_message_tv);
+            h.fromIV = (ImageView) convertView.findViewById(R.id.from_iv);
+            h.toIV = (ImageView) convertView.findViewById(R.id.to_iv);
+            convertView.setTag(h);
 
-            holder.messageTV.setTag(R.id._makemoji_hypermoji_listener_tag_id, new HyperMojiListener() {
+            h.messageTV.setTag(R.id._makemoji_hypermoji_listener_tag_id, new HyperMojiListener() {
                 @Override
                 public void onClick(String url) {
                     Toast.makeText(getContext(),"hypermoji clicked from adapter url " + url,Toast.LENGTH_SHORT).show();
                 }
             });
 
-            if (mTextSize== -1) mTextSize = holder.messageTV.getTextSize();
+            if (mTextSize== -1) mTextSize = h.messageTV.getTextSize();
         }
-        holder = (Holder) convertView.getTag();
+        final Holder holder = (Holder) convertView.getTag();
         if (holder.simple!=mSimple){//simple has changed, destroy cached spanned
             message.parsedAttributes = null;
         }
+
         if (!message.id.equals(holder.id)){
             holder.id = message.id;
             ParsedAttributes parsedAttributes = message.parsedAttributes;

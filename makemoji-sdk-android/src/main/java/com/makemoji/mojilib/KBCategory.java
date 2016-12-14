@@ -30,7 +30,8 @@ public class KBCategory {
     public interface KBTAbListener{
         void onNewTabs(List<TabLayout.Tab> tabs);
     }
-    static Map<String,Integer> defaults = new HashMap<>();
+    public static Map<String,Integer> defaults = new HashMap<>();
+    public static Map<String,Integer> categoryDrawables = new HashMap<>();
     private static String [] defaultCategories = {"trending","animals","clothing","expression","food",
             "hands","objects","politics","pop culture","sports","keyboard"};
     private static int [] icons = {R.drawable.mm_trending,R.drawable.mm_animals,R.drawable.mm_clothing,R.drawable.mm_expression,R.drawable.mm_food,
@@ -39,6 +40,7 @@ public class KBCategory {
         for (int i = 0; i < defaultCategories.length; i++) {
             defaults.put(defaultCategories[i],icons[i]);
         }
+
 
     }
 
@@ -143,7 +145,7 @@ public class KBCategory {
                         setContentDescription(c.name).setIcon(R.drawable.mm_placeholder);
                 tab.getCustomView().setSelected(false);
                 ImageView iv =(ImageView) tab.getCustomView().findViewWithTag("iv");
-               if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(Moji.uriImage(c.image_url)).into(iv);
+                if (c.image_url!= null && !c.image_url.isEmpty()) Moji.picasso.load(Moji.uriImage(c.image_url)).into(iv);
                 tabs.add(tab);
 
             }
@@ -172,6 +174,9 @@ public class KBCategory {
             if ("recent".equalsIgnoreCase(c.name)){
                 c.drawableRes=R.drawable.mm_recent;
                 if (!keepRecent)iterator.remove();
+            }
+            if (categoryDrawables.containsKey(c.name)){
+                c.drawableRes = categoryDrawables.get(c.name);
             }
         }
         return oldCategories;

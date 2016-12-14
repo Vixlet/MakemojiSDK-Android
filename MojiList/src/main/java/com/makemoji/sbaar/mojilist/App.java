@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.makemoji.keyboard.MMKB;
+import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
 
 /**
@@ -32,6 +33,7 @@ public class App extends Application {
         //tennis 8e707167ff772613a58af6ec86022575980fd895
         //broncos bb0b5cf8d6a9e73fb2800202d204a15ef5a578d3
         //a custom listener that will display a view (ie to prompt a purchase), when a locked category is clicked
+        KBCategory.categoryDrawables.put("Sports",R.drawable.custom_kb_tab);
         MMKB.setLockedListener(new MMKB.ILockedCategorySelected() {
             @Override
             public void categorySelected(String category, final FrameLayout parent) {

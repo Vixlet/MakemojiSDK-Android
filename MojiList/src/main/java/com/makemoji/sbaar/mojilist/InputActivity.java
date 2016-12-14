@@ -3,6 +3,7 @@ package com.makemoji.sbaar.mojilist;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 public class InputActivity extends AppCompatActivity{
     MojiEditText outsideMojiEdit;
@@ -64,7 +67,7 @@ public class InputActivity extends AppCompatActivity{
         lv.setAdapter(mAdapter);
         mojiInputLayout.setSendLayoutClickListener(new MojiInputLayout.SendClickListener() {
             @Override
-            public boolean onClick(String html, Spanned spanned) {
+            public boolean onClick(final String html, Spanned spanned) {
                 MojiMessage mojiMessage = new MojiMessage(html);
                 mAdapter.add(mojiMessage);
 
