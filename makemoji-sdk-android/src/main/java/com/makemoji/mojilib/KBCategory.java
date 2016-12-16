@@ -35,7 +35,7 @@ public class KBCategory {
     private static String [] defaultCategories = {"trending","animals","clothing","expression","food",
             "hands","objects","politics","pop culture","sports","keyboard"};
     private static int [] icons = {R.drawable.mm_trending,R.drawable.mm_animals,R.drawable.mm_clothing,R.drawable.mm_expression,R.drawable.mm_food,
-            R.drawable.mm_hands,R.drawable.mm_objects,R.drawable.mm_politics,R.drawable.mm_popculture,R.drawable.mm_sports,R.drawable.mm_keyboard};
+            R.drawable.mm_hands,R.drawable.mm_objects,R.drawable.mm_politics,R.drawable.mm_popculture,R.drawable.mm_sports,R.drawable.mm_abc};
     static{
         for (int i = 0; i < defaultCategories.length; i++) {
             defaults.put(defaultCategories[i],icons[i]);

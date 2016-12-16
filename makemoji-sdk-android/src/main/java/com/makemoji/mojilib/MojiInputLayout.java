@@ -326,6 +326,8 @@ public class MojiInputLayout extends LinearLayout implements
             final String t = s.toString();
             sendLayout.setEnabled(t.length()>=minimumSendLength);
 
+            if (!showLeft) return;
+
             int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
             if (selectionEnd==-1){
                 useTrendingAdapter(true);
@@ -881,9 +883,11 @@ public class MojiInputLayout extends LinearLayout implements
         return bottomPageBg;
     }
 
+    boolean showLeft = true;
     public void showLeftNavigation(boolean visible){
         topScroller.setEnableScroll(visible);
         topScroller.setShowLeft(visible);
+        showLeft = visible;
     }
 
     protected MojiEditText.IDrawableClick drawableClick;

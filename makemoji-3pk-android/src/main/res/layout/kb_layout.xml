@@ -60,7 +60,7 @@
                 android:layout_marginRight="2dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/mm_backspace_grey600_24dp"
+                android:src="@drawable/mm_backspace"
                 android:contentDescription="@string/_mm_backspace" />
         </LinearLayout>
     </LinearLayout>
