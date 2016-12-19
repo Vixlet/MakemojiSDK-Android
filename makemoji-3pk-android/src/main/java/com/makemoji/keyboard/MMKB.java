@@ -99,10 +99,15 @@ public class MMKB extends InputMethodService
         PagerPopulator.PopulatorObserver,KBCategory.KBTAbListener, MojiUnlock.ICategoryUnlock {
 
 
-    public interface ILockedCategorySelected{
-        void categorySelected(String category, FrameLayout parent);
+    public interface ICategorySelected{
+        void categorySelected(String category, boolean locked, FrameLayout parent);
     }
-    static ILockedCategorySelected lockedListener;
+    public interface IKBCustomizer{
+        int getRows(String category);
+        int getCols(String category);
+    }
+    static ICategorySelected categorySelected;
+    static  IKBCustomizer kbCustomizer;
 
     /**
      * This boolean indicates the optional example code for performing
@@ -152,6 +157,7 @@ public class MMKB extends InputMethodService
     SearchPopulator searchPopulator;
     boolean useTrending = true;
     View kbBottomNav;
+    String category;
 
     static int forceDimen;
     public static void forceSizeDp(@Dimension(unit = Dimension.DP) int dimen){
@@ -169,6 +175,19 @@ public class MMKB extends InputMethodService
         gifRows = Moji.context.getResources().getInteger(R.integer.mm_3pk_gif_rows);
         videoRows = Moji.context.getResources().getInteger(R.integer._mm_video_rows);
         cols = Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
+
+        kbCustomizer = new IKBCustomizer() {
+            @Override
+            public int getRows(String category) {
+                return Moji.context.getResources().getInteger(R.integer.mm_3pk_rows);
+            }
+
+            @Override
+            public int getCols(String category) {
+                return Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
+            }
+        };
+
     }
 
     /**
@@ -198,8 +217,11 @@ public class MMKB extends InputMethodService
         }
     }
 
-    public static void setLockedListener(@NonNull ILockedCategorySelected listener){
-        lockedListener = listener;
+    public static void setCategoryListener(@NonNull ICategorySelected listener){
+        categorySelected = listener;
+    }
+    public static void setKbCustomizer(@NonNull IKBCustomizer customizer){
+        kbCustomizer = customizer;
     }
     public static void setShareMessage(CharSequence message){
         shareMessage = message;
@@ -232,10 +254,11 @@ public class MMKB extends InputMethodService
             shareText.setVisibility(View.VISIBLE);
         }
 
-        if (lockedListener==null){
-            lockedListener=new ILockedCategorySelected() {
+        if (categorySelected==null){
+            categorySelected=new ICategorySelected() {
                 @Override
-                public void categorySelected(String category, FrameLayout parent) {
+                public void categorySelected(String category,boolean locked, FrameLayout parent) {
+                    if (!locked) return;
                     Intent i = new Intent(Moji.ACTION_LOCKED_CATEGORY_CLICK);
                     i.putExtra(Moji.EXTRA_CATEGORY_NAME,category);
                     i.putExtra(Moji.EXTRA_PACKAGE_ORIGIN,Moji.context.getPackageName());
@@ -966,6 +989,7 @@ public class MMKB extends InputMethodService
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         heading.setText(tab.getContentDescription());
+        category = tab.getContentDescription().toString();
         if (populator!=null)populator.teardown();
         if ("keyboard".equals(tab.getContentDescription())){
             mInputView.setVisibility(View.VISIBLE);
@@ -1000,8 +1024,9 @@ public class MMKB extends InputMethodService
             horizRv.setAdapter(null);
         }
 
+        categorySelected.categorySelected(tab.getContentDescription().toString(),
+                (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))),inputView);
          if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-            lockedListener.categorySelected(tab.getContentDescription().toString(),inputView);
             tabLayout.getTabAt(currentTab).select();//go back to last tab
             return;
         }
@@ -1032,6 +1057,8 @@ public class MMKB extends InputMethodService
     boolean gifs;
     @Override
     public void onNewDataAvailable() {
+        rows = kbCustomizer.getRows(category);
+        cols = kbCustomizer.getCols(category);
         int h = rv.getHeight();
         int size = h / rows;
         int vSpace = (h - (size * rows)) / rows;

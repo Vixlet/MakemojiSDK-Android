@@ -34,10 +34,17 @@ public class App extends Application {
         //broncos bb0b5cf8d6a9e73fb2800202d204a15ef5a578d3
         //a custom listener that will display a view (ie to prompt a purchase), when a locked category is clicked
         KBCategory.categoryDrawables.put("Sports",R.drawable.custom_kb_tab);
-        MMKB.setLockedListener(new MMKB.ILockedCategorySelected() {
+        MMKB.setCategoryListener(new MMKB.ICategorySelected() {
+            View v;
             @Override
-            public void categorySelected(String category, final FrameLayout parent) {
-                View v = new View(context);
+            public void categorySelected(String category,boolean locked, final FrameLayout parent) {
+                if (v!=null) {
+                    parent.removeView(v);
+                    v=null;
+                    return;
+                }
+                if (!"Sports".equalsIgnoreCase(category))return;
+                v = new View(context);
                 v.setAlpha(.5f);
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -48,6 +55,7 @@ public class App extends Application {
                 });
                 v.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)(210*Moji.density), Gravity.FILL));
                 v.setBackgroundColor(ContextCompat.getColor(context,R.color.colorPrimary));
+
                 parent.addView(v);
             }
         });
