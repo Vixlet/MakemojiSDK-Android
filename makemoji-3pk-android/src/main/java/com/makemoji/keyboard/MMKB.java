@@ -84,6 +84,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +162,7 @@ public class MMKB extends InputMethodService
     String category;
 
     static int forceDimen;
+    WeakReference<MMKB> instance;
     public static void forceSizeDp(@Dimension(unit = Dimension.DP) int dimen){
         forceDimen = dimen;
     }
@@ -175,8 +178,10 @@ public class MMKB extends InputMethodService
         gifRows = Moji.context.getResources().getInteger(R.integer.mm_3pk_gif_rows);
         videoRows = Moji.context.getResources().getInteger(R.integer._mm_video_rows);
         cols = Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
+        instance = new WeakReference<>(this);
 
-        kbCustomizer = new IKBCustomizer() {
+        if (kbCustomizer==null)
+            kbCustomizer = new IKBCustomizer() {
             @Override
             public int getRows(String category) {
                 return Moji.context.getResources().getInteger(R.integer.mm_3pk_rows);
@@ -992,6 +997,8 @@ public class MMKB extends InputMethodService
         category = tab.getContentDescription().toString();
         if (populator!=null)populator.teardown();
         if ("keyboard".equals(tab.getContentDescription())){
+            category = "keyboard";
+            categorySelected.categorySelected("keyboard",false,inputView);
             mInputView.setVisibility(View.VISIBLE);
             pageFrame.setVisibility(View.GONE);
             kbBottomNav.setVisibility(View.GONE);
