@@ -168,7 +168,7 @@ public class KBCategory {
                 c.drawableRes = defaults.get(c.name.toLowerCase());
             }
             if ("osemoji".equalsIgnoreCase(c.name)){
-                c.drawableRes=R.drawable.mm_globe;
+                c.drawableRes=R.drawable.mm_globe_drawable;
                 if (!keepOs) iterator.remove();
             }
             if ("recent".equalsIgnoreCase(c.name)){

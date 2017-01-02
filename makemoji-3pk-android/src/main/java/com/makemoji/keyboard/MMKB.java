@@ -162,7 +162,7 @@ public class MMKB extends InputMethodService
     String category;
 
     static int forceDimen;
-    WeakReference<MMKB> instance;
+    public static WeakReference<MMKB> instance;
     public static void forceSizeDp(@Dimension(unit = Dimension.DP) int dimen){
         forceDimen = dimen;
     }
@@ -1332,9 +1332,11 @@ public class MMKB extends InputMethodService
     }
 
 
+    public static boolean showTrending= true;
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
         int selectedPosition = tabLayout.getSelectedTabPosition();
+        if (!showTrending) tabs.remove(0);
 
         //to resolve timing issue: If tablayout/inputview is rapidly created->destroyed->created, old tab will try to be added to the new tablayout.
         if (!tabs.isEmpty()){
