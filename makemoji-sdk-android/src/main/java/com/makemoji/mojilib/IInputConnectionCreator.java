@@ -5,7 +5,7 @@ import android.view.inputmethod.InputConnection;
 
 /**
  * supply an implementation to MojiEditText to create your own input connection, for supporting things like commitContent from a keyboard
- * Created by s_baa on 11/19/2016.
+ * Created by Scott Baar on 11/19/2016.
  */
 
 public interface IInputConnectionCreator {

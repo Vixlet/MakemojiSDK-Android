@@ -99,7 +99,7 @@ public class InputActivity extends AppCompatActivity{
         mojiInputLayout.setLockedCategoryClicked(new MojiUnlock.ILockedCategoryClicked() {
             @Override
             public void lockedCategoryClick(String name) {
-                lockedCategoryClick(name);
+                InputActivity.this.lockedCategoryClick(name);
             }
         });
 

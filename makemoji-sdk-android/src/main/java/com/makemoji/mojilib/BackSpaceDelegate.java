@@ -4,7 +4,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Created by DouglasW on 4/5/2016.
+ * Created by Scott Baar on 4/5/2016.
  */
 public class BackSpaceDelegate {
     boolean isPressed;

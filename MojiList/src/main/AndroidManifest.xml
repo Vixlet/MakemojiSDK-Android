@@ -8,14 +8,9 @@
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:debuggable="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.makemoji.mojilib.wall.MojiWallActivity"
             android:label="Emoji Wall Activity"></activity>

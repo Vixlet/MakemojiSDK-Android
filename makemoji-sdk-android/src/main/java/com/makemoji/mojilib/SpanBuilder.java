@@ -27,6 +27,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.makemoji.mojilib.model.MojiModel;
+
 import org.ccil.cowan.tagsoup2.Parser;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -350,6 +352,10 @@ class SpanBuilder implements ContentHandler {
             final MojiSpan mojiSpan = MojiSpan.createMojiSpan(d,src,width,height,parsedAttributes.fontSizePt,simple,link,refreshView,null);
             mojiSpan.name = name;
             mojiSpan.id = idInt;
+            MojiModel model = new MojiModel(name,src);
+            model.id = idInt;
+            model.link_url = link;
+            mojiSpan.model = model;
 
             text.setSpan(mojiSpan, len, text.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

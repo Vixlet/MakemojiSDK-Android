@@ -40,13 +40,9 @@ import java.lang.ref.WeakReference;
     public class MojiSpan extends ReplacementSpan implements Spanimatable {
 
     protected Drawable mDrawable;
-    protected Uri mContentUri;
-    protected int mResourceId;
-    protected Context mContext;
     protected String mSource;
     protected int mWidth;
     protected int mHeight;
-    protected int mFontSize;
 
     // the baseline "normal" font size in sp.
     static final int BASE_TEXT_PT = 16;
@@ -78,8 +74,8 @@ import java.lang.ref.WeakReference;
 
     public MojiSpan() {
     }
-
-    public static MojiSpan createMojiSpan
+     //static constructors might need to be merged in the future
+     static MojiSpan createMojiSpan
             (@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView,Bitmap b){
         if (source!=null && source.toLowerCase().endsWith(".gif")){
             return new GifSpan(d,source,w,h,fontSize,simple,link,refreshView);

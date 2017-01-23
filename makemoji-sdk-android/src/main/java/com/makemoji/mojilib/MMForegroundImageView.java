@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
-
+//https://gist.github.com/JakeWharton/0a251d67649305d84e8a
 public class MMForegroundImageView extends ImageView {
     private Drawable foreground;
 

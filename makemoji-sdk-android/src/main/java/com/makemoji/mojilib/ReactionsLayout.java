@@ -25,7 +25,7 @@ import com.makemoji.mojilib.wall.MojiWallActivity;
 import java.util.List;
 
 /**
- * Created by s_baa on 7/5/2016.
+ * Created by Scott Baar on 7/5/2016.
  */
 public class ReactionsLayout extends LinearLayout implements PagerPopulator.PopulatorObserver, ReactionsAdapter.onItemClick {
     ReactionsData data;

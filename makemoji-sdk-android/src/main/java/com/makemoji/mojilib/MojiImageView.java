@@ -19,7 +19,6 @@ import com.squareup.picasso252.Callback;
 import java.lang.ref.WeakReference;
 
 /**
- * Don't use this outsid
  * Created by Scott Baar on 1/24/2016.
  */
 class MojiImageView extends ImageView  implements Spanimatable{

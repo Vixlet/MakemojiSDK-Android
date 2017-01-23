@@ -4,7 +4,7 @@ import android.text.style.ClickableSpan;
 
 /**
  * override equals to facilitate equality tests
- * Created by DouglasW on 3/21/2016.
+ * Created by Scott Baar on 3/21/2016.
  */
 public abstract class MojiClickableSpan extends ClickableSpan {
     @Override

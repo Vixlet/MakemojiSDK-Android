@@ -72,7 +72,7 @@ public class MojiModel {
         return  (m.image_url).equals(image_url);
     }
     public static JSONObject toJson(MojiModel m){
-        if ( m.image_url==null||m.name==null)return null;//invalid object
+        if ( m==null || m.image_url==null||m.name==null)return null;//invalid object
         try{
             return new JSONObject(Moji.gson.toJson(m));
         }
@@ -90,7 +90,7 @@ public class MojiModel {
         if (models==null ||models.isEmpty())return ja;
         for (MojiModel m : models){
             JSONObject jo = toJson(m);
-            ja.put(jo);
+            if (jo!=null)ja.put(jo);
         }
         return ja;
     }

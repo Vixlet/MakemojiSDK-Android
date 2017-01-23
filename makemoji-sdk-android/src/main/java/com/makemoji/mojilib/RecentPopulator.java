@@ -34,6 +34,7 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
     }
     @UiThread
     public static void addRecent(MojiModel model){
+        if (model==null) return;
         if (!ALLOW_GIFS && model.gif==1)return;//no gifs
         List<MojiModel> list = getRecents();
         if (!list.contains(model))list.add(0,model);
