@@ -90,11 +90,11 @@ class MojiImageView extends ImageView  implements Spanimatable{
                 if (sizeImagesToSpanSize)//resize if re using bitmap loaded for moji spans.
                     Moji.picasso.load(Moji.uriImage(m.image_url))
                             .resize(size, size)
-                            .placeholder(d).into(this);
+                            .onlyScaleDown().placeholder(d).into(this);
                 else
                     Moji.picasso.load(Moji.uriImage(m.image_url))
                             .resize(Math.max(forceDimen,1),Math.max(forceDimen,1))//fix rare crash
-                            .placeholder(d).into(this);
+                            .onlyScaleDown().placeholder(d).into(this);
 
             } else if (m.character!=null){
                 setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));

@@ -47,7 +47,6 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     public static final int DRAWABLE_BOTTOM = 3;
 
     public IInputConnectionCreator connectionCreator;
-    IMojiSelected iMojiSelected;
 
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         InputConnection connection =super.onCreateInputConnection(outAttrs);
@@ -109,9 +108,11 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
         addTextChangedListener(new TextWatcher() {
             CharSequence before;
             List<MojiSpan> beforeSpans = new ArrayList<>();
+            int beforeLength;
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {before =s;
-            //Moji.unsubSpanimatable(before);
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                before =s;
+                beforeLength = before.length();
                 beforeSpans.clear();
                 if (before instanceof Spanned){
                     MojiSpan spans[] = ((Spanned) before).getSpans(0,before.length(),MojiSpan.class);
@@ -148,10 +149,11 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                 for (MojiSpan span : beforeSpans)
                     Spanimator.unsubscribe(Spanimator.HYPER_PULSE,span);
 
-                if (ssb.length()>builder.length()){//mojis have been deleted
+                //if (ssb.length()>builder.length()){//mojis have been deleted
+                if (beforeLength!=builder.length()){
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
                    // Moji.unsubSpanimatable(before);
-                    setText(builder);
+                    Moji.setText(builder,MojiEditText.this);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));
                 }
                 }

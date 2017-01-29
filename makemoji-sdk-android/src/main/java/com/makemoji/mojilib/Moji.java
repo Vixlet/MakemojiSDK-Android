@@ -258,6 +258,8 @@ public class Moji {
         CharSequence cs = tv.getText();
         if (cs instanceof Spanned)
             unsubSpanimatable((Spanned)cs);
+        if (tv.getTag(R.id._makemoji_text_watcher)!=null)
+            spanned = ((IMojiTextWatcher)tv.getTag(R.id._makemoji_text_watcher)).textAboutToChange(spanned);
         tv.setText(spanned);
         subSpanimatable(spanned,tv);
 

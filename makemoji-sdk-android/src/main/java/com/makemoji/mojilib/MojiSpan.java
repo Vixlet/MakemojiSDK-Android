@@ -22,6 +22,7 @@ import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso252.MemoryPolicy;
 import com.squareup.picasso252.NetworkPolicy;
 import com.squareup.picasso252.Picasso;
+import com.squareup.picasso252.RequestCreator;
 import com.squareup.picasso252.Target;
 
 import java.io.InputStream;
@@ -60,6 +61,8 @@ import java.lang.ref.WeakReference;
     //proportion to size the moji on next frame when being animated;
     private float currentAnimationScale = 1f;
 
+    private float sizeMultiplier = 1f;
+
 
     protected SoftReference<Drawable> mDrawableRef;
     protected WeakReference<TextView> mViewRef;
@@ -71,6 +74,7 @@ import java.lang.ref.WeakReference;
     protected String name;
     public MojiModel model;
     int id = -1;
+    Runnable loadRunnable;
 
     public MojiSpan() {
     }
@@ -87,15 +91,15 @@ import java.lang.ref.WeakReference;
      *
      * @param d The placeholder drawable.
      * @param source URL of the actual emoji
-     * @param w width
-     * @param h height
+     * @param w width, usually 20
+     * @param h height, usually 20
      * @param fontSize pt size of parsed attributes
      * @param simple if true, scale based on fontSize, otherwise refreshView's size
      * @param link URL to callback when clicked.
      * @param refreshView view to size against and invalidate after image load.
      * @param b bitmap to use instead of picasso load
      */
-    public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, TextView refreshView,Bitmap b) {
+    public MojiSpan(@NonNull Drawable d, String source, int w, int h, int fontSize, boolean simple, String link, final TextView refreshView, Bitmap b) {
         //scale based on font size
         if (simple) { //scale based on current text size
             if (refreshView != null) mFontRatio = refreshView.getTextSize() / BASE_TEXT_PX_SCALED;
@@ -124,7 +128,7 @@ import java.lang.ref.WeakReference;
             return;
         }
         if (mSource != null && !mSource.isEmpty()) {
-            Runnable runnable = new Runnable() {
+            loadRunnable = new Runnable() {
                 @Override
                 public void run() {
 
@@ -133,15 +137,18 @@ import java.lang.ref.WeakReference;
                         t.onBitmapLoaded(cache, null);
                         return;
                     }
-                    Moji.picasso.load(Moji.uriImage(mSource))
-                            .resize(size, size)
-                            .into(t);
+                    //if load exact has not been set or is true, load at given size, otherwise load raw image.
+                    boolean loadExact = (refreshView==null || refreshView.getTag(R.id._makemoji_load_exact_size)==null
+                            || Boolean.TRUE.equals(refreshView.getTag(R.id._makemoji_load_exact_size)));
+                    RequestCreator requestCreator = Moji.picasso.load(Moji.uriImage(mSource));
+                            if (loadExact)requestCreator = requestCreator.resize(size, size).onlyScaleDown();
+                            requestCreator.into(t);
                 }
             };
             if (Moji.isMain()) {
-                runnable.run();
+                loadRunnable.run();
             } else {
-                Moji.handler.post(runnable);
+                Moji.handler.post(loadRunnable);
             }
         }
     }
@@ -223,11 +230,10 @@ import java.lang.ref.WeakReference;
         return mVerticalAlignment;
     }
 
-    /**
-     * Your subclass must implement this method to provide the bitmap
-     * to be drawn.  The dimensions of the bitmap must be the same
-     * from each call to the next.
-     */
+
+    public void setSizeMultiplier(float multiplier){
+        sizeMultiplier = multiplier;
+    }
 
     @Override
     public int getSize(Paint paint, CharSequence text,
@@ -235,8 +241,8 @@ import java.lang.ref.WeakReference;
                        Paint.FontMetricsInt fm) {
         Drawable d = getCachedDrawable();
         Rect rect = d.getBounds();
-        rect.bottom = mHeight;
-        rect.right = mWidth;
+        rect.bottom = (int)(mHeight *sizeMultiplier);
+        rect.right = (int)(mWidth * sizeMultiplier);
         //rect.bottom=100;
 
         if (fm != null) {
@@ -247,9 +253,9 @@ import java.lang.ref.WeakReference;
             fm.bottom = 0;
         }
 
-        //return 100;
         return rect.right;
     }
+
 
     @Override
     public void draw(Canvas canvas, CharSequence text,
@@ -257,6 +263,7 @@ import java.lang.ref.WeakReference;
                      int top, int y, int bottom, Paint paint) {
         if (LOG)Log.d(TAG,"draw "+name);
         Drawable d = getCachedDrawable();
+        d.setBounds(0,0,(int)(mWidth * sizeMultiplier),(int)(mHeight * sizeMultiplier));
         canvas.save();
         //save bounds before applying animation scale. for a size pulse only
         //int oldRight = d.getBounds().right;
@@ -270,7 +277,8 @@ import java.lang.ref.WeakReference;
 
         d.setAlpha((int)(255 * currentAnimationScale));
         canvas.translate(x, transY);
-        d.draw(canvas);
+        //d.draw(canvas);
+        canvas.drawBitmap(((BitmapDrawable)d).getBitmap(),null,d.getBounds(),paint);
        // d.setBounds(d.getBounds().left,d.getBounds().top,oldRight,oldBottom);
         canvas.restore();
     }
@@ -336,18 +344,9 @@ import java.lang.ref.WeakReference;
         if (mDrawable==null && mSource!=null && !mSource.isEmpty()) //if bitmap was gced, get it again. don't bother refetching for a new size.
         {
             if (Moji.isMain())
-            Moji.picasso.load(Moji.uriImage(mSource))
-                    .resize(mWidth, mHeight)
-                    .into(t);
+                loadRunnable.run();
             else
-                Moji.handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Moji.picasso.load(Moji.uriImage(mSource))
-                                .resize(mWidth, mHeight)
-                                .into(t);
-                    }
-                });
+                Moji.handler.post(loadRunnable);
         }
     }
     public void setTextView(TextView tv){
@@ -378,6 +377,7 @@ import java.lang.ref.WeakReference;
             return false;
         if (id!=other.id)return false;
         if (name!=null && !name.equals(other.name)) return false;
+        if (sizeMultiplier==other.sizeMultiplier) return false;
         if (other.name!=null && !other.name.equals(name)) return false;
 
         if (mLink!=null && !mLink.equals(other.mLink)) return false;
@@ -385,8 +385,12 @@ import java.lang.ref.WeakReference;
 
         return true;
     }
+    @Override
+    public boolean equals(Object o){
+        return equivelant(o);
+    }
     @Override public int hashCode() {
-        return (41 * (41 + id) *(41*(""+name).hashCode())) + (""+mLink).hashCode();
+        return (int)(41 * (41 + id) *(41 + sizeMultiplier) *(41*(""+name).hashCode())) + (""+mLink).hashCode();
     }
 
 }

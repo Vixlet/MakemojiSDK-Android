@@ -726,6 +726,9 @@ public class MojiInputLayout extends LinearLayout implements
         editText.setSelection(editText.getText().length());//set selection to end
         editTextWatcher.afterTextChanged(editText.getText());
     }
+    public EditText getEditText(){
+        return editText;
+    }
     void attatchEditText(EditText met){
         editText = met;
         if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);

@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,9 +25,11 @@ import android.widget.Toast;
 import com.makemoji.keyboard.MMKB;
 import com.makemoji.mojilib.HyperMojiListener;
 import com.makemoji.mojilib.IMojiSelected;
+import com.makemoji.mojilib.IMojiTextWatcher;
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiEditText;
 import com.makemoji.mojilib.MojiInputLayout;
+import com.makemoji.mojilib.MojiSpan;
 import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.ParsedAttributes;
 import com.makemoji.mojilib.model.MojiModel;
@@ -103,11 +108,39 @@ public class InputActivity extends AppCompatActivity{
             }
         });
 
-        //to intercept 3pk selections without having to listen to a picture intent
+        //to intercept 3pk selections without having to listen to a share image intent
         mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
         //outsideMojiEdit.connectionCreator =new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout);
 
-       // mojiInputLayout.showLeftNavigation(false);
+        /*  example of how to change the size of emojis in certain conditions; eg, make the first 3 emojis bigger when they are the only text
+            First, since the emojis may be bigger than 1x, tell the textview keep the raw emoji image in memory, not the downscaled image usually used.
+            Seconds, set a special textwatcher that will be called by the library when the input changes
+         */
+        outsideMojiEdit.setTag(R.id._makemoji_load_exact_size,false);
+        outsideMojiEdit.setTag(R.id._makemoji_text_watcher, new IMojiTextWatcher() {
+            @Override
+            public Spanned textAboutToChange(Spanned spanned) {
+                MojiSpan spans [] = spanned.getSpans(0,spanned.length(),MojiSpan.class);
+                String string = spanned.toString();
+
+                for (int i = 0; i < string.length();i++) {
+                    if (Character.isLetterOrDigit(string.charAt(i))){//there is something besides emojis: make everything normal
+                        for (MojiSpan span : spans)
+                            span.setSizeMultiplier(1);
+                        return spanned;
+                    }
+                }
+
+                if (spans.length>3){//there are more than three makemojis
+                    for (MojiSpan span : spans)
+                        span.setSizeMultiplier(1);
+                    return spanned;
+                }
+                for (MojiSpan span : spans)
+                    span.setSizeMultiplier(3);
+                return spanned;
+            }
+        });
 
     }
 
