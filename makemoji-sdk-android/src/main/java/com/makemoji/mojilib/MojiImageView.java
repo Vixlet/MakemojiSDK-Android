@@ -19,9 +19,10 @@ import com.squareup.picasso252.Callback;
 import java.lang.ref.WeakReference;
 
 /**
+ * Don't use this outsid
  * Created by Scott Baar on 1/24/2016.
  */
-class MojiImageView extends ImageView  implements Spanimatable{
+public class MojiImageView extends ImageView  implements Spanimatable{
     MojiModel model;
     float currentAnimationScale =1f;
     boolean animate;
@@ -90,11 +91,11 @@ class MojiImageView extends ImageView  implements Spanimatable{
                 if (sizeImagesToSpanSize)//resize if re using bitmap loaded for moji spans.
                     Moji.picasso.load(Moji.uriImage(m.image_url))
                             .resize(size, size)
-                            .onlyScaleDown().placeholder(d).into(this);
+                            .placeholder(d).into(this);
                 else
                     Moji.picasso.load(Moji.uriImage(m.image_url))
                             .resize(Math.max(forceDimen,1),Math.max(forceDimen,1))//fix rare crash
-                            .onlyScaleDown().placeholder(d).into(this);
+                            .placeholder(d).into(this);
 
             } else if (m.character!=null){
                 setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));

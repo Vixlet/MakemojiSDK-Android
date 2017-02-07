@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Scott Baar on 1/9/2016.
@@ -45,7 +46,9 @@ public class MojiModel {
     public int video;
     public String video_url;
 
+    //local use only
     public WeakReference<Bitmap> bitmapRef;
+    boolean locked;
 
 
     @SerializedName("native")
@@ -69,7 +72,17 @@ public class MojiModel {
         if (m.character!=null && !m.character.equals(character))return false;
         else if (character!=null && !character.equals(m.character))return false;
         if (m.image_url==null)return image_url==null;
+        if (id!=m.id)return false;
         return  (m.image_url).equals(image_url);
+    }
+    @Override
+    public int hashCode(){
+        int result = 17;
+        result = 31 * result + (name!=null?name.hashCode():0);
+        result = 31 * result + id;
+        result = 31 * result + (image_url!=null?image_url.hashCode():0);
+        result = 31 * result + (character!=null?character.hashCode():0);
+        return result;
     }
     public static JSONObject toJson(MojiModel m){
         if ( m==null || m.image_url==null||m.name==null)return null;//invalid object
