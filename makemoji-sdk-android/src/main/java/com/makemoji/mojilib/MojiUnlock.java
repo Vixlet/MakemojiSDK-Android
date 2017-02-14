@@ -28,7 +28,7 @@ public class MojiUnlock {
     }
     public static Set<String> getUnlockedGroups(){
         if (unlocked == null)
-           unlocked= Moji.context.getSharedPreferences("mm_unlock",0).getStringSet("groupUnlocks",new HashSet<String>());
+           unlocked= new HashSet<>(Moji.context.getSharedPreferences("mm_unlock",0).getStringSet("groupUnlocks",new HashSet<String>()));
         return unlocked;
     }
     public static void addGroup(String name){

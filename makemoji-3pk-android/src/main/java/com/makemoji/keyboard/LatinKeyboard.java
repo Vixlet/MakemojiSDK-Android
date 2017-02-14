@@ -83,7 +83,7 @@ public class LatinKeyboard extends Keyboard {
      * Dynamically change the visibility of the language switch key (a.k.a. globe key).
      * @param visible True if the language switch key should be visible.
      */
-    void setLanguageSwitchKeyVisibility(boolean visible) {
+    public void setLanguageSwitchKeyVisibility(boolean visible) {
         if (visible) {
             // The language switch key should be visible. Restore the size of the mode change key
             // and language switch key using the saved layout.
@@ -106,7 +106,7 @@ public class LatinKeyboard extends Keyboard {
      * This looks at the ime options given by the current editor, to set the
      * appropriate label on the keyboard's enter key (if it has one).
      */
-    void setImeOptions(Resources res, int options) {
+    public void setImeOptions(Resources res, int options) {
         if (mEnterKey == null) {
             return;
         }
@@ -138,13 +138,13 @@ public class LatinKeyboard extends Keyboard {
         }
     }
 
-    void setSpaceIcon(final Drawable icon) {
+    public void setSpaceIcon(final Drawable icon) {
         if (mSpaceKey != null) {
             mSpaceKey.icon = icon;
         }
     }
 
-    static class LatinKey extends Key {
+    public static class LatinKey extends Key {
 
         public LatinKey(Resources res, Row parent, int x, int y,
                 XmlResourceParser parser) {

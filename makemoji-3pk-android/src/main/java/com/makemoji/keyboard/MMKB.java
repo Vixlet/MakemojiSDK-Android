@@ -86,6 +86,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -384,21 +385,22 @@ public class MMKB extends InputMethodService
         pngSupported = false;
         mp4Supported = false;
         makemojiSupported = false;
-        for (String mimeType : mimeTypes) {
-            if (ClipDescription.compareMimeTypes(mimeType, "image/gif")) {
-                gifSupported = true;
-            }
-            if (ClipDescription.compareMimeTypes(mimeType, "image/png")) {
-                pngSupported = true;
-            }
-            if (ClipDescription.compareMimeTypes(mimeType, "video/mp4")) {
-                mp4Supported = true;
-            }
-            if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*") && Moji.context.getPackageName().equals(attribute.packageName)) {
-                makemojiSupported = true;
+        if (!attribute.packageName.equals("com.facebook.orca")) {//facebook is doing something bad. Same error happens when inserting gifs from gboard.
+            for (String mimeType : mimeTypes) {
+                if (ClipDescription.compareMimeTypes(mimeType, "image/gif")) {
+                    gifSupported = true;
+                }
+                if (ClipDescription.compareMimeTypes(mimeType, "image/png")) {
+                    pngSupported = true;
+                }
+                if (ClipDescription.compareMimeTypes(mimeType, "video/mp4")) {
+                    mp4Supported = true;
+                }
+                if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*") && Moji.context.getPackageName().equals(attribute.packageName)) {
+                    makemojiSupported = true;
+                }
             }
         }
-
         // Reset our state.  We want to do this even if restarting, because
         // the underlying state of the text editor could have changed in any way.
         mComposing.setLength(0);

@@ -25,9 +25,9 @@ import android.view.inputmethod.InputMethodSubtype;
 
 public class LatinKeyboardView extends KeyboardView {
 
-    static final int KEYCODE_OPTIONS = -100;
+    public static final int KEYCODE_OPTIONS = -100;
     // TODO: Move this into android.inputmethodservice.Keyboard
-    static final int KEYCODE_LANGUAGE_SWITCH = -101;
+    public static final int KEYCODE_LANGUAGE_SWITCH = -101;
 
     public LatinKeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,7 +38,7 @@ public class LatinKeyboardView extends KeyboardView {
     }
 
     @Override
-    protected boolean onLongPress(Key key) {
+    public boolean onLongPress(Key key) {
         if (key.codes[0] == Keyboard.KEYCODE_CANCEL) {
             getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
             return true;
@@ -47,7 +47,7 @@ public class LatinKeyboardView extends KeyboardView {
         }
     }
 
-    void setSubtypeOnSpaceKey(final InputMethodSubtype subtype) {
+    public void setSubtypeOnSpaceKey(final InputMethodSubtype subtype) {
         final LatinKeyboard keyboard = (LatinKeyboard)getKeyboard();
         keyboard.setSpaceIcon(getResources().getDrawable(subtype.getIconResId()));
         invalidateAllKeys();
