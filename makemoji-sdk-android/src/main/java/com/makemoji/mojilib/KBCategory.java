@@ -172,7 +172,7 @@ public class KBCategory {
                 if (!keepOs) iterator.remove();
             }
             if ("recent".equalsIgnoreCase(c.name)){
-                c.drawableRes=R.drawable.mm_recent;
+                c.drawableRes=R.drawable.mm_recent_drawable;
                 if (!keepRecent)iterator.remove();
             }
             if (categoryDrawables.containsKey(c.name)){
