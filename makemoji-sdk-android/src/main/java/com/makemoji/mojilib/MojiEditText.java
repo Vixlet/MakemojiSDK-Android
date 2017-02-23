@@ -127,7 +127,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                 String string = s.toString();
                 SpannableStringBuilder ssb = new SpannableStringBuilder(s);
                 SpannableStringBuilder builder = new SpannableStringBuilder();
-
+                boolean newEmoji = beforeSpans.size()!=ssb.getSpans(0,ssb.length(),MojiSpan.class).length;
                 for (int i = 0; i < string.length();) {
                     MojiSpan spanAtPoint[] = ssb.getSpans(i, i + 1, MojiSpan.class);
                     if (spanAtPoint.length == 0) {//not a moji
@@ -143,16 +143,15 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
                             builder.append(ssb.subSequence(start, end));
                             beforeSpans.remove(span);
                         }
-                            i+=spanLength;//invalid emoji, skip
+                        else{
+                            newEmoji = true;//invalid emoji, skip
+                        }
+                            i+=spanLength;
                         }
                     }
-                for (MojiSpan span : beforeSpans)
-                    Spanimator.unsubscribe(Spanimator.HYPER_PULSE,span);
 
-                //if (ssb.length()>builder.length()){//mojis have been deleted
-                if (beforeLength!=builder.length()){
+                if (beforeLength!=builder.length() && newEmoji){
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
-                   // Moji.unsubSpanimatable(before);
                     Moji.setText(builder,MojiEditText.this);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));
                 }

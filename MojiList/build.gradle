@@ -5,7 +5,6 @@ android {
         config {
             keyAlias 'password'
             keyPassword 'password'
-            storeFile file('C:/Users/DouglasW/Documents/throwawaystore.jks')
             storePassword 'password'
         }
     }

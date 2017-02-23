@@ -275,7 +275,8 @@ import java.lang.ref.WeakReference;
             transY -= paint.getFontMetricsInt().descent;
         }
 
-        d.setAlpha((int)(255 * currentAnimationScale));
+        //d.setAlpha((int)(255 * currentAnimationScale));
+        paint.setAlpha((int)(255 * currentAnimationScale));
         canvas.translate(x, transY);
         //d.draw(canvas);
         canvas.drawBitmap(((BitmapDrawable)d).getBitmap(),null,d.getBounds(),paint);
