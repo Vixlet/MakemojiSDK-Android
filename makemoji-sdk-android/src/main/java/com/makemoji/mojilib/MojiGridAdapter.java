@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.makemoji.mojilib.gif.GifImageView;
 import com.makemoji.mojilib.model.MojiModel;
+import com.makemoji.mojilib.model.SpaceMojiModel;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,10 +40,11 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     boolean useKbLifecycle;
 
 
-    static final int ITEM_NORMAL = 0;
-    static final int ITEM_GIF = 1;
-    static final int ITEM_PHRASE = 2;
-    static final int ITEM_VIDEO = 3;
+    public static final int ITEM_NORMAL = 0;
+    public static final int ITEM_GIF = 1;
+    public static final int ITEM_PHRASE = 2;
+    public static final int ITEM_VIDEO = 3;
+    public static final int ITEM_HSPACE = 4;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({ITEM_NORMAL,ITEM_GIF,ITEM_PHRASE,ITEM_VIDEO})
@@ -70,7 +72,9 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
     public void setMojiModels(List<MojiModel> models){
         mojiModels = new ArrayList<>(models);
         notifyDataSetChanged();
-
+    }
+    public List<MojiModel> getMojiModels(){
+        return mojiModels;
     }
     public void setImagesSizedtoSpan(boolean enable){
         imaagesSizedToSpan = enable;
@@ -82,6 +86,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
 
 
     @Override public int getItemViewType(int position){
+        if (mojiModels.get(position) instanceof SpaceMojiModel) return ITEM_HSPACE;
         if (mojiModels.get(position).gif==1)return ITEM_GIF;
         if (mojiModels.get(position).isPhrase()) return ITEM_PHRASE;
         if (mojiModels.get(position).isVideo()) return ITEM_VIDEO;
@@ -101,6 +106,10 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.mm_rv_phrase_item, parent, false);
             v.setBackgroundDrawable(phraseBg);
+        }
+        else if (viewType == ITEM_HSPACE){
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.mm_item_hspace, parent, false);
         }
         else{
             v = LayoutInflater.from(parent.getContext())
@@ -150,7 +159,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
             lp.height = holder.dimen/2;
             holder.overlay.setLayoutParams(lp);
         }
-        else {
+        else if (getItemViewType(position)==ITEM_PHRASE) {
             LinearLayout ll = (LinearLayout) holder.itemView;
             ll.setOnClickListener(new View.OnClickListener() {
                 @Override

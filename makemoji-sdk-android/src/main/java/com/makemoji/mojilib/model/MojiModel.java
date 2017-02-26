@@ -49,6 +49,7 @@ public class MojiModel {
     //local use only
     public WeakReference<Bitmap> bitmapRef;
     public boolean locked;
+    public String categoryName;
 
 
     @SerializedName("native")

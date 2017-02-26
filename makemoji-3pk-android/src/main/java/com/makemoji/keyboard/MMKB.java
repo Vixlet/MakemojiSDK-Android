@@ -32,6 +32,7 @@ import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.Space;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,6 +45,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -52,6 +54,7 @@ import android.view.inputmethod.InputMethodSubtype;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +77,7 @@ import com.makemoji.mojilib.SpacesItemDecoration;
 import com.makemoji.mojilib.Spanimator;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
+import com.makemoji.mojilib.model.SpaceMojiModel;
 import com.squareup.picasso252.Picasso;
 import com.squareup.picasso252.RequestCreator;
 import com.squareup.picasso252.Target;
@@ -147,12 +151,15 @@ public class MMKB extends InputMethodService
     String packageName;
     TabLayout tabLayout;
     RecyclerView rv;
+    GridLayoutManager glm;
     RecyclerView.ItemDecoration itemDecoration;
     PagerPopulator<MojiModel> populator;
+    List<MojiModel> allModels = new ArrayList<>();
     SmoothProgressBar spb;
     int mojisPerPage;
     MojiGridAdapter adapter;
-    TextView heading, shareText;
+    TextSwitcher heading;
+    TextView shareText;
     View pageFrame;
     static CharSequence shareMessage;
     int rows, cols, gifRows,videoRows;
@@ -245,8 +252,13 @@ public class MMKB extends InputMethodService
                 inflate(R.layout.kb_layout, null);
         tabLayout = (TabLayout)inputView.findViewById(R.id.tabs);
         rv = (RecyclerView) inputView.findViewById(R.id.kb_page_grid);
-        rv.setLayoutManager(new GridLayoutManager(inputView.getContext(), rows, LinearLayoutManager.HORIZONTAL, false));
-        heading = (TextView) inputView.findViewById(R.id.kb_page_heading);
+        glm = new GridLayoutManager(inputView.getContext(), rows, LinearLayoutManager.HORIZONTAL, false);
+        rv.setLayoutManager(glm);
+        heading = (TextSwitcher) inputView.findViewById(R.id.kb_page_heading);
+        heading.setInAnimation(AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_in));
+        heading.setOutAnimation(AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_out));
         shareText = (TextView) inputView.findViewById(R.id.share_kb_tv);
         mInputView = (LatinKeyboardView) inputView.findViewById(R.id._mm_kb_latin);
         pageFrame = inputView.findViewById(R.id._mm_kb_pageframe);
@@ -995,9 +1007,8 @@ public class MMKB extends InputMethodService
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        heading.setText(tab.getContentDescription());
-        category = tab.getContentDescription().toString();
-        if (populator!=null)populator.teardown();
+        setHeading(tab.getContentDescription());
+        String categoryName = tab.getContentDescription().toString();
         if ("keyboard".equals(tab.getContentDescription())){
             category = "keyboard";
             categorySelected.categorySelected("keyboard",false,inputView);
@@ -1047,9 +1058,12 @@ public class MMKB extends InputMethodService
         }
 
         currentTab = tab.getPosition();
-        gifs = "gifs".equalsIgnoreCase(tab.getContentDescription().toString());
-        populator.use3pk = true;
-        populator.setup(this);
+        for (MojiModel m: allModels){
+            if (m.categoryName.equals(categoryName)){
+                glm.scrollToPositionWithOffset(allModels.indexOf(m),0);
+                break;
+            }
+        }
     }
 
     @Override
@@ -1063,7 +1077,6 @@ public class MMKB extends InputMethodService
     }
 
 
-    boolean gifs;
     @Override
     public void onNewDataAvailable() {
         rows = kbCustomizer.getRows(category);
@@ -1075,7 +1088,7 @@ public class MMKB extends InputMethodService
 
 
         mojisPerPage = Math.max(rows*2, cols * rows);
-        List<MojiModel> models =populator.populatePage(populator.getTotalCount(),0);
+        List<MojiModel> models =allModels;
         adapter = new MojiGridAdapter(models,this,false,size);
         adapter.setImagesSizedtoSpan(getContext().getResources().getBoolean(R.bool.mmUseSpanSizeFor3pkImages));
         adapter.setEnablePulse(false);
@@ -1085,11 +1098,39 @@ public class MMKB extends InputMethodService
             itemDecoration = new SpacesItemDecoration(vSpace, hSpace);
             rv.addItemDecoration(itemDecoration);
      //   }
-        ((GridLayoutManager)rv.getLayoutManager()).setSpanCount(gifs?gifRows:rows);
+        glm.setSpanCount(rows);
+        glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch(adapter.getItemViewType(position)){
+                    case MojiGridAdapter.ITEM_HSPACE:
+                        return glm.getSpanCount();
+                    default:
+                        return 1;
+                }
+            }
+        });
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int firstVisible = glm.findFirstCompletelyVisibleItemPosition();
+                if (firstVisible!=-1)
+                    setHeading(adapter.getMojiModels().get(firstVisible).categoryName);
+
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
         if (OneGridPage.hasVideo(models)) ((GridLayoutManager) rv.getLayoutManager()).setSpanCount(videoRows);
         rv.setAdapter(adapter);
 
 
+    }
+    CharSequence currentHeading =null;
+    void setHeading(CharSequence s){
+        if (s!=null && !s.equals(currentHeading)){
+            currentHeading = s;
+            heading.setText(s);
+        }
     }
     @Override
     public void onDestroy(){
@@ -1348,12 +1389,25 @@ public class MMKB extends InputMethodService
             }
         }
         tabLayout.removeAllTabs();
-        for (TabLayout.Tab tab: tabs) tabLayout.addTab(tab);
+        allModels.clear();
+        for (TabLayout.Tab tab: tabs) {
+            if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null ){
+                Category category = (Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
+                if (category.models!=null && !category.models.isEmpty()){
+                    for (MojiModel m : category.models) m.categoryName = category.name;
+                    allModels.addAll(category.models);
+                    allModels.add(new SpaceMojiModel(category.name));
+                }
+            }
 
-        tabLayout.setOnTabSelectedListener(this);
-        if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
-            tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
+            tabLayout.addTab(tab);
         }
+        tabLayout.setOnTabSelectedListener(this);
+
+        onNewDataAvailable();
+       /* if (selectedPosition!= -1 && selectedPosition<tabs.size()) {
+            tabLayout.getTabAt(selectedPosition).select();//setscrollposition doesn't work...
+        }*/
     }
 
     @Override
