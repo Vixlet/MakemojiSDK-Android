@@ -1005,9 +1005,14 @@ public class MMKB extends InputMethodService
 
 
 
+    boolean ignoreNextTabSelect = false;
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         setHeading(tab.getContentDescription());
+        if (ignoreNextTabSelect){
+            ignoreNextTabSelect = false;
+            return;
+        }
         String categoryName = tab.getContentDescription().toString();
         if ("keyboard".equals(tab.getContentDescription())){
             category = "keyboard";
@@ -1047,20 +1052,21 @@ public class MMKB extends InputMethodService
         categorySelected.categorySelected(tab.getContentDescription().toString(),
                 (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))),inputView);
          if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-            tabLayout.getTabAt(currentTab).select();//go back to last tab
-            return;
+            tabLayout.getTabAt(currentTab).select();//go back to last tab\
         }
-        else{
+       /* else{
             Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
            if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
             else populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));//should not happen
 
-        }
+        }*/
 
         currentTab = tab.getPosition();
-        for (MojiModel m: allModels){
+        MojiModel m;
+        for (int i = 0; i < allModels.size(); i++) {
+            m = allModels.get(i);
             if (m.categoryName.equals(categoryName)){
-                glm.scrollToPositionWithOffset(allModels.indexOf(m),0);
+                glm.scrollToPositionWithOffset(i,0);
                 break;
             }
         }
@@ -1102,9 +1108,13 @@ public class MMKB extends InputMethodService
         glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
+                MojiModel m = adapter.getMojiModels().get(position);
+                if ("gifs".equalsIgnoreCase(m.categoryName))return 2;
                 switch(adapter.getItemViewType(position)){
                     case MojiGridAdapter.ITEM_HSPACE:
                         return glm.getSpanCount();
+                    case MojiGridAdapter.ITEM_VIDEO:
+                        return glm.getSpanCount()/2;
                     default:
                         return 1;
                 }
@@ -1114,13 +1124,23 @@ public class MMKB extends InputMethodService
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int firstVisible = glm.findFirstCompletelyVisibleItemPosition();
-                if (firstVisible!=-1)
-                    setHeading(adapter.getMojiModels().get(firstVisible).categoryName);
+                if (firstVisible!=-1) {
+                    MojiModel m = adapter.getMojiModels().get(firstVisible);
+                    setHeading(m.categoryName);
+                    for (TabLayout.Tab tab : tabList){
+                        if (!tab.isSelected() && tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null &&
+                                m.categoryName.equalsIgnoreCase(((Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id)).name)){
+                            ignoreNextTabSelect=true;
+                            tab.select();
+                            break;
+                        }
+                    }
+                }
 
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
-        if (OneGridPage.hasVideo(models)) ((GridLayoutManager) rv.getLayoutManager()).setSpanCount(videoRows);
+        //if (OneGridPage.hasVideo(models)) ((GridLayoutManager) rv.getLayoutManager()).setSpanCount(videoRows);
         rv.setAdapter(adapter);
 
 
@@ -1376,9 +1396,9 @@ public class MMKB extends InputMethodService
 
 
     public static boolean showTrending= true;
+    List<TabLayout.Tab> tabList = new ArrayList<>();
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
-        int selectedPosition = tabLayout.getSelectedTabPosition();
         if (!showTrending) tabs.remove(0);
 
         //to resolve timing issue: If tablayout/inputview is rapidly created->destroyed->created, old tab will try to be added to the new tablayout.
@@ -1390,6 +1410,7 @@ public class MMKB extends InputMethodService
         }
         tabLayout.removeAllTabs();
         allModels.clear();
+        tabList = tabs;
         for (TabLayout.Tab tab: tabs) {
             if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null ){
                 Category category = (Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
