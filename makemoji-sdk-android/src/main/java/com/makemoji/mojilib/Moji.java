@@ -78,7 +78,7 @@ import static android.os.Build.VERSION_CODES.HONEYCOMB;
  */
 public class Moji {
     public static Context context;
-    static Resources resources;
+    public static Resources resources;
 
     //We use our own static import of Picasso to set our own caches, logging behavior, etc
     // and to not conflict with app-side picasso implementations

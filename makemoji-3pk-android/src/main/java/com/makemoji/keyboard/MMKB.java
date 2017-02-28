@@ -71,6 +71,7 @@ import com.makemoji.mojilib.MojiSpan;
 import com.makemoji.mojilib.MojiUnlock;
 import com.makemoji.mojilib.OneGridPage;
 import com.makemoji.mojilib.PagerPopulator;
+import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.SearchPopulator;
 import com.makemoji.mojilib.SmallCB;
 import com.makemoji.mojilib.SpacesItemDecoration;
@@ -1396,10 +1397,25 @@ public class MMKB extends InputMethodService
 
 
     public static boolean showTrending= true;
+    public static boolean showRecent= true;
+    public static int recentCount= 20;
     List<TabLayout.Tab> tabList = new ArrayList<>();
     @Override
     public void onNewTabs(List<TabLayout.Tab> tabs) {
+
         if (!showTrending) tabs.remove(0);
+
+        TabLayout.Tab recent = tabLayout.newTab().setCustomView(R.layout.kb_tab)
+                .setContentDescription("Used").setIcon(R.drawable.mm_recent_drawable);
+        View v = recent.getCustomView().findViewWithTag("iv");
+        if ((v!=null) && v instanceof ImageView)
+            ((ImageView) v).setColorFilter(Moji.resources.getColor(R.color._mm_left_button_cf));
+
+        Category recentCategory = new Category("Used",null);
+        List<MojiModel> recents = RecentPopulator.getRecents();
+        recentCategory.models = new ArrayList<>(recents.subList(0,Math.min(recentCount,recents.size())));//set truncated list of recents.
+        recent.getCustomView().setTag(R.id._makemoji_category_tag_id,recentCategory);
+        if (showRecent)tabs.add(tabs.size()>0?1:0,recent);
 
         //to resolve timing issue: If tablayout/inputview is rapidly created->destroyed->created, old tab will try to be added to the new tablayout.
         if (!tabs.isEmpty()){
