@@ -1050,11 +1050,6 @@ public class MMKB extends InputMethodService
             horizRv.setAdapter(null);
         }
 
-        categorySelected.categorySelected(tab.getContentDescription().toString(),
-                (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))),inputView);
-         if (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))){
-            tabLayout.getTabAt(currentTab).select();//go back to last tab\
-        }
        /* else{
             Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
            if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
@@ -1357,7 +1352,7 @@ public class MMKB extends InputMethodService
     Target t;
     @Override
     public void mojiSelected(MojiModel model, BitmapDrawable d) {
-
+        RecentPopulator.addRecent(model);
         if (model.character!=null && !model.character.isEmpty()){
             getCurrentInputConnection().finishComposingText();
             getCurrentInputConnection().setComposingText(model.character, 1);
