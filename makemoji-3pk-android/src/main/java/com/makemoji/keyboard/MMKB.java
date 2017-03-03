@@ -1050,6 +1050,9 @@ public class MMKB extends InputMethodService
             horizRv.setAdapter(null);
         }
 
+        categorySelected.categorySelected(tab.getContentDescription().toString(),
+                (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))),inputView);
+
        /* else{
             Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
            if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
