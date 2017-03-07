@@ -185,6 +185,7 @@ import java.lang.ref.WeakReference;
             mDrawable.setBounds(0,0,mWidth,mHeight);
             mDrawableRef = new SoftReference<>(mDrawable);
             TextView tv = mViewRef.get();
+            if (tv!=null) tv.setTag(R.id._makemoji_tv_has_new_load,true);
             Moji.invalidateTextView(tv);
         }
 

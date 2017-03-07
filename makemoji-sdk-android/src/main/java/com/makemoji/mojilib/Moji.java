@@ -528,6 +528,7 @@ public class Moji {
     /**
      * Invalidate a view to trigger a redraw for a spanimator animation. EditText requires more work.
      * Only invalidate once a frame.
+     * request layout when a new emoji is loaded or always depending on tag
      * @param tv
      */
     @UiThread
@@ -542,10 +543,16 @@ public class Moji {
         if (lastInvalidated+15>now) return;
 
         tv.invalidate();
-        if (tv.getTag(R.id._makemoji_request_layout_id)!=null) tv.requestLayout();
-        if (tv instanceof EditText) {
+        if (tv.getTag(R.id._makemoji_tv_has_new_load)!=null){
             tv.requestLayout();
+            tv.setTag(R.id._makemoji_tv_has_new_load,null);
         }
+        else if (tv.getTag(R.id._makemoji_request_layout_id)!=null)
+            tv.requestLayout();
+        else if (tv instanceof EditText)
+            tv.requestLayout();
+
+
         if (tv instanceof ISpecialInvalidate){
             ((ISpecialInvalidate) tv).specialInvalidate();
         }

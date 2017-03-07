@@ -1,5 +1,7 @@
 package com.makemoji.mojilib;
 
+import android.util.Log;
+
 /**
  * https://gist.github.com/jdcrensh/4670128
  * Created by Scott Baar on 3/20/2016.
@@ -51,7 +53,7 @@ public class Base62 {
 
         /**
          * Decodes a Base62 <code>String</code> returning a <code>long</code>.
-         *
+         * Drop invalid characters. They're probably getting in because of bad regex TODO when does this happen?
          * @param b62
          *            the Base62 <code>String</code> to decode.
          * @return the decoded number as a <code>long</code>.
@@ -60,6 +62,16 @@ public class Base62 {
          *             specified in the constructor.
          */
         public long decodeBase62(String b62) {
+            if (b62 == null )return 0;
+            StringBuilder sb = new StringBuilder();
+            for (char c : b62.toCharArray())
+            {
+                if (characters.contains(String.valueOf(c)))
+                    sb.append(c);
+                else
+                    Log.d("base62 makemoji", "dropping char " + c + " trying to decode " + b62);
+            }
+            b62 = sb.toString();
             for (char character : b62.toCharArray()) {
                 if (!characters.contains(String.valueOf(character))) {
                     throw new IllegalArgumentException("Invalid character(s) in string: " + character);
