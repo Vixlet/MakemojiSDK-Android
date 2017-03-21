@@ -91,8 +91,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public boolean SSBEquals(SpannableStringBuilder ssb, Object o){
+        String s1 = ssb.toString().replace("\u0000", "");
+        String s2 = o.toString().replace("\u0000", "");
         if (o instanceof Spanned &&
-                ssb.toString().equals(o.toString())) {
+               s1.contentEquals(s2)) {
             Spanned other = (Spanned) o;
             // Check span data
             Object[] otherSpans = other.getSpans(0, other.length(), Object.class);

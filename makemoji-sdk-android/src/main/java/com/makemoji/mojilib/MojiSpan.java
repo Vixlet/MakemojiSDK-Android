@@ -379,7 +379,7 @@ import java.lang.ref.WeakReference;
             return false;
         if (id!=other.id)return false;
         if (name!=null && !name.equals(other.name)) return false;
-        if (sizeMultiplier==other.sizeMultiplier) return false;
+        if (sizeMultiplier!=other.sizeMultiplier) return false;
         if (other.name!=null && !other.name.equals(name)) return false;
 
         if (mLink!=null && !mLink.equals(other.mLink)) return false;
