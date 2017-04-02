@@ -98,6 +98,8 @@ public class MojiInputLayout extends LinearLayout implements
             alwaysShowBar = tryAlwaysShowBar;
         else
             alwaysShowBar = true;
+
+        setTopScrollerVisiblity(alwaysShowBar ? View.VISIBLE:View.GONE);
     }
 
     public interface SendClickListener{

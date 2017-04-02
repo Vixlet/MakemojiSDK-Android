@@ -101,13 +101,13 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             super(v);
             this.v = v;
             v.setTag(this);
-            name = (TextView) v.findViewById(R.id.tv);
+            name = (TextView) v.findViewById(R.id._mm_horiz_item_name);
             if (mil instanceof MojiInputLayout)name.setTextColor(((MojiInputLayout) mil).getHeaderTextColor());
-            View view = v.findViewById(R.id.pic);
+            View view = v.findViewById(R.id._mm_horiz_item_image);
             if (view instanceof GifImageView){
                 gifImageView = (GifImageView) view;
             }else {
-                image = (MojiImageView) v.findViewById(R.id.pic);
+                image = (MojiImageView) v.findViewById(R.id._mm_horiz_item_image);
                 int h = (int) (45.0 * Moji.density * .85);
                 image.sizeImagesToSpanSize(useSpanSizes);
                 dimen =h;
