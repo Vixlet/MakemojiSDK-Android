@@ -22,7 +22,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
 
     public static MojiSQLHelper mInstance;
     public static MojiSQLHelper m3pkInstance;
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "makemoji.db";
 
     private static final String FTS_VIRTUAL_TABLE = "FTS";
@@ -42,6 +42,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public static final  String COL_GIF_40 = "GIF_40";
     public static final  String COL_VIDEO = "VIDEO";
     public static final  String COL_VIDEO_URL = "VIDEO_URL";
+    public static final  String COL_TAGS = "TAGS";
 
 
     private static String getCreateString(String tableName){
@@ -56,7 +57,8 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
                 + COL_GIF + " INT, "
                 + COL_GIF_40 + " TEXT, "
                 + COL_VIDEO + " INT, "
-                + COL_VIDEO_URL + " TEXT "
+               + COL_VIDEO_URL + " TEXT, "
+               + COL_TAGS + " TEXT "
                 +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
                 + ");";
     }
@@ -99,6 +101,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
         values.put(COL_GIF_40, model.fourtyX40Url);
         values.put(COL_VIDEO, model.video);
         values.put(COL_VIDEO_URL, model.video_url);
+        values.put(COL_TAGS, model.tags);
         return values;
     }
     public synchronized void insert(List<MojiModel> models){
@@ -133,6 +136,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             mm.fourtyX40Url = c.getString(8);
             mm.video = c.getInt(9);
             mm.video_url = c.getString(10);
+            mm.tags = c.getString(11);
         }
         catch (Exception e){
             mm = null;
@@ -146,7 +150,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public List<MojiModel> search(String query, int limit){
         SQLiteDatabase db = this.getReadableDatabase();
         List<MojiModel> models = new ArrayList<>();
-        String raw = "SELECT * FROM "+table + " WHERE "+COL_NAME + " LIKE '" + query.replaceAll("'", "''") + "%' LIMIT "+ limit + " COLLATE NOCASE";
+        String raw = "SELECT * FROM "+table + " WHERE "+COL_TAGS + " LIKE '%" + query.replaceAll("'", "''") + "%' LIMIT "+ limit + " COLLATE NOCASE";
         Cursor c = db.rawQuery(raw,null);
         try{
             while (c.moveToNext()) {
@@ -161,6 +165,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
                 mm.fourtyX40Url = c.getString(8);
                 mm.video = c.getInt(9);
                 mm.video_url = c.getString(10);
+                mm.tags = c.getString(11);
                 models.add(mm);
             }
 

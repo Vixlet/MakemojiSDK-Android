@@ -47,6 +47,7 @@ import com.makemoji.mojilib.model.MojiModel;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -331,20 +332,17 @@ public class MojiInputLayout extends LinearLayout implements
             if (!showLeft) return;
 
             int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
-            if (selectionEnd==-1){
+            if (selectionEnd==-1 || editText.length()<1){
                 useTrendingAdapter(true);
                 return;
             }
             String text = t.substring(0,selectionEnd);//only look at what's before selection
-            int lastBang = text.lastIndexOf('!');
             int lastSpace = text.lastIndexOf(' ');
             if (lastSpace==-1) lastSpace = text.lastIndexOf('\n');
             if (lastSpace==-1) lastSpace = text.lastIndexOf('\t');
-            if (lastBang==-1 || (lastSpace>0 && lastSpace>lastBang)) {
-                useTrendingAdapter(true);//no bang or there's whitespace afterward.
-                return;
-            }
-            final String query = text.substring(lastBang+1,selectionEnd);
+            if (lastSpace==-1) lastSpace = 0;
+
+            final String query = text.substring(lastSpace,selectionEnd).trim();
             if (query.length()<=1){
                 useTrendingAdapter(true);
                 return;
@@ -395,8 +393,10 @@ public class MojiInputLayout extends LinearLayout implements
             if (page!=null)page.onNewDataAvailable();
             trendingPopulator.onNewDataAvailable();
             if (!usingTrendingAdapter){
-                adapter.showNames(true);
-                adapter.setMojiModels(searchPopulator.populatePage(50,0));
+                //adapter.showNames(true);
+                LinkedHashSet<MojiModel> set = new LinkedHashSet<>(searchPopulator.populatePage(50,0));
+                set.addAll(trendingPopulator.populatePage(100,0));
+                adapter.setMojiModels(new ArrayList<>(set));
                 if (rnUpdateListener!=null)rnUpdateListener.needsUpdate();
             }
         }
