@@ -12,6 +12,7 @@ import com.makemoji.mojilib.gif.GifProducer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -29,7 +30,7 @@ public class Spanimator {
     public static final float HYPER_PULSE_MIN = .25f;
 
 
-    static final Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakHashMap<Spanimatable,Boolean>());
+    static final Map<Spanimatable,Boolean> subscribers = Collections.synchronizedMap(new WeakIdentityHashMap<Spanimatable, Boolean>());
     static ValueAnimator hyperAnimation;
     static Handler mainHandler = new Handler(Looper.getMainLooper());
     static boolean mPaused =false, kbPaused;
@@ -180,4 +181,5 @@ public class Spanimator {
         return !mPaused || !kbPaused;
     }
     public static int actHash;
+
 }

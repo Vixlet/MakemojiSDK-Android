@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import com.makemoji.keyboard.MMKB;
 import com.makemoji.mojilib.KBCategory;
 import com.makemoji.mojilib.Moji;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by Scott Baar on 12/14/2015.
@@ -24,7 +25,7 @@ public class App extends Application {
         super.onCreate();
         context=this;
         Moji.initialize(this,"YOUR_KEY_HERE");
-        //LeakCanary.install(this);
+        LeakCanary.install(this);
 
         KBCategory.categoryDrawables.put("Sports",R.drawable.custom_kb_tab);
         MMKB.setCategoryListener(new MMKB.ICategorySelected() {
