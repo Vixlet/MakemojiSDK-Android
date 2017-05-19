@@ -144,7 +144,7 @@ public class MojiInputLayout extends LinearLayout implements
         init(attrs,defStyle);
     }
     public void init(AttributeSet attributeSet, int defStyle){
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,R.style.MojiInputLayoutDefaultStyle);
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,R.style.MojiInputLayoutDefaultStyle_White);
         int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawable,R.drawable.mm_camera_icon);
         backSpaceDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_backSpaceButtonDrawable,R.drawable.mm_backspace_grey600_24dp);
         int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout,R.layout.mm_default_send_layout);
@@ -278,11 +278,7 @@ public class MojiInputLayout extends LinearLayout implements
             @Override
             public void onClick(View v) {
                 deactiveButtons();
-                int index = Math.max(0,editText.getSelectionStart());
-                editText.getText().insert(index,"!");
-                editText.setSelection(index+1);
-                topScroller.snapOpen();
-                showKeyboard();
+                topScroller.snapOpenOrClose();
                     layoutRunnable = new Runnable() {
                         @Override
                         public void run() {
@@ -296,14 +292,14 @@ public class MojiInputLayout extends LinearLayout implements
         setButtonColor(buttonColor);
     }
     void setButtonBackground(Drawable d){
-        flashtagButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+        //flashtagButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         recentButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         trendingButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         categoriesButton.setBackgroundDrawable(d.getConstantState().newDrawable());
     }
     void setButtonColor(int color){
 
-        flashtagButton.setColorFilter(color);
+       // flashtagButton.setColorFilter(color);
         recentButton.setColorFilter(color);
         trendingButton.setColorFilter(color);
         categoriesButton.setColorFilter(color);
@@ -685,6 +681,7 @@ public class MojiInputLayout extends LinearLayout implements
     void onLeftClosed(){
         showKeyboard();
         deactiveButtons();
+        flashtagButton.setScaleX(1);
         layoutRunnable = new Runnable() {
             @Override
             public void run() {
@@ -693,6 +690,11 @@ public class MojiInputLayout extends LinearLayout implements
             }
         };
 
+    }
+
+    void onLeftOpened(){
+
+        flashtagButton.setScaleX(-1);
     }
     @Override
     protected void onDetachedFromWindow() {

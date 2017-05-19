@@ -233,14 +233,22 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         });
         animator.start();
     }
-    private void snapOpenOrClose(int currentWidth){
-        if (!enableScroll |!showLeft) return;
+
+    public void snapOpenOrClose() {
+        animateSnap(leftView.getMeasuredWidth(),lastStateOpened ? minSize : maxSize);
+    }
+
+    public void snapOpenOrClose(int currentWidth){
+        if (!enableScroll ||!showLeft) return;
         int goalWidth = maxSize;
         if ((lastStateOpened && maxSize-currentWidth>MAXIMIZED_VIEW_TOLERANCE_DIP)//closed enough to snap close
                 || (!lastStateOpened && minSize+MINIMIZED_VIEW_TOLERANCE_DIP>currentWidth))//not open enough to snap open.
             goalWidth = minSize;
+        animateSnap(currentWidth,goalWidth);
 
 
+    }
+    private void animateSnap(int currentWidth, int goalWidth){
         animator = ValueAnimator.ofInt(currentWidth,goalWidth);
         animator.setDuration(SNAP_DURATION);
         animator.setInterpolator(new DecelerateInterpolator());
@@ -252,6 +260,15 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
                     ((MojiInputLayout)getParent().getParent()).onLeftClosed();
                 }
             });
+        else {
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ((MojiInputLayout)getParent().getParent()).onLeftOpened();
+                }
+            });
+        }
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -259,7 +276,6 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
             }
         });
         animator.start();
-
     }
 
 

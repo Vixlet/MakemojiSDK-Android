@@ -48,9 +48,10 @@
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
         android:layout_width="45dp"
+        android:layout_gravity="center"
         android:layout_height="match_parent"
         android:id="@+id/_mm_flashtag_button"
-        android:src="@drawable/mm_flashtag_icon"/>
+        android:src="@drawable/mm_toggle_left"/>
     <View
         android:id="@+id/_mm_spacer_right"
         android:layout_width="0dp"
