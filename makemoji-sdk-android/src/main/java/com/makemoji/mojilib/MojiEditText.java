@@ -311,7 +311,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
     }
 
     /**
-     * Will
+     * Captures makemoji keyboard emoji selections instead of using the intent api for more seamless integration
      */
     public static class MakemojiAwareConnectionCreator implements IInputConnectionCreator{
         IMojiSelected iMojiSelected;

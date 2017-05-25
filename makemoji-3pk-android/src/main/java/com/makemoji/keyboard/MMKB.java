@@ -94,7 +94,9 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import okhttp3.Call;
@@ -116,6 +118,12 @@ public class MMKB extends InputMethodService
     }
     static ICategorySelected categorySelected;
     static  IKBCustomizer kbCustomizer;
+    //the apps and input connections in this set that support the mime type "makemoji/*" will use the private action api, not send an intent.
+    //by default, it only contains the package name of the app containing this keyboard
+    public static Set<String> makemojiInputConnectionWhitelist = new HashSet<>();
+    //apps here will not use the app compat image keyboard support, even when they advertise their support. Use this to circumvent buggy apps.
+    public static Set<String> imageKBBlacklist = new HashSet<>();
+
 
     /**
      * This boolean indicates the optional example code for performing
@@ -188,6 +196,7 @@ public class MMKB extends InputMethodService
         videoRows = Moji.context.getResources().getInteger(R.integer._mm_video_rows);
         cols = Moji.context.getResources().getInteger(R.integer.mm_3pk_cols);
         instance = new WeakReference<>(this);
+        makemojiInputConnectionWhitelist.add(getPackageName());
 
         if (kbCustomizer==null)
             kbCustomizer = new IKBCustomizer() {
@@ -398,7 +407,7 @@ public class MMKB extends InputMethodService
         pngSupported = false;
         mp4Supported = false;
         makemojiSupported = false;
-        if (!attribute.packageName.equals("com.facebook.orca")) {//facebook is doing something bad. Same error happens when inserting gifs from gboard.
+        if (!imageKBBlacklist.contains(attribute.packageName)) {//facebook is doing something bad. Same error happens when inserting gifs from gboard.
             for (String mimeType : mimeTypes) {
                 if (ClipDescription.compareMimeTypes(mimeType, "image/gif")) {
                     gifSupported = true;
@@ -409,7 +418,7 @@ public class MMKB extends InputMethodService
                 if (ClipDescription.compareMimeTypes(mimeType, "video/mp4")) {
                     mp4Supported = true;
                 }
-                if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*") && Moji.context.getPackageName().equals(attribute.packageName)) {
+                if (ClipDescription.compareMimeTypes(mimeType, "makemoji/*") && makemojiInputConnectionWhitelist.contains(attribute.packageName)) {
                     makemojiSupported = true;
                 }
             }
