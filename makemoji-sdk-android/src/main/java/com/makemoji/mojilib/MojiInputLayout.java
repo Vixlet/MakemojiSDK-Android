@@ -14,6 +14,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -85,6 +86,8 @@ public class MojiInputLayout extends LinearLayout implements
     HorizRVAdapter adapter;
     Drawable bottomPageBg;
     View leftButtons;
+
+    String currentSearchQuery;
 
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
@@ -273,7 +276,7 @@ public class MojiInputLayout extends LinearLayout implements
         trendingPopulator.setup(trendingObserver);
         searchPopulator = new SearchPopulator(true);
         searchPopulator.setup(searchObserver);
-        editText.addTextChangedListener(editTextWatcher);
+        ((IMakemojiDelegate)editText).setMojiInputLayout(this);
         flashtagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -308,63 +311,48 @@ public class MojiInputLayout extends LinearLayout implements
         return headerTextColor;
     }
 
-    String currentSearchQuery;
-     TextWatcher editTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    void onSelectionChanged(){
+        final String t = editText.getText().toString();
+        sendLayout.setEnabled(t.length()>=minimumSendLength);
 
+        if (!showLeft) return;
+
+        int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
+        if (selectionEnd==-1 || editText.length()<1){
+            useTrendingAdapter(true);
+            return;
         }
+        String text = t.substring(0,selectionEnd);//only look at what's before selection
+        int lastSpace = text.lastIndexOf(' ',selectionEnd-2);
+        if (lastSpace==-1) lastSpace = text.lastIndexOf('\n',selectionEnd-2);
+        if (lastSpace==-1) lastSpace = text.lastIndexOf('\t',selectionEnd-2);
+        if (lastSpace==-1) lastSpace = 0;
 
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+        final String query = text.substring(lastSpace,selectionEnd).trim();
+        if (query.length()<=1){
+            useTrendingAdapter(true);
+            return;
         }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            final String t = s.toString();
-            sendLayout.setEnabled(t.length()>=minimumSendLength);
-
-            if (!showLeft) return;
-
-            int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
-            if (selectionEnd==-1 || editText.length()<1){
-                useTrendingAdapter(true);
-                return;
-            }
-            String text = t.substring(0,selectionEnd);//only look at what's before selection
-            int lastSpace = text.lastIndexOf(' ');
-            if (lastSpace==-1) lastSpace = text.lastIndexOf('\n');
-            if (lastSpace==-1) lastSpace = text.lastIndexOf('\t');
-            if (lastSpace==-1) lastSpace = 0;
-
-            final String query = text.substring(lastSpace,selectionEnd).trim();
-            if (query.length()<=1){
-                useTrendingAdapter(true);
-                return;
-            }
-            currentSearchQuery = query;
-                useTrendingAdapter(false);
-                searchPopulator.search(query);
-               Moji.offHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (query.equals(currentSearchQuery) && Moji.enableUpdates) {
-                            Moji.mojiApi.flashtagSearchAnalytics(query).enqueue(new SmallCB<Void>() {
-                                @Override
-                                public void done(Response<Void> response, @Nullable Throwable t) {
-                                    if (t != null)
-                                        t.printStackTrace();
-                                }
-                            });
-                           // Log.d(TAG,"sending search query " + query);
+        currentSearchQuery = query;
+        useTrendingAdapter(false);
+        searchPopulator.search(query);
+        Moji.offHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (query.equals(currentSearchQuery) && Moji.enableUpdates) {
+                    Moji.mojiApi.flashtagSearchAnalytics(query).enqueue(new SmallCB<Void>() {
+                        @Override
+                        public void done(Response<Void> response, @Nullable Throwable t) {
+                            if (t != null)
+                                t.printStackTrace();
                         }
-                    }
-                },1000);
+                    });
+                    // Log.d(TAG,"sending search query " + query);
+                }
+            }
+        },1000);
 
-        }
-    };
-
+    }
     boolean usingTrendingAdapter = true;
     void useTrendingAdapter(boolean trending){
         boolean wasUsingTrending = usingTrendingAdapter;
@@ -391,6 +379,7 @@ public class MojiInputLayout extends LinearLayout implements
             if (!usingTrendingAdapter){
                 //adapter.showNames(true);
                 LinkedHashSet<MojiModel> set = new LinkedHashSet<>(searchPopulator.populatePage(50,0));
+                for (MojiModel m : set) m.fromSearch = true;
                 set.addAll(trendingPopulator.populatePage(100,0));
                 adapter.setMojiModels(new ArrayList<>(set));
                 if (rnUpdateListener!=null)rnUpdateListener.needsUpdate();
@@ -635,12 +624,23 @@ public class MojiInputLayout extends LinearLayout implements
     void removeSuggestion(){
         if (usingTrendingAdapter|| editText.getSelectionStart()==-1)return;
         int selectionStart = editText.getSelectionStart();
-        int lastBang = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf("!");
+        int lastBang = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(" ")+1;
         if (lastBang==-1)return;
         SpannableStringBuilder ssb = new SpannableStringBuilder(editText.getText());
         ssb.delete(lastBang,selectionStart);
         editText.setText(ssb);
         editText.setSelection(Math.min(lastBang,ssb.length()));
+    }
+    //the range of text to replace when inserting a moji
+    @Nullable
+    Pair<Integer,Integer> getReplaceRange(){
+        if (editText.getSelectionStart()==-1)return null;
+        int selectionStart = editText.getSelectionStart();
+        int lastSpace = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(' ')+1;
+        if (lastSpace ==-1)lastSpace = 0;//start of string when no space
+        if (selectionStart == lastSpace) return null;
+
+        return new Pair<>(lastSpace,selectionStart);
     }
     @Override
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
@@ -648,15 +648,25 @@ public class MojiInputLayout extends LinearLayout implements
         Mojilytics.trackClick(model);
         int selectionStart = editText.getSelectionStart();
         if (selectionStart==-1)selectionStart = editText.length();
+        Pair<Integer, Integer> range = getReplaceRange();
 
         if (model.character!= null && !model.character.isEmpty()){
-            ssb.insert(selectionStart,model.character);
+            if (range!=null)
+                ssb.replace(range.first,range.second,model.character);
+            else
+                ssb.insert(selectionStart,model.character);
             editText.setText(ssb);
             editText.setSelection(Math.min(selectionStart+model.character.length(),ssb.length()));
             return;
         }
         final MojiSpan mojiSpan = MojiSpan.fromModel(model,editText,bitmapDrawable);
-        ssb.insert(selectionStart," \uFFFC ");
+
+        if (range!=null)
+            ssb.replace(range.first,range.second," \uFFFC ");
+        else
+            ssb.insert(selectionStart," \uFFFC ");
+
+        if (range!=null) selectionStart = range.first;
         ssb.setSpan(mojiSpan, selectionStart,selectionStart+3,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -721,14 +731,13 @@ public class MojiInputLayout extends LinearLayout implements
         attatchEditText(met);
     }
     public void detachMojiEditText(){
-        editText.removeTextChangedListener(editTextWatcher);
+        if (editText instanceof IMakemojiDelegate) ((IMakemojiDelegate)editText).setMojiInputLayout(null);
         editText = myEditText;
         horizontalLayout.setVisibility(View.VISIBLE);
         editText.requestFocus();
         outsideEditText = false;
-        editText.addTextChangedListener(editTextWatcher);
+        if (editText instanceof IMakemojiDelegate) ((IMakemojiDelegate)editText).setMojiInputLayout(this);
         editText.setSelection(editText.getText().length());//set selection to end
-        editTextWatcher.afterTextChanged(editText.getText());
     }
     public EditText getEditText(){
         return editText;
@@ -738,10 +747,10 @@ public class MojiInputLayout extends LinearLayout implements
         if (hyperMojiListener!=null)setHyperMojiClickListener(hyperMojiListener);
         horizontalLayout.setVisibility(View.GONE);
         outsideEditText = true;
-        met.addTextChangedListener(editTextWatcher);
-        myEditText.removeTextChangedListener(editTextWatcher);
+        if (met instanceof IMakemojiDelegate) ((IMakemojiDelegate)met).setMojiInputLayout(this);
+        if (myEditText instanceof IMakemojiDelegate) ((IMakemojiDelegate)myEditText).setMojiInputLayout(null);
         editText.setSelection(editText.getText().length());
-        editTextWatcher.afterTextChanged(editText.getText());
+        onSelectionChanged();
     }
 
     /**

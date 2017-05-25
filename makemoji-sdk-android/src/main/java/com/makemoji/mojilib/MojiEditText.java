@@ -12,6 +12,7 @@ import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.os.BuildCompat;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -40,28 +41,19 @@ import java.util.regex.Pattern;
 /**
  * Created by Scott Baar on 1/29/2016.
  */
-public class MojiEditText extends EditText implements ISpecialInvalidate {
+public class MojiEditText extends AppCompatEditText implements ISpecialInvalidate, IMakemojiDelegate{
     public static final int DRAWABLE_LEFT = 0;
     public static final int DRAWABLE_TOP = 1;
     public static final int DRAWABLE_RIGHT = 2;
     public static final int DRAWABLE_BOTTOM = 3;
-
-    public IInputConnectionCreator connectionCreator;
-
-    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        InputConnection connection =super.onCreateInputConnection(outAttrs);
-        if (connectionCreator!=null) connection =connectionCreator.onCreateInputConnection(outAttrs,connection);
-        return connection;
-    }
+    MojiInputLayout mojiInputLayout;
 
     @Override
-    public void specialInvalidate() {
-        invalidateReflect();
+    public void setMojiInputLayout(MojiInputLayout mojiInputLayout) {
+
+        this.mojiInputLayout = mojiInputLayout;
     }
 
-    public interface IDrawableClick{
-        void onClick(int drawablePosition );
-    }
 
     public MojiEditText(Context context) {
         super(context);
@@ -81,6 +73,24 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
     Object editor;
     Method invalidateTextDisplayList;
     static Object[] emptyObject = new Object[]{};
+
+    public IInputConnectionCreator connectionCreator;
+
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+        InputConnection connection =super.onCreateInputConnection(outAttrs);
+        if (connectionCreator!=null) connection =connectionCreator.onCreateInputConnection(outAttrs,connection);
+        return connection;
+    }
+
+    @Override
+    public void specialInvalidate() {
+        invalidateReflect();
+    }
+
+    public interface IDrawableClick{
+        void onClick(int drawablePosition );
+    }
+
     public void invalidateReflect(){
     if (invalidateTextDisplayList!=null && mEditor!=null && editor!=null)
         try{
@@ -297,7 +307,7 @@ public class MojiEditText extends EditText implements ISpecialInvalidate {
 
     }
     protected void onSelectionChanged(int selStart, int selEnd) {
-       // Log.d("met","selection " + selStart + " " +(selStart %3));
+        if (mojiInputLayout!=null) mojiInputLayout.onSelectionChanged();
     }
 
     /**

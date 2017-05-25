@@ -56,7 +56,7 @@
             android:id="@+id/_mm_horizontal_top_scroller"
             android:orientation="horizontal"
             android:visibility="visible"
-            android:layout_height="wrap_content">
+            android:layout_height="45dp">
             <include
                 layout="@layout/mm_top_left_page"
                 android:layout_width="50dp"

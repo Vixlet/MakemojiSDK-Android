@@ -45,6 +45,13 @@
         android:layout_height="match_parent"
         android:id="@+id/_mm_recent_button"
         android:src="@drawable/mm_recent"/>
+    <View
+        android:id="@+id/_mm_spacer_right"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+
     <ImageView
         style="@style/MakeMojiLeftButtonStyle"
         android:layout_width="45dp"
@@ -52,11 +59,5 @@
         android:layout_height="match_parent"
         android:id="@+id/_mm_flashtag_button"
         android:src="@drawable/mm_toggle_left"/>
-    <View
-        android:id="@+id/_mm_spacer_right"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        />
 
 </LinearLayout>

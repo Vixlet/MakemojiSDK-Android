@@ -43,6 +43,8 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.mm_horiz_moji_item, parent, false);
         }
+        v.setFocusable(false);
+        v.setFocusableInTouchMode(false);
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

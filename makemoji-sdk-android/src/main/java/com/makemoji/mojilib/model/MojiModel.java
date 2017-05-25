@@ -27,20 +27,11 @@ import java.util.Objects;
  */
 public class MojiModel {
     public int id;
- //   public String user_id;
- //   public String origin_id;
     public  String name;
     public String image_url;
     public String link_url;
- //   public String legacy;
-//    public String deleted;
     public String created;
-  //  public String access;
- //   public String username;
     public String flashtag;
- //   public int shares;
-   // public int remoji;
-  //  public int likes;
     public int gif;
     public String character;
     public int video;
@@ -51,6 +42,7 @@ public class MojiModel {
     public boolean locked;
     public String categoryName;
     public String tags;
+    public boolean fromSearch;
 
 
     @SerializedName("native")

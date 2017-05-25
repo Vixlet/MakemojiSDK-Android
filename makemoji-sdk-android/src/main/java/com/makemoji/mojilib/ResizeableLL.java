@@ -59,7 +59,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
     public static int SNAP_DURATION = 200;
     float lastRightWeight;
     void setMaxSize(int max){
-        maxSize = max - (int)(Moji.density *45);
+        maxSize = max; //- (int)(Moji.density *45);
         int buttonWidth =(int) (45*4 * Moji.density);
         float minusContentEachSide = (max - buttonWidth)/2f;
         float rightWeight = (minusContentEachSide - (45*Moji.density))/minusContentEachSide;
