@@ -81,7 +81,7 @@ public class MojiModel {
     public static JSONObject toJson(MojiModel m){
         if ( m==null || m.image_url==null||m.name==null)return null;//invalid object
         try{
-            return new JSONObject(Moji.gson.toJson(m));
+            return new JSONObject(Moji.gson.toJson(m)).putOpt("fromSearch",false);
         }
         catch (Exception e){
             e.printStackTrace();

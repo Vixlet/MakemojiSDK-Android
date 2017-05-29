@@ -306,8 +306,20 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
         });
 
     }
+
+    //when changing text, selection can change rapidly. Only do it once per frame.
+    private boolean postedSelectionChanged = false;
     protected void onSelectionChanged(int selStart, int selEnd) {
-        if (mojiInputLayout!=null) mojiInputLayout.onSelectionChanged();
+       if (!postedSelectionChanged) {
+           postedSelectionChanged =true;
+           post(new Runnable() {
+               @Override
+               public void run() {
+                   postedSelectionChanged = false;
+                   if (mojiInputLayout!=null) mojiInputLayout.onSelectionChanged();
+               }
+           });
+       }
     }
 
     /**

@@ -311,24 +311,53 @@ public class MojiInputLayout extends LinearLayout implements
         return headerTextColor;
     }
 
+    private StringBuilder alphaBuilder = new StringBuilder(255);
+    private int lastAlphaBeforePosition(Editable editable,int limit){
+        alphaBuilder.setLength(0);
+        alphaBuilder.append(editable);
+        MojiSpan [] spans = editable.getSpans(0,editable.length(),MojiSpan.class);
+        //first transform models inserted from search into a new format to exclude from next step
+        for (int i = 0; i < spans.length; i++) {
+            int start = editable.getSpanStart(spans[i]);
+            int end = editable.getSpanEnd(spans[i]);
+            if (spans[i].model.fromSearch && (end-start == 3)){
+                alphaBuilder.replace(start,end,"\uFFFC\uFFFC\uFFFC");
+            }
+        }
+        //if two spaces in a row, stop searching back, or find last alpha.
+        boolean previousSpace = false;
+        for (int i = limit; i > 0; i--) {
+            int type = Character.getType(alphaBuilder.charAt(i));
+            if (type == Character.SPACE_SEPARATOR) {
+                if (!previousSpace)  previousSpace = true;
+                    else return i;
+            }
+            else
+                previousSpace = false;
+
+            if (type==Character.LOWERCASE_LETTER || type == Character.UPPERCASE_LETTER || type == Character.OTHER_PUNCTUATION ) return i;
+        }
+        return -1;
+    }
     void onSelectionChanged(){
         final String t = editText.getText().toString();
         sendLayout.setEnabled(t.length()>=minimumSendLength);
 
         if (!showLeft) return;
 
-        int selectionEnd = editText.getSelectionEnd();//should probably use this instead of edittext.length()
+        int selectionEnd = editText.getSelectionEnd();
         if (selectionEnd==-1 || editText.length()<1){
             useTrendingAdapter(true);
             return;
         }
-        String text = t.substring(0,selectionEnd);//only look at what's before selection
-        int lastSpace = text.lastIndexOf(' ',selectionEnd-2);
-        if (lastSpace==-1) lastSpace = text.lastIndexOf('\n',selectionEnd-2);
-        if (lastSpace==-1) lastSpace = text.lastIndexOf('\t',selectionEnd-2);
+        int lastAlpha =lastAlphaBeforePosition(editText.getText(),Math.min(editText.getText().length()-1,selectionEnd));
+        if (lastAlpha!=-1) selectionEnd = lastAlpha;
+        String text = t.substring(0,Math.min(selectionEnd+1,t.length()));//only look at what's before selection
+        int lastSpace = text.lastIndexOf(' ',selectionEnd);
         if (lastSpace==-1) lastSpace = 0;
 
-        final String query = text.substring(lastSpace,selectionEnd).trim();
+        final String query = text.substring(lastSpace,text.length()).replace("\'","").trim();
+        Log.d("query","query "+ query);
         if (query.length()<=1){
             useTrendingAdapter(true);
             return;

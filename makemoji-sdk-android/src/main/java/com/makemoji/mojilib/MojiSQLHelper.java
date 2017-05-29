@@ -151,8 +151,9 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<MojiModel> models = new ArrayList<>();
         String raw = "SELECT * FROM "+table + " WHERE "+COL_TAGS + " LIKE '%" + query.replaceAll("'", "''") + "%' LIMIT "+ limit + " COLLATE NOCASE";
-        Cursor c = db.rawQuery(raw,null);
+        Cursor c = null;
         try{
+            c = db.rawQuery(raw,null);
             while (c.moveToNext()) {
                 MojiModel mm = new MojiModel();
                 mm.id = c.getInt(1);
@@ -174,7 +175,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         try{
-            c.close();
+            if (c!=null)c.close();
         } catch (Exception e){e.printStackTrace();}
         return models;
     }
