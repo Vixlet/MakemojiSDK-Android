@@ -365,21 +365,6 @@ public class MojiInputLayout extends LinearLayout implements
         currentSearchQuery = query;
         useTrendingAdapter(false);
         searchPopulator.search(query);
-        Moji.offHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (query.equals(currentSearchQuery) && Moji.enableUpdates) {
-                    Moji.mojiApi.flashtagSearchAnalytics(query).enqueue(new SmallCB<Void>() {
-                        @Override
-                        public void done(Response<Void> response, @Nullable Throwable t) {
-                            if (t != null)
-                                t.printStackTrace();
-                        }
-                    });
-                    // Log.d(TAG,"sending search query " + query);
-                }
-            }
-        },1000);
 
     }
     boolean usingTrendingAdapter = true;
