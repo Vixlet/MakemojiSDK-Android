@@ -321,21 +321,27 @@ public class MojiInputLayout extends LinearLayout implements
             int start = editable.getSpanStart(spans[i]);
             int end = editable.getSpanEnd(spans[i]);
             if (spans[i].model.fromSearch && (end-start == 3)){
-                alphaBuilder.replace(start,end,"\uFFFC\uFFFC\uFFFC");
+                alphaBuilder.replace(start,end,"~~~");
             }
         }
         //if two spaces in a row, stop searching back, or find last alpha.
         boolean previousSpace = false;
         for (int i = limit; i > 0; i--) {
             int type = Character.getType(alphaBuilder.charAt(i));
+
+            if (previousSpace && alphaBuilder.charAt(i)=='~')
+                return i;
+
             if (type == Character.SPACE_SEPARATOR) {
                 if (!previousSpace)  previousSpace = true;
-                    else return i;
+                    else return -1;//double space
             }
             else
                 previousSpace = false;
 
-            if (type==Character.LOWERCASE_LETTER || type == Character.UPPERCASE_LETTER || type == Character.OTHER_PUNCTUATION ) return i;
+
+            if (type==Character.LOWERCASE_LETTER || type == Character.UPPERCASE_LETTER || type == Character.OTHER_PUNCTUATION )
+                return i;
         }
         return -1;
     }
@@ -350,14 +356,17 @@ public class MojiInputLayout extends LinearLayout implements
             useTrendingAdapter(true);
             return;
         }
-        int lastAlpha =lastAlphaBeforePosition(editText.getText(),Math.min(editText.getText().length()-1,selectionEnd));
-        if (lastAlpha!=-1) selectionEnd = lastAlpha;
+        int lastAlpha =lastAlphaBeforePosition(editText.getText(),Math.min(editText.getText().length()-1,selectionEnd-1));
+        if (lastAlpha==-1){
+            useTrendingAdapter(true);
+            return;
+        }
+        selectionEnd = lastAlpha;
         String text = t.substring(0,Math.min(selectionEnd+1,t.length()));//only look at what's before selection
         int lastSpace = text.lastIndexOf(' ',selectionEnd);
         if (lastSpace==-1) lastSpace = 0;
 
         final String query = text.substring(lastSpace,text.length()).replace("\'","").trim();
-        Log.d("query","query "+ query);
         if (query.length()<=1){
             useTrendingAdapter(true);
             return;
