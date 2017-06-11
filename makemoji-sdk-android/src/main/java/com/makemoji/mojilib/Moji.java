@@ -91,9 +91,7 @@ public class Moji {
 
     public static MojiApi mojiApi;
     public static OkHttpClient okHttpClient;
-    //randomly seed some mojispans with links when in demo mode
     public static Handler handler;
-    public static Handler offHandler = new Handler(Looper.getMainLooper());
     public static final String EXTRA_JSON = "com.makemoji.mojilib.EXTRA_JSON";
     public static final String EXTRA_MM = "com.makemoji.mojilib.EXTRA_MM";
     public static final String EXTRA_PACKAGE_ORIGIN = "com.makemoji.mojilib.PACKAGE_ORIGIN";

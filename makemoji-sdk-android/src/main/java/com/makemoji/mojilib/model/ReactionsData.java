@@ -28,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
@@ -41,7 +42,6 @@ public class ReactionsData {
     public List<Reaction> reactions;
     public CurrentUser user;
     static Type ReactionsListType;
-    boolean inFlight = false;
     PagerPopulator.PopulatorObserver observer;
     public String id;
     static WeakReference<ReactionsData> selectedData;
@@ -52,7 +52,6 @@ public class ReactionsData {
         Moji.mojiApi.getReactionData(getHash(id)).enqueue(new SmallCB<JsonObject>() {
             @Override
             public void done(Response<JsonObject> response, @Nullable Throwable t) {
-                inFlight = false;
                 if (t!=null){
                     t.printStackTrace();
                     return;
@@ -72,7 +71,10 @@ public class ReactionsData {
         if (observerToRemove==observer)
             observer =null;
     }
-    public List<Reaction> getReactions(){return reactions;}
+    public List<Reaction> getReactions(){
+        if (reactions==null)reactions = new ArrayList<>();
+        return reactions;
+    }
 
     static void fromJson(ReactionsData data, JsonObject jo){
         if (ReactionsListType==null)ReactionsListType = new TypeToken<List<Reaction>>() {}.getType();
@@ -176,7 +178,7 @@ public class ReactionsData {
     }
 
     public static void onNewReactionClicked(ReactionsData data){
-        selectedData = new WeakReference<ReactionsData>(data);
+        selectedData = new WeakReference<>(data);
     }
     public static boolean onActivityResult(int requestCode, int resultCode, Intent data){
         if (selectedData==null)

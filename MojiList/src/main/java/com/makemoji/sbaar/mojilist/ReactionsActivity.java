@@ -13,12 +13,13 @@ import java.util.ArrayList;
 
 public class ReactionsActivity extends AppCompatActivity {
     ListView lv;
+    ReactionsAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reactions);
         lv = (ListView)findViewById(R.id.list_view);
-        ReactionsAdapter adapter = new ReactionsAdapter(this,new ArrayList<MojiMessage>());
+        adapter = new ReactionsAdapter(this,new ArrayList<MojiMessage>());
         for (int i = 0; i < Sample.sample.length; i++) {
             adapter.add(new MojiMessage(Sample.sample[i]));
         }

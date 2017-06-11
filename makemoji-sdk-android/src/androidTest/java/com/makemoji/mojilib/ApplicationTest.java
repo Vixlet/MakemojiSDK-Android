@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ApplicationTestCase;
@@ -39,7 +40,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         super.setUp();
         createApplication();
         application  = getApplication();
-        Moji.initialize(getApplication(),"940ced93abf2ca4175a4a865b38f1009d8848a58");
+        Moji.initialize(getApplication(),"78f8c331e715ae73cf9dc0997e3ca7276ad5b35e");
     }
     @Before
     public void TestSimpleCreate() {
@@ -48,7 +49,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         createApplication();
         application = getApplication();
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
-        Moji.initialize(getApplication(),"940ced93abf2ca4175a4a865b38f1009d8848a58");
+        Moji.initialize(getApplication(),"78f8c331e715ae73cf9dc0997e3ca7276ad5b35e");
         assertNotNull(application);
     }
 
@@ -88,6 +89,34 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         String newHtml = Moji.toHtml(spanned);
         assertEquals(originalHtml,newHtml);
 
+    }
+    @Test
+    public void offlineImage(){
+        Uri webUri = Uri.parse("www.google.com");
+        Uri offlineUri = Uri.parse("file:///android_asset/makemoji/sdkimages/"+"www.google.com");
+        Uri mojiWebUri = Moji.uriImage("www.google.com");
+        Moji.setEnableUpdates(false);
+        Uri mojiOfflineUri = Moji.uriImage("www.google.com");
+
+        assertEquals(webUri,mojiWebUri);
+        assertEquals(mojiOfflineUri,offlineUri);
+    }
+    @Test
+    public void testRescentList(){
+        MojiModel model = new MojiModel("testing","www.google.com");
+        model.id=12;
+        MojiModel second = new MojiModel("second","www.google.com");
+        second.id=4;
+        RecentPopulator.clearRecents();
+        assert RecentPopulator.getRecents().isEmpty();
+        RecentPopulator.addRecent(model);
+        RecentPopulator.addRecent(second);
+        assert RecentPopulator.getRecents().get(0).name.equals("second");
+        RecentPopulator.addRecent(model);
+        assert RecentPopulator.getRecents().get(0).name.equals("model");
+        assert RecentPopulator.getRecents().size()==2;
+        RecentPopulator.clearRecents();
+        assert RecentPopulator.getRecents().isEmpty();
     }
 
     public boolean SSBEquals(SpannableStringBuilder ssb, Object o){

@@ -24,7 +24,7 @@ public class App extends Application {
     public void onCreate(){
         super.onCreate();
         context=this;
-        Moji.initialize(this,"YOUR_KEY_HERE");
+        Moji.initialize(this,"78f8c331e715ae73cf9dc0997e3ca7276ad5b35e");
         LeakCanary.install(this);
 
         KBCategory.categoryDrawables.put("Sports",R.drawable.custom_kb_tab);

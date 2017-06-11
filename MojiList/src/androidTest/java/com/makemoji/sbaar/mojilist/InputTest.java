@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.makemoji.mojilib.Moji;
 import com.makemoji.mojilib.MojiInputLayout;
+import com.makemoji.mojilib.MojiSQLHelper;
 import com.makemoji.mojilib.RecentPopulator;
 import com.makemoji.mojilib.model.MojiModel;
 import com.makemoji.mojilib.wall.MojiWallActivity;
@@ -34,9 +35,15 @@ import android.support.test.InstrumentationRegistry;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Assert.*;
+
+import java.util.List;
+
+
 
 /**
  * Created by s_baa on 3/21/2017.
@@ -242,4 +249,17 @@ public class InputTest {
         });
         onView(withId(R.id._mm_recylcer_view)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
     }
+
+    //test that sql searches tags, that limit is respected
+    @Test
+    public void testSQLSearch(){
+        MojiSQLHelper helper = MojiSQLHelper.getInstance(InstrumentationRegistry.getTargetContext(),false);
+        List<MojiModel> results = helper.search("smi",50);
+        List<MojiModel> smallResults = helper.search("smi",1);
+        Assert.assertTrue(!results.isEmpty());
+        for (MojiModel m : results)
+            Assert.assertTrue( m.tags.toLowerCase().contains("smi"));
+        Assert.assertTrue( results.size()>=smallResults.size() && smallResults.size()==1);
+    }
+
 }

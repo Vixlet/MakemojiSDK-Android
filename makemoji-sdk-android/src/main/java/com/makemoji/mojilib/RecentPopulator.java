@@ -32,6 +32,11 @@ public class RecentPopulator extends PagerPopulator<MojiModel> {
         return recents;
 
     }
+    public static void clearRecents(){
+        Moji.context.getSharedPreferences("_mm_recent",0).edit().putString("recent","[]").apply();
+        getRecents().clear();
+
+    }
     @UiThread
     public static void addRecent(MojiModel model){
         if (model==null) return;
