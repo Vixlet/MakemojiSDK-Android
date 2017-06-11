@@ -3,6 +3,7 @@ package com.makemoji.mojilib;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -15,13 +16,18 @@ import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
+import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
+
+import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * To run test, right click file in project view on the left and click Run ApplicationTest
@@ -108,15 +114,41 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         MojiModel second = new MojiModel("second","www.google.com");
         second.id=4;
         RecentPopulator.clearRecents();
-        assert RecentPopulator.getRecents().isEmpty();
+        Assert.assertTrue( RecentPopulator.getRecents().isEmpty());
         RecentPopulator.addRecent(model);
         RecentPopulator.addRecent(second);
-        assert RecentPopulator.getRecents().get(0).name.equals("second");
+        Assert.assertTrue( RecentPopulator.getRecents().get(0).name.equals("second"));
         RecentPopulator.addRecent(model);
-        assert RecentPopulator.getRecents().get(0).name.equals("model");
-        assert RecentPopulator.getRecents().size()==2;
+        Assert.assertTrue( RecentPopulator.getRecents().get(0).name.equals("testing"));
+        Assert.assertTrue( RecentPopulator.getRecents().size()==2);
         RecentPopulator.clearRecents();
-        assert RecentPopulator.getRecents().isEmpty();
+        Assert.assertTrue( RecentPopulator.getRecents().isEmpty());
+    }
+    @Test
+    public void testUnlockCategory(){
+        MojiUnlock.unlockCategory("testing");
+        assertTrue(MojiUnlock.getUnlockedGroups().contains("testing"));
+        MojiUnlock.clearGroups();
+        assertFalse(MojiUnlock.getUnlockedGroups().contains("testing"));
+    }
+    @Test
+    public void assertMojiSpanCreationGif(){
+        Drawable d = getContext().getResources().getDrawable(R.drawable.mm_placeholder);
+        assertTrue(MojiSpan.createMojiSpan(d,"http://gmaasdf.com/asdfasd.gif",20,20,12,true,null,null,null) instanceof GifSpan);
+        assertTrue(MojiSpan.createMojiSpan(d,"http://gmaasdf.com/asdfasd.Gif",20,20,12,true,null,null,null) instanceof GifSpan);
+        assertTrue(MojiSpan.createMojiSpan(d,"http://gmaasdf.com/asdfasd.GIF",20,20,12,true,null,null,null) instanceof GifSpan);
+        assertTrue(MojiSpan.createMojiSpan(d,"http://gmaasdf.com/asdfasd.GIFS",20,20,12,true,null,null,null) instanceof MojiSpan);
+        assertTrue(MojiSpan.createMojiSpan(d,"http://gmaasdf.com/asdfasd.PNG",20,20,12,true,null,null,null) instanceof MojiSpan);
+    }
+    @Test
+    public void testAnalytics(){
+        Mojilytics.trackClick(new MojiModel("test",null));
+        Mojilytics.trackView(15);
+        assertTrue(Mojilytics.clickList.size()==1);
+        assertTrue(Mojilytics.viewed.size()==1);
+        Mojilytics.forceSend();
+        assertTrue(Mojilytics.clickList.size()==0);
+        assertTrue(Mojilytics.viewed.size()==0);
     }
 
     public boolean SSBEquals(SpannableStringBuilder ssb, Object o){
