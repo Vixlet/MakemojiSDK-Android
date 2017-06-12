@@ -3,9 +3,11 @@ package com.makemoji.mojilib;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.base.MainThread;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ApplicationTestCase;
 import android.test.mock.MockContext;
@@ -15,6 +17,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.TextView;
 
 import com.makemoji.mojilib.gif.GifSpan;
 import com.makemoji.mojilib.model.MojiModel;
@@ -149,6 +152,49 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         Mojilytics.forceSend();
         assertTrue(Mojilytics.clickList.size()==0);
         assertTrue(Mojilytics.viewed.size()==0);
+    }
+
+    @Test
+    public void testParseAttributes(){
+        String originalHtml = "<p dir=\"auto\" style=\"margin-bottom:16px;font-family:'.Helvetica Neue Interface';font-size:16px;\">" +
+            "<span style=\"color:#000000;\">abc<img style=\"vertical-align:text-bottom;width:20px;height:20px;\" " +
+            "id=\"12\"src=\"http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png\" name=\"moji\" link=\"\">123" +
+            "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\" id=\"523\"src=\"" +
+            "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png\" name=\"roarke\" link=\"www.google.com\"></p>";
+        ParsedAttributes attributes = Moji.parseHtml(originalHtml,null,false,true);
+        assertEquals(attributes.fontSizePt,16);
+        assertEquals(attributes.fontFamily,".Helvetica Neue Interface");
+        assertEquals(attributes.color, Color.parseColor("#000000"));
+    }
+    @Test
+    public void testSetText(){
+        TextView tv = new TextView(getContext());
+        String originalHtml = "<p dir=\"auto\" style=\"margin-bottom:16px;font-family:'.Helvetica Neue Interface';font-size:16px;\">" +
+                "<span style=\"color:#000000;\">abc<img style=\"vertical-align:text-bottom;width:20px;height:20px;\" " +
+                "id=\"12\"src=\"http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png\" name=\"moji\" link=\"\">123" +
+                "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\" id=\"523\"src=\"" +
+                "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/1034-large@2x.png\" name=\"roarke\" link=\"www.google.com\"></p>";
+        Moji.setText(originalHtml,tv,false,true);
+        assertEquals(Color.parseColor("#000000"),tv.getCurrentTextColor());
+        assertEquals(tv.getTextSize(),16*Moji.density);
+    }
+
+    @Test
+    public void testMainThradDetector() throws  Exception{
+        assertFalse(Moji.isMain());
+        final Object o =new Object();
+        Moji.handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                assertTrue(Moji.isMain());
+                synchronized (o) {
+                    o.notify();
+                }
+            }
+        },10);
+        synchronized (o) {
+            o.wait();
+        }
     }
 
     public boolean SSBEquals(SpannableStringBuilder ssb, Object o){
