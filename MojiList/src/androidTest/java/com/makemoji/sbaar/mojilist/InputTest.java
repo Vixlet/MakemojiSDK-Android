@@ -59,14 +59,16 @@ public class InputTest {
     public void openKb(){
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("ab"),ViewActions.clearText());
     }
-    @Test//test ! appears
+    @Test//test search is substitted on search click when appropriate
     public void atestSearchClick(){
         openKb();
-        onView(withId(R.id._mm_flashtag_button)).perform(ViewActions.click());
-        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("!")));
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("sm"), new SetSelectionEndAction());
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
         onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText(SPAN_STRING)));
+        onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.clearText(),ViewActions.typeTextIntoFocusedView("a "));
+        onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
+
+        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("a "+SPAN_STRING)));
     }
 
     @Test public void testOpenLeft(){
@@ -97,22 +99,22 @@ public class InputTest {
     @Test public void testAttatchDetatch(){
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("a"));
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
-        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("a" +SPAN_STRING)));
+        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText(SPAN_STRING)));
         openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getTargetContext());
         onView(withText("Attatch EditText")).perform(ViewActions.click());
 
         onView(withId(R.id.outside_met)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
         onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-        onView(withId(R.id.outside_met)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("b"));
+        onView(withId(R.id.outside_met)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("b "));
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
-        onView(withId(R.id.outside_met)).check(ViewAssertions.matches(ViewMatchers.withText("b" + SPAN_STRING)));
+        onView(withId(R.id.outside_met)).check(ViewAssertions.matches(ViewMatchers.withText("b " + SPAN_STRING)));
 
         openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getTargetContext());
         onView(withText("Detach EditText")).perform(ViewActions.click());
 
-        onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("b"));
+        onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("b "));
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
-        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("a"+SPAN_STRING+"b"+ SPAN_STRING)));
+        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText(SPAN_STRING+"b "+ SPAN_STRING)));
         onView(withId(R.id.outside_met)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
         onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
 
