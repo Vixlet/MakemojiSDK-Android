@@ -10,7 +10,6 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -80,11 +79,11 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         //leftView.setOnTouchListener(this);
         setOnTouchListener(this);
 
-        minSize = (int)(46 *Moji.density);
+        minSize = getResources().getDimensionPixelSize(R.dimen.mm_toggle_button_width);
 
         ViewConfiguration vc = ViewConfiguration.get(getContext());
         mTouchSlop = vc.getScaledTouchSlop();
-        flashButton = (ImageView) findViewById(R.id._mm_flashtag_button);
+        flashButton = (ImageView) findViewById(R.id._mm_toggle_button);
 
     }
     @Override

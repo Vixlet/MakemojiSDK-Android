@@ -24,6 +24,7 @@
         <item name="_mm_cameraButtonVisible">true</item>
         <item name="_mm_topBarBg">@color/_mm_top_layout_bg</item>
         <item name="_mm_bottomPageBg">@color/_mm_top_layout_bg</item>
+        <item name="_mm_trendingBarBg">@color/_mm_top_layout_bg</item>
         <item name="_mm_phraseBgColor">@color/_mm_default_phrase_bg_color</item>
         <item name="_mm_headerTextColor">@color/_mm_header_text_color</item>
         <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>
@@ -34,13 +35,10 @@
         <item name="_mm_minimumSendLength">1</item>
     </style>
     <style name="MojiInputLayoutDefaultStyle.White">
-        <item name="_mm_topBarBg">@android:color/white</item>
-        <item name="_mm_bottomPageBg">@android:color/white</item>
-        <item name="_mm_phraseBgColor">@android:color/white</item>
+        <item name="_mm_trendingBarBg">@android:color/white</item>
         <item name="_mm_headerTextColor">@color/_mm_header_text_color</item>
         <item name="_mm_leftButtonColor">@color/_mm_left_button_cf</item>
         <item name="_mm_leftButtonBg">@drawable/mm_left_button_item_bg</item>
-        <item name="_mm_leftContainerDrawable">@android:color/white</item>
     </style>
     <style name="MojiWallDefaultStyle" parent="Theme.AppCompat">
         <item name="_mm_wall_tab_layout">@layout/mm_wall_tab</item>

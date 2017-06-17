@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -21,7 +20,6 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
@@ -40,7 +38,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.makemoji.mojilib.model.Category;
 import com.makemoji.mojilib.model.MojiModel;
@@ -79,12 +76,13 @@ public class MojiInputLayout extends LinearLayout implements
     ResizeableLL topScroller;
     LinearLayout horizontalLayout;
 
-    ImageView trendingButton,flashtagButton,categoriesButton,recentButton,backButton;
+    ImageView trendingButton, toggleButton,categoriesButton,recentButton,backButton;
     Stack<MakeMojiPage> pages = new Stack<>();
     CategoryPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
     Drawable bottomPageBg;
+    Drawable trendingBarBg;
     View leftButtons;
 
     String currentSearchQuery;
@@ -161,6 +159,7 @@ public class MojiInputLayout extends LinearLayout implements
 
         Drawable topBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
         bottomPageBg = a.getDrawable(R.styleable.MojiInputLayout__mm_bottomPageBg);
+        trendingBarBg = a.getDrawable(R.styleable.MojiInputLayout__mm_trendingBarBg);
 
         boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
         tryAlwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
@@ -194,7 +193,7 @@ public class MojiInputLayout extends LinearLayout implements
         LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         rv.setLayoutManager(llm);
         rv.setItemViewCacheSize(20);
-        rv.setBackgroundDrawable(bottomPageBg);
+        rv.setBackgroundDrawable(trendingBarBg);
         adapter = new HorizRVAdapter(this);
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
@@ -203,7 +202,7 @@ public class MojiInputLayout extends LinearLayout implements
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
 
         categoriesButton =(ImageView) findViewById(R.id._mm_categories_button);
-        flashtagButton =(ImageView) findViewById(R.id._mm_flashtag_button);
+        toggleButton =(ImageView) findViewById(R.id._mm_toggle_button);
         recentButton = (ImageView)findViewById(R.id._mm_recent_button);
         trendingButton = (ImageView)findViewById(R.id._mm_trending_button);
         categoriesButton.setOnClickListener(new OnClickListener() {
@@ -277,7 +276,7 @@ public class MojiInputLayout extends LinearLayout implements
         searchPopulator = new SearchPopulator(true);
         searchPopulator.setup(searchObserver);
         ((IMakemojiDelegate)editText).setMojiInputLayout(this);
-        flashtagButton.setOnClickListener(new OnClickListener() {
+        toggleButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 deactiveButtons();
@@ -295,14 +294,12 @@ public class MojiInputLayout extends LinearLayout implements
         setButtonColor(buttonColor);
     }
     void setButtonBackground(Drawable d){
-        //flashtagButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         recentButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         trendingButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         categoriesButton.setBackgroundDrawable(d.getConstantState().newDrawable());
+        toggleButton.setBackgroundDrawable(trendingBarBg.getConstantState().newDrawable());
     }
     void setButtonColor(int color){
-
-       // flashtagButton.setColorFilter(color);
         recentButton.setColorFilter(color);
         trendingButton.setColorFilter(color);
         categoriesButton.setColorFilter(color);
@@ -714,7 +711,7 @@ public class MojiInputLayout extends LinearLayout implements
     void onLeftClosed(){
         showKeyboard();
         deactiveButtons();
-        flashtagButton.setScaleX(1);
+        toggleButton.setScaleX(1);
         layoutRunnable = new Runnable() {
             @Override
             public void run() {
@@ -727,7 +724,7 @@ public class MojiInputLayout extends LinearLayout implements
 
     void onLeftOpened(){
 
-        flashtagButton.setScaleX(-1);
+        toggleButton.setScaleX(-1);
     }
     @Override
     protected void onDetachedFromWindow() {
