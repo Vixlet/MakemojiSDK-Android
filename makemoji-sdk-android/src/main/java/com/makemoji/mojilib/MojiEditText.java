@@ -265,7 +265,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
     }
     private void stopActionMode(){
         try{
-            Method m = getClass().getSuperclass().getSuperclass().getDeclaredMethod("stopTextActionMode");
+            Method m = getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredMethod("stopTextActionMode");
             m.setAccessible(true);
             m.invoke(this);
         }
