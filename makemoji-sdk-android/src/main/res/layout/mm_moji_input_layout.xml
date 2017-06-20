@@ -73,7 +73,7 @@
         </com.makemoji.mojilib.ResizeableLL>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="@dimen/mm_page_height"
         android:visibility="gone"
         android:animateLayoutChanges="false"
         android:id="@+id/_mm_page_container">

@@ -7,4 +7,5 @@
     <dimen name="mm_grid_page_vert_spacing">0dp</dimen>
     <dimen name="mm_edit_text_size">16sp</dimen>
     <dimen name="mm_toggle_button_width">53dp</dimen>
+    <dimen name="mm_page_height">225dp</dimen>
 </resources>
