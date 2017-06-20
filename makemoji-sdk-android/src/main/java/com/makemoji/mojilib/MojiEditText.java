@@ -103,7 +103,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
     }
     private void init(){
         try {
-            mEditor = getClass().getSuperclass().getSuperclass().getDeclaredField("mEditor");
+            mEditor = getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredField("mEditor");
             mEditor.setAccessible(true);
             Class c  = mEditor.getType();
                     invalidateTextDisplayList = c.getDeclaredMethod("invalidateTextDisplayList");
