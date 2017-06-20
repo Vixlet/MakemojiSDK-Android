@@ -1,5 +1,6 @@
 package com.makemoji.mojilib;
 
+import android.support.annotation.CheckResult;
 import android.text.Spanned;
 
 /**
@@ -9,6 +10,31 @@ import android.text.Spanned;
  */
 
 public interface IMojiTextWatcher {
-    //return a spanned to set, optionally modified if needed
+    // modify the contents of the spanned if needed. return true if changes were made
+    @CheckResult
     Spanned textAboutToChange(Spanned spanned);
+    IMojiTextWatcher BigThreeTextWatcher =  new IMojiTextWatcher() {
+        @Override
+        public Spanned textAboutToChange(Spanned spanned) {
+            MojiSpan spans [] = spanned.getSpans(0,spanned.length(),MojiSpan.class);
+            String string = spanned.toString();
+
+            for (int i = 0; i < string.length();i++) {
+                if (Character.isLetterOrDigit(string.charAt(i))){//there is something besides emojis: make everything normal
+                    for (MojiSpan span : spans)
+                        span.setSizeMultiplier(1);
+                    return spanned;
+                }
+            }
+
+            if (spans.length>3){//there are more than three makemojis
+                for (MojiSpan span : spans)
+                    span.setSizeMultiplier(1);
+                return spanned;
+            }
+            for (MojiSpan span : spans)
+                span.setSizeMultiplier(3);
+            return spanned;
+        }
+    };
 }

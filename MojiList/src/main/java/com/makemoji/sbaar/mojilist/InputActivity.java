@@ -115,31 +115,6 @@ public class InputActivity extends AppCompatActivity{
             First, since the emojis may be bigger than 1x, tell the textview keep the raw emoji image in memory, not the downscaled image usually used.
             Seconds, set a special textwatcher that will be called by the library when the input changes
          */
-        outsideMojiEdit.setTag(R.id._makemoji_load_exact_size,false);
-        outsideMojiEdit.setTag(R.id._makemoji_text_watcher, new IMojiTextWatcher() {
-            @Override
-            public Spanned textAboutToChange(Spanned spanned) {
-                MojiSpan spans [] = spanned.getSpans(0,spanned.length(),MojiSpan.class);
-                String string = spanned.toString();
-
-                for (int i = 0; i < string.length();i++) {
-                    if (Character.isLetterOrDigit(string.charAt(i))){//there is something besides emojis: make everything normal
-                        for (MojiSpan span : spans)
-                            span.setSizeMultiplier(1);
-                        return spanned;
-                    }
-                }
-
-                if (spans.length>3){//there are more than three makemojis
-                    for (MojiSpan span : spans)
-                        span.setSizeMultiplier(1);
-                    return spanned;
-                }
-                for (MojiSpan span : spans)
-                    span.setSizeMultiplier(3);
-                return spanned;
-            }
-        });
 
     }
 

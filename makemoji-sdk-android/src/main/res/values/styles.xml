@@ -33,6 +33,7 @@
         <item name="_mm_showKbOnInflate">false</item>
         <item name="_mm_alwaysShowEmojiBar">false</item>
         <item name="_mm_minimumSendLength">1</item>
+        <item name="_mm_largeEmojiSizing">true</item>
     </style>
     <style name="MojiInputLayoutDefaultStyle.White">
         <item name="_mm_trendingBarBg">@android:color/white</item>

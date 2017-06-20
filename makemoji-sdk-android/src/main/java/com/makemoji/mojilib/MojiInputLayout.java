@@ -94,6 +94,7 @@ public class MojiInputLayout extends LinearLayout implements
     boolean alwaysShowBar = false;
     boolean tryAlwaysShowBar = false;
     int minimumSendLength;
+    boolean largeEmojiSizing;
 
     public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
         if (!isInMultiWindowMode)
@@ -102,6 +103,12 @@ public class MojiInputLayout extends LinearLayout implements
             alwaysShowBar = true;
 
         setTopScrollerVisiblity(alwaysShowBar ? View.VISIBLE:View.GONE);
+    }
+
+    public void setLargeEmojiSizing(boolean largeEmojiSizing) {
+        this.largeEmojiSizing = largeEmojiSizing;
+        editText.setTag(R.id._makemoji_load_exact_size, !largeEmojiSizing);
+        editText.setTag(R.id._makemoji_text_watcher,largeEmojiSizing? IMojiTextWatcher.BigThreeTextWatcher:null);
     }
 
     public interface SendClickListener{
@@ -144,39 +151,39 @@ public class MojiInputLayout extends LinearLayout implements
         super(context, attrs, defStyle);
         init(attrs,defStyle);
     }
-    public void init(AttributeSet attributeSet, int defStyle){
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet,R.styleable.MojiInputLayout,0,R.style.MojiInputLayoutDefaultStyle_White);
-        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawable,R.drawable.mm_camera_icon);
-        backSpaceDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_backSpaceButtonDrawable,R.drawable.mm_backspace_grey600_24dp);
-        int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout,R.layout.mm_default_send_layout);
-        boolean cameraVisibility = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible,true);
-        int buttonColor = a.getColor(R.styleable.MojiInputLayout__mm_leftButtonColor,ContextCompat.getColor(getContext(),R.color._mm_left_button_cf));
+
+    public void init(AttributeSet attributeSet, int defStyle) {
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(attributeSet, R.styleable.MojiInputLayout, 0, R.style.MojiInputLayoutDefaultStyle_White);
+        int cameraDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_cameraButtonDrawable, R.drawable.mm_camera_icon);
+        backSpaceDrawableRes = a.getResourceId(R.styleable.MojiInputLayout__mm_backSpaceButtonDrawable, R.drawable.mm_backspace_grey600_24dp);
+        int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout, R.layout.mm_default_send_layout);
+        boolean cameraVisibility = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible, true);
+        int buttonColor = a.getColor(R.styleable.MojiInputLayout__mm_leftButtonColor, ContextCompat.getColor(getContext(), R.color._mm_left_button_cf));
         Drawable buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
-        headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor,ContextCompat.getColor(getContext(),R.color._mm_header_text_color));
-        phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor,ContextCompat.getColor(getContext(),R.color._mm_default_phrase_bg_color));
-        minimumSendLength = a.getInteger(R.styleable.MojiInputLayout__mm_minimumSendLength,1);
+        headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor, ContextCompat.getColor(getContext(), R.color._mm_header_text_color));
+        phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor, ContextCompat.getColor(getContext(), R.color._mm_default_phrase_bg_color));
+        minimumSendLength = a.getInteger(R.styleable.MojiInputLayout__mm_minimumSendLength, 1);
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
 
         Drawable topBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
         bottomPageBg = a.getDrawable(R.styleable.MojiInputLayout__mm_bottomPageBg);
         trendingBarBg = a.getDrawable(R.styleable.MojiInputLayout__mm_trendingBarBg);
 
-        boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate,false);
-        tryAlwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar,false);
+        boolean showKbOnInflate = a.getBoolean(R.styleable.MojiInputLayout__mm_showKbOnInflate, false);
+        tryAlwaysShowBar = a.getBoolean(R.styleable.MojiInputLayout__mm_alwaysShowEmojiBar, false);
         alwaysShowBar = tryAlwaysShowBar;
-        if (Build.VERSION.SDK_INT>=24){
+        if (Build.VERSION.SDK_INT >= 24) {
             Activity activity = Moji.getActivity(getContext());
-            if (activity!=null && activity.isInMultiWindowMode())alwaysShowBar = true;
+            if (activity != null && activity.isInMultiWindowMode()) alwaysShowBar = true;
         }
-        a.recycle();
 
-        inflate(getContext(),R.layout.mm_moji_input_layout,this);
+        inflate(getContext(), R.layout.mm_moji_input_layout, this);
         findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
-        topScroller = (ResizeableLL)findViewById(R.id._mm_horizontal_top_scroller);
-        if (alwaysShowBar)setTopScrollerVisiblity(View.VISIBLE);
+        topScroller = (ResizeableLL) findViewById(R.id._mm_horizontal_top_scroller);
+        if (alwaysShowBar) setTopScrollerVisiblity(View.VISIBLE);
 
-        sendLayout = ((LinearLayout)inflate(getContext(),sendLayoutRes,horizontalLayout)).getChildAt(2);
+        sendLayout = ((LinearLayout) inflate(getContext(), sendLayoutRes, horizontalLayout)).getChildAt(2);
 
         leftButtons = findViewById(R.id._mm_left_buttons);
         leftButtons.setBackgroundDrawable(leftContainerDrawable);
@@ -185,12 +192,12 @@ public class MojiInputLayout extends LinearLayout implements
         cameraImageButton.setImageResource(cameraDrawableRes);
         if (!cameraVisibility) cameraImageButton.setVisibility(View.GONE);
 
-        editText = (EditText)findViewById(R.id._mm_edit_text);
+        editText = (EditText) findViewById(R.id._mm_edit_text);
         myEditText = editText;
-        sendLayout.setEnabled(editText.getText().length()>=minimumSendLength);
+        sendLayout.setEnabled(editText.getText().length() >= minimumSendLength);
 
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
-        LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rv.setLayoutManager(llm);
         rv.setItemViewCacheSize(20);
         rv.setBackgroundDrawable(trendingBarBg);
@@ -198,13 +205,13 @@ public class MojiInputLayout extends LinearLayout implements
         rv.setAdapter(adapter);
         pageContainer = (FrameLayout) findViewById(R.id._mm_page_container);
         pageContainer.setBackgroundDrawable(bottomPageBg);
-        categoriesPage = new CategoriesPage((ViewStub)findViewById(R.id._mm_stub_cat_page),Moji.mojiApi,this);
+        categoriesPage = new CategoriesPage((ViewStub) findViewById(R.id._mm_stub_cat_page), Moji.mojiApi, this);
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(this);
 
-        categoriesButton =(ImageView) findViewById(R.id._mm_categories_button);
-        toggleButton =(ImageView) findViewById(R.id._mm_toggle_button);
-        recentButton = (ImageView)findViewById(R.id._mm_recent_button);
-        trendingButton = (ImageView)findViewById(R.id._mm_trending_button);
+        categoriesButton = (ImageView) findViewById(R.id._mm_categories_button);
+        toggleButton = (ImageView) findViewById(R.id._mm_toggle_button);
+        recentButton = (ImageView) findViewById(R.id._mm_recent_button);
+        trendingButton = (ImageView) findViewById(R.id._mm_trending_button);
         categoriesButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,7 +230,7 @@ public class MojiInputLayout extends LinearLayout implements
                 toggleRecentPage();
             }
         });
-        backButton =(ImageView) findViewById(R.id._mm_back_button);
+        backButton = (ImageView) findViewById(R.id._mm_back_button);
         backButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -233,21 +240,22 @@ public class MojiInputLayout extends LinearLayout implements
 
         //don't show kb if pages are showing.
         editText.setOnTouchListener(new OnTouchListener() {
-            boolean within(int t, int min, int max){
-                if (t>max)return false;
+            boolean within(int t, int min, int max) {
+                if (t > max) return false;
                 return t >= min;
             }
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_UP && drawableClick!=null)
+                if (event.getAction() == MotionEvent.ACTION_UP && drawableClick != null)
 
-                    if(editText.getCompoundDrawables()[MojiEditText.DRAWABLE_RIGHT]!=null&&
+                    if (editText.getCompoundDrawables()[MojiEditText.DRAWABLE_RIGHT] != null &&
                             event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[MojiEditText.DRAWABLE_RIGHT].getBounds().width())) {
                         drawableClick.onClick(MojiEditText.DRAWABLE_RIGHT);
                         return true;
                     }
-                if(editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT] !=null && event.getRawX() <=
-                        (editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT].getBounds().width()+editText.getLeft())) {
+                if (editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT] != null && event.getRawX() <=
+                        (editText.getCompoundDrawables()[MojiEditText.DRAWABLE_LEFT].getBounds().width() + editText.getLeft())) {
                     {
                         drawableClick.onClick(MojiEditText.DRAWABLE_LEFT);
                         return true;
@@ -256,9 +264,8 @@ public class MojiInputLayout extends LinearLayout implements
 
 
                 if (pages.empty()) return editText.onTouchEvent(event);
-                else
-                {
-                    int pos = editText.getOffsetForPosition(event.getX(),event.getY());
+                else {
+                    int pos = editText.getOffsetForPosition(event.getX(), event.getY());
                     editText.setSelection(pos);
                     /*if (event.getAction()== MotionEvent.ACTION_UP){
                         ClickableSpan spans[] =editText.getText().getSpans(pos,pos,ClickableSpan.class);
@@ -269,29 +276,32 @@ public class MojiInputLayout extends LinearLayout implements
             }
         });
         if (showKbOnInflate)
-                grabFocusShowKb();
+            grabFocusShowKb();
 
-        trendingPopulator = new CategoryPopulator(new Category("Trending",null));
+        trendingPopulator = new CategoryPopulator(new Category("Trending", null));
         trendingPopulator.setup(trendingObserver);
         searchPopulator = new SearchPopulator(true);
         searchPopulator.setup(searchObserver);
-        ((IMakemojiDelegate)editText).setMojiInputLayout(this);
+        ((IMakemojiDelegate) editText).setMojiInputLayout(this);
         toggleButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 deactiveButtons();
                 topScroller.snapOpenOrClose();
-                    layoutRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            clearStack();
-                        }
-                    };
+                layoutRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        clearStack();
+                    }
+                };
             }
         });
 
         setButtonBackground(buttonBg);
         setButtonColor(buttonColor);
+
+        setLargeEmojiSizing(a.getBoolean(R.styleable.MojiInputLayout__mm_largeEmojiSizing, true));
+        a.recycle();
     }
     void setButtonBackground(Drawable d){
         recentButton.setBackgroundDrawable(d.getConstantState().newDrawable());
@@ -749,6 +759,7 @@ public class MojiInputLayout extends LinearLayout implements
     boolean outsideEditText = false;
     public void attatchMojiEditText(@NonNull MojiEditText met){
         attatchEditText(met);
+        setLargeEmojiSizing(largeEmojiSizing);
     }
     public void detachMojiEditText(){
         if (editText instanceof IMakemojiDelegate) ((IMakemojiDelegate)editText).setMojiInputLayout(null);
@@ -758,6 +769,7 @@ public class MojiInputLayout extends LinearLayout implements
         outsideEditText = false;
         if (editText instanceof IMakemojiDelegate) ((IMakemojiDelegate)editText).setMojiInputLayout(this);
         editText.setSelection(editText.getText().length());//set selection to end
+        setLargeEmojiSizing(largeEmojiSizing);
     }
     public EditText getEditText(){
         return editText;

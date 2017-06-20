@@ -103,7 +103,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
     }
     private void init(){
         try {
-            mEditor = getClass().getSuperclass().getSuperclass().getDeclaredField("mEditor");
+            mEditor = getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredField("mEditor");
             mEditor.setAccessible(true);
             Class c  = mEditor.getType();
                     invalidateTextDisplayList = c.getDeclaredMethod("invalidateTextDisplayList");
@@ -111,13 +111,14 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
             editor = mEditor.get(this);
         }
         catch (Exception e){
-           // e.printStackTrace();
+            e.printStackTrace();
         }
         //If any mojispans span less than three characters, remove them because a backspace has happened.
         setImeOptions(getImeOptions()|EditorInfo.IME_FLAG_NO_EXTRACT_UI|EditorInfo.IME_FLAG_NO_FULLSCREEN);
         addTextChangedListener(new TextWatcher() {
             CharSequence before;
             List<MojiSpan> beforeSpans = new ArrayList<>();
+            List<MojiSpan> afterSpans = new ArrayList<>();
             int beforeLength;
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -137,7 +138,15 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
                 String string = s.toString();
                 SpannableStringBuilder ssb = new SpannableStringBuilder(s);
                 SpannableStringBuilder builder = new SpannableStringBuilder();
-                boolean newEmoji = beforeSpans.size()!=ssb.getSpans(0,ssb.length(),MojiSpan.class).length;
+                afterSpans.clear();
+                Collections.addAll(afterSpans,ssb.getSpans(0,ssb.length(),MojiSpan.class));
+
+                boolean newEmoji = beforeSpans.size()!=afterSpans.size();
+                if (!newEmoji && beforeSpans.size()==afterSpans.size() )
+                    for (int i = 0; i < beforeSpans.size(); i++) {
+                        newEmoji = !afterSpans.contains(beforeSpans.get(i));
+                        if (newEmoji) break;
+                    }
                 for (int i = 0; i < string.length();) {
                     MojiSpan spanAtPoint[] = ssb.getSpans(i, i + 1, MojiSpan.class);
                     if (spanAtPoint.length == 0) {//not a moji
@@ -160,7 +169,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
                         }
                     }
 
-                if (beforeLength!=builder.length() && newEmoji){
+                if (beforeLength!=builder.length() || newEmoji){
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
                     Moji.setText(builder,MojiEditText.this);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));
