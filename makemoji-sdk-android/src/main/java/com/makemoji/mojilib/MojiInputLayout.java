@@ -196,6 +196,8 @@ public class MojiInputLayout extends LinearLayout implements
         myEditText = editText;
         sendLayout.setEnabled(editText.getText().length() >= minimumSendLength);
 
+        setLargeEmojiSizing(a.getBoolean(R.styleable.MojiInputLayout__mm_largeEmojiSizing, true));
+
         rv = (RecyclerView) findViewById(R.id._mm_recylcer_view);
         LinearLayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rv.setLayoutManager(llm);
@@ -300,7 +302,6 @@ public class MojiInputLayout extends LinearLayout implements
         setButtonBackground(buttonBg);
         setButtonColor(buttonColor);
 
-        setLargeEmojiSizing(a.getBoolean(R.styleable.MojiInputLayout__mm_largeEmojiSizing, true));
         a.recycle();
     }
     void setButtonBackground(Drawable d){
@@ -483,7 +484,7 @@ public class MojiInputLayout extends LinearLayout implements
         hideKeyboard();
         deactiveButtons();
         if (trendingPage==null)
-            trendingPage = new OneGridPage(getContext().getString(R.string._mm_trending),this,new CategoryPopulator(new Category("Trending",null)));
+            trendingPage = new VPPage(getContext().getString(R.string._mm_trending),this,new CategoryPopulator(new Category("Trending",null)));
 
         if (trendingPage.isVisible()){
             onLeftClosed();
@@ -515,7 +516,7 @@ public class MojiInputLayout extends LinearLayout implements
         hideKeyboard();
         deactiveButtons();
         if (recentPage==null)
-            recentPage = new OneGridPage(getContext().getString(R.string._mm_recent),this,new RecentPopulator());
+            recentPage = new VPPage(getContext().getString(R.string._mm_recent),this,new RecentPopulator());
 
         if (recentPage.isVisible()){
             onLeftClosed();

@@ -76,7 +76,7 @@ public class CategoriesPage extends MakeMojiPage implements CategoriesAdapter.IC
             mMojiInput.onLockedCategoryClicked(category.name);
             return;
         }
-        MakeMojiPage mmp = new OneGridPage(category.name,mMojiInput,new CategoryPopulator(category));
+        MakeMojiPage mmp = new VPPage(category.name,mMojiInput,new CategoryPopulator(category));
         mMojiInput.addPage(mmp);
     }
 }

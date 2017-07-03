@@ -5,4 +5,5 @@
     <integer name="_mm_gif_rows">2</integer>
     <integer name="_mm_video_rows">2</integer>
     <integer name="_mm_emoji_rows">4</integer>
+    <integer name="_mm_emoji_cols">8</integer>
 </resources>

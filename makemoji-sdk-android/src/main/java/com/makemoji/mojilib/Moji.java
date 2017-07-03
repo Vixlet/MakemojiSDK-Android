@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.support.v4.util.SparseArrayCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -113,6 +114,7 @@ public class Moji {
         resources = context.getResources();
         density = resources.getDisplayMetrics().density;
         OneGridPage.DEFAULT_ROWS = resources.getInteger(R.integer._mm_emoji_rows);
+        OneGridPage.DEFAULT_COLS = resources.getInteger(R.integer._mm_emoji_cols);
         OneGridPage.GIFROWS = resources.getInteger(R.integer._mm_gif_rows);
         OneGridPage.VIDEOROWS = resources.getInteger(R.integer._mm_video_rows);
         OneGridPage.useSpanSizes = resources.getBoolean(R.bool.mmUseSpanSizeForSdkImages);
@@ -361,10 +363,10 @@ public class Moji {
             return activityManager.getLargeMemoryClass();
         }
     }
-     static Activity getActivity(Context context) {
+     static AppCompatActivity getActivity(Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {
-                return (Activity)context;
+                return (AppCompatActivity)context;
             }
             context = ((ContextWrapper)context).getBaseContext();
         }

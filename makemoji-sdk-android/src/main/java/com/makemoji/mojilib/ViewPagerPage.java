@@ -33,7 +33,7 @@ public class ViewPagerPage extends MakeMojiPage implements PagerPopulator.Popula
     public ViewPagerPage (String title,MojiInputLayout mojiInputLayout,PagerPopulator p){
         super(R.layout.mm_vp_page,mojiInputLayout);
         mPopulator = p;
-        vp = (ViewPager) mView.findViewById(R.id._mm_moji_pager);
+        vp = (ViewPager) mView.findViewById(R.id._mm_view_pager);
         vp.setOffscreenPageLimit(7);
        // circlePageIndicator = (CirclePageIndicator) mView.findViewById(R.id._mm_vp_indicator);
      //   VPAdapter vpAdapter = new VPAdapter();

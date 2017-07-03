@@ -2,7 +2,10 @@ package com.makemoji.mojilib;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
@@ -22,7 +25,9 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
     TextView heading;
     int count;
     public int ROWS;
+    public int COLS;
     public static int DEFAULT_ROWS;
+    public static int DEFAULT_COLS;
     public static int GIFROWS;
     public static int VIDEOROWS;
     public static int hSpacing;
@@ -41,6 +46,7 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         super("gifs".equalsIgnoreCase(title)?R.layout.mm_one_grid_page_gif:R.layout.mm_one_grid_page, mil);
         this.mojiInputLayout = mil;
         ROWS = DEFAULT_ROWS;
+        COLS = DEFAULT_COLS +1;
         if ("gifs".equalsIgnoreCase(title)) {
             gifs=true;
             ROWS = GIFROWS;
@@ -99,9 +105,10 @@ public class OneGridPage extends MakeMojiPage implements PagerPopulator.Populato
         int h = rv.getHeight();
         if (h ==0)
             h = (int) (height*.75f);
-        int size = h / ROWS;
+        int w = rv.getWidth();
+        int size = Math.min(h / ROWS, w/COLS);
         int vSpace = vSpacing;
-        int hSpace = hSpacing;// (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
+        int hSpace = (mojiInputLayout.getWidth() - (size * COLS)) / (COLS*2);
         //heading.setPadding(hSpace,heading.getPaddingTop(),heading.getPaddingRight(),heading.getPaddingBottom());
 
         MojiGridAdapter adapter = new MojiGridAdapter(mojiModelList, mMojiInput, false, size);
