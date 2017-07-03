@@ -42,7 +42,7 @@ public class ReactionsAdapter extends ArrayAdapter<MojiMessage> {
         holder = (Holder) convertView.getTag();
         if (!message.id.equals(holder.id)){
             holder.id = message.id;
-            Moji.setText(message.messageRaw,holder.message,true);
+            Moji.setText(message.html,holder.message,true);
 
             //cache this in your item data so it's not fetched on every scroll.
             if (message.reactionsData==null) message.reactionsData = new ReactionsData(message.id);

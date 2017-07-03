@@ -307,7 +307,7 @@ public class MojiInputLayout extends LinearLayout implements
         recentButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         trendingButton.setBackgroundDrawable(d.getConstantState().newDrawable());
         categoriesButton.setBackgroundDrawable(d.getConstantState().newDrawable());
-        toggleButton.setBackgroundDrawable(trendingBarBg.getConstantState().newDrawable());
+        toggleButton.setBackgroundDrawable(d.getConstantState().newDrawable());
     }
     void setButtonColor(int color){
         recentButton.setColorFilter(color);
@@ -721,7 +721,6 @@ public class MojiInputLayout extends LinearLayout implements
     void onLeftClosed(){
         showKeyboard();
         deactiveButtons();
-        toggleButton.setScaleX(1);
         layoutRunnable = new Runnable() {
             @Override
             public void run() {
@@ -734,7 +733,6 @@ public class MojiInputLayout extends LinearLayout implements
 
     void onLeftOpened(){
 
-        toggleButton.setScaleX(-1);
     }
     @Override
     protected void onDetachedFromWindow() {

@@ -187,12 +187,17 @@ To hide the built in Edit Text and use your own that is somewhere else on the sc
 **Plain Text Converter**
 
 If you need to convert an html message to a platform that does not support Makemoji, you can use the plain text converter to produce a message with a human-friendly reading that converts emojis into the form [flashtagname.base62emojiid hypermojiurl]. For example, "Aliens are real [alien.gG iwanttobelieve.com]." It is recommended to store the html of the message as the canonical version, but you can also convert from plain text back to html if needed.
+Note the plain text format contains no sizing information unlike html. Therefore, if you are using the "large emoji sizing" that modifies the size of the first three emojis
+you will need to set a special text watcher as a tag on the textview to replicate this behavior. Make sure to null this tag if you call Moji.setText(...) with html later.
+
 ```java
         mojiInputLayout.setSendLayoutClickListener(new MojiInputLayout.SendClickListener() {
             @Override
             public boolean onClick(String html, Spanned spanned) {
                     String plainText = Moji.htmlToPlainText(html);
-                    String htmlFromPlain = Moji.plainTextToHtml(plainText);
+                    Spanned spanned = Moji.plainTextToSpanned(plainText);
+                    textview.setTag(R.id._makemoji_text_watcher, Moji.getDefaultTextWatcher());
+                    Moji.setText(spanned,textview);
                     }});
 ```
 

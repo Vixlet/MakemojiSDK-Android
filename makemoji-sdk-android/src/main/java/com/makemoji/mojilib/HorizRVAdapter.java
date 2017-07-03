@@ -110,6 +110,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
                 gifImageView = (GifImageView) view;
             }else {
                 image = (MojiImageView) v.findViewById(R.id._mm_horiz_item_image);
+                image.sizeImagesToSpanSize(false);
                 int h = (int) (45.0 * Moji.density * .85);
                 image.sizeImagesToSpanSize(useSpanSizes);
                 dimen =h;

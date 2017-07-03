@@ -77,12 +77,10 @@ public class InputActivity extends AppCompatActivity{
 
                 if (plainTextConversion) {//not needed usually, only to facilitate sharing to 3rd party places legibly
                     String plainText = Moji.htmlToPlainText(html);
-                    String htmlFromPlain = Moji.plainTextToHtml(plainText);
                     Log.d(TAG, "plain text " + plainText);//must convert to html to show new lines
-                    MojiMessage message2 = new MojiMessage(plainText);
-                    MojiMessage message3 = new MojiMessage(htmlFromPlain);
+                    MojiMessage message2 = new MojiMessage(null);
+                    message2.plainText = plainText;
                     mAdapter.add(message2);
-                    mAdapter.add(message3);
                 }
 
                 return true;
@@ -110,11 +108,6 @@ public class InputActivity extends AppCompatActivity{
         //to intercept 3pk selections without having to listen to a share image intent
         mojiInputLayout.setInputConnectionCreator(new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout));
         //outsideMojiEdit.connectionCreator =new MojiEditText.MakemojiAwareConnectionCreator(mojiInputLayout);
-
-        /*  example of how to change the size of emojis in certain conditions; eg, make the first 3 emojis bigger when they are the only text
-            First, since the emojis may be bigger than 1x, tell the textview keep the raw emoji image in memory, not the downscaled image usually used.
-            Seconds, set a special textwatcher that will be called by the library when the input changes
-         */
 
     }
 

@@ -39,7 +39,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
     }
 
    private int forceDimen = -1;
-    boolean sizeImagesToSpanSize = true;
+    private boolean sizeImagesToSpanSize = true;
     public void forceDimen(int dimen){
         forceDimen = dimen;
 

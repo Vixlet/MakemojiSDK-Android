@@ -1,6 +1,7 @@
 package com.makemoji.sbaar.mojilist;
 
 import android.content.Context;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,40 +48,33 @@ public class MAdapter extends ArrayAdapter<MojiMessage> {
                     Toast.makeText(getContext(),"hypermoji clicked from adapter url " + url,Toast.LENGTH_SHORT).show();
                 }
             });
+            h.messageTV.setTag(R.id._makemoji_text_watcher, Moji.getDefaultTextWatcher());
 
             if (mTextSize== -1) mTextSize = h.messageTV.getTextSize();
         }
         final Holder holder = (Holder) convertView.getTag();
-        if (holder.simple!=mSimple){//simple has changed, destroy cached spanned
-            message.parsedAttributes = null;
-        }
 
         if (!message.id.equals(holder.id)){
             holder.id = message.id;
             ParsedAttributes parsedAttributes = message.parsedAttributes;
-            if (parsedAttributes==null) {
-                parsedAttributes = Moji.parseHtml(message.messageRaw, holder.messageTV, mSimple);
+            if (parsedAttributes==null && message.html!=null) {
+                //if simple is true, do not set things like text color. We can set those later from Parsed Attributes.
+                parsedAttributes = Moji.parseHtml(message.html, holder.messageTV, mSimple);
                 message.parsedAttributes =parsedAttributes;
-            }
-            Moji.setText(message.parsedAttributes.spanned,holder.messageTV);
-            holder.simple = mSimple;
-        }
-        if (holder.messageTV.getTextSize()!= mTextSize){
-            holder.messageTV.setTextSize(mTextSize);
-            Moji.setText(message.messageRaw,holder.messageTV,mSimple);
-        }
 
+                //make sure the text watcher put in place for plain text messages in code below is removed, since this view can be a recycled one.
+                holder.messageTV.setTag(R.id._makemoji_text_watcher,null);
+                Moji.setText(message.parsedAttributes.spanned,holder.messageTV);
+            }
+            else if (parsedAttributes==null && message.plainText!=null){
+                Spanned spanned = Moji.plainTextToSpanned(message.plainText);
+                holder.messageTV.setTag(R.id._makemoji_text_watcher,Moji.getDefaultTextWatcher());
+                Moji.setText(spanned,holder.messageTV);
+            }
+        }
         return convertView;
     }
 
-    public void changeTextSize(float increase){
-        mTextSize+=increase;
-        notifyDataSetChanged();
-    }
-    public void setSimple(boolean simple){
-        mSimple = simple;
-        notifyDataSetChanged();
-    }
     static class Holder{
         public TextView messageTV;
         public String id;

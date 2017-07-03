@@ -172,6 +172,7 @@ public class MojiGridAdapter extends RecyclerView.Adapter<MojiGridAdapter.Holder
                 MojiImageView v = (MojiImageView)LayoutInflater.from(holder.itemView.getContext())
                         .inflate(R.layout.mm_rv_moji_item, ll, false);
                 v.setPulseEnabled(enablePulse);
+                v.sizeImagesToSpanSize(false);
                 //v.setPadding(0,(int)(2*Moji.density),(int)(-5*Moji.density),(int)(2*Moji.density));
                 ll.addView(v);
                 holder.mojiImageViews.add((MojiImageView)v);

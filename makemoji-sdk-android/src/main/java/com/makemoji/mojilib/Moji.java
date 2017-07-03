@@ -256,11 +256,16 @@ public class Moji {
         CharSequence cs = tv.getText();
         if (cs instanceof Spanned)
             unsubSpanimatable((Spanned)cs);
-        if (tv.getTag(R.id._makemoji_text_watcher)!=null)
+
+        if (tv.getTag(R.id._makemoji_text_watcher)!=null && tv.getTag(R.id._makemoji_text_watcher) instanceof IMojiTextWatcher)
             spanned = ((IMojiTextWatcher)tv.getTag(R.id._makemoji_text_watcher)).textAboutToChange(spanned);
         tv.setText(spanned);
         subSpanimatable(spanned,tv);
 
+    }
+
+    public static IMojiTextWatcher getDefaultTextWatcher(){
+        return IMojiTextWatcher.BigThreeTextWatcher;
     }
 
     /**
@@ -437,12 +442,12 @@ public class Moji {
             int id = (int) base62.decodeBase62(idString);
             MojiModel model = new MojiModel();
             model.id = id;
-            model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-large@2x.png";
+            model.image_url = "https://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-large@2x.png";
             model.name = name;
             if ("gif".equals(name)){
                 if (GifSpan.USE_SMALL_GIFS) model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + "-40x40@2x.gif";
                 else
-                    model.image_url = "http://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + ".gif";
+                    model.image_url = "https://d1tvcfe0bfyi6u.cloudfront.net/emoji/" + id + ".gif";
             }
             model.link_url = url;
             MojiSpan mojiSpan = MojiSpan.fromModel(model, null, null);

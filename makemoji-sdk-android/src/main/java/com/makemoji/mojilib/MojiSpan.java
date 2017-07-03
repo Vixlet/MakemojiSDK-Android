@@ -133,13 +133,17 @@ import java.lang.ref.WeakReference;
                 public void run() {
 
                     Bitmap cache = Moji.picasso.quickMemoryCacheCheckStartsWith(Moji.uriImage(mSource).toString());
-                    if (cache != null && cache.getWidth() >= size) {
+                    if (cache != null) {
+                        Log.d("moji span","mojispan cache hit  " +mSource);
                         t.onBitmapLoaded(cache, null);
                         return;
                     }
+                    Log.d("moji span","mojispan cache miss " +mSource);
                     //if load exact has not been set or is true, load at given size, otherwise load raw image.
-                    boolean loadExact = (refreshView==null || refreshView.getTag(R.id._makemoji_load_exact_size)==null
-                            || Boolean.TRUE.equals(refreshView.getTag(R.id._makemoji_load_exact_size)));
+                    //lets disable this for now since we're resizing mojispans so much.
+                //    boolean loadExact = (refreshView==null || refreshView.getTag(R.id._makemoji_load_exact_size)==null
+                  //          || Boolean.TRUE.equals(refreshView.getTag(R.id._makemoji_load_exact_size)));
+                    boolean loadExact= false;
                     RequestCreator requestCreator = Moji.picasso.load(Moji.uriImage(mSource));
                             if (loadExact)requestCreator = requestCreator.resize(size, size).onlyScaleDown();
                             requestCreator.into(t);
@@ -356,7 +360,7 @@ import java.lang.ref.WeakReference;
     }
 
     public String toHtml() {
-        return "<img style=\"vertical-align:text-bottom;width:20px;height:20px;\""
+        return "<img style=\"vertical-align:text-bottom;width:"+ ((int) sizeMultiplier *20)+"px;height:"+ ((int) sizeMultiplier *20)+"px;\""
                 +
         (id == -1 ? " " : " id=\"" + id + "\"")//insert id if this came from a model
                 + "src=\"" + mSource + "\" "
