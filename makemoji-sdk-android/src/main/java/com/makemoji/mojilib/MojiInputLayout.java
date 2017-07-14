@@ -72,7 +72,6 @@ public class MojiInputLayout extends LinearLayout implements
     MakeMojiPage trendingPage;
     MakeMojiPage recentPage;
 
-    //just used for measurement
     ResizeableLL topScroller;
     LinearLayout horizontalLayout;
 
@@ -81,8 +80,7 @@ public class MojiInputLayout extends LinearLayout implements
     CategoryPopulator trendingPopulator;
     SearchPopulator searchPopulator;
     HorizRVAdapter adapter;
-    Drawable bottomPageBg;
-    Drawable trendingBarBg;
+    Drawable bottomPageBg, trendingBarBg, topScrollerBg,buttonBg;
     View leftButtons;
 
     String currentSearchQuery;
@@ -159,13 +157,13 @@ public class MojiInputLayout extends LinearLayout implements
         int sendLayoutRes = a.getResourceId(R.styleable.MojiInputLayout__mm_sendButtonLayout, R.layout.mm_default_send_layout);
         boolean cameraVisibility = a.getBoolean(R.styleable.MojiInputLayout__mm_cameraButtonVisible, true);
         int buttonColor = a.getColor(R.styleable.MojiInputLayout__mm_leftButtonColor, ContextCompat.getColor(getContext(), R.color._mm_left_button_cf));
-        Drawable buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
+        buttonBg = a.getDrawable(R.styleable.MojiInputLayout__mm_leftButtonBg);
         headerTextColor = a.getColor(R.styleable.MojiInputLayout__mm_headerTextColor, ContextCompat.getColor(getContext(), R.color._mm_header_text_color));
         phraseBgColor = a.getColor(R.styleable.MojiInputLayout__mm_phraseBgColor, ContextCompat.getColor(getContext(), R.color._mm_default_phrase_bg_color));
         minimumSendLength = a.getInteger(R.styleable.MojiInputLayout__mm_minimumSendLength, 1);
         Drawable leftContainerDrawable = a.getDrawable(R.styleable.MojiInputLayout__mm_leftContainerDrawable);
 
-        Drawable topBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
+        topScrollerBg = a.getDrawable(R.styleable.MojiInputLayout__mm_topBarBg);
         bottomPageBg = a.getDrawable(R.styleable.MojiInputLayout__mm_bottomPageBg);
         trendingBarBg = a.getDrawable(R.styleable.MojiInputLayout__mm_trendingBarBg);
 
@@ -178,7 +176,7 @@ public class MojiInputLayout extends LinearLayout implements
         }
 
         inflate(getContext(), R.layout.mm_moji_input_layout, this);
-        findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topBg);
+        findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topScrollerBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL) findViewById(R.id._mm_horizontal_top_scroller);
         if (alwaysShowBar) setTopScrollerVisiblity(View.VISIBLE);
@@ -734,6 +732,11 @@ public class MojiInputLayout extends LinearLayout implements
 
     void onLeftOpened(){
 
+    }
+    //from 0-1
+    void onLeftAnimationProgress(float fractionOpen){
+        toggleButton.setRotation(180f*(1f-fractionOpen));
+        toggleButton.setBackgroundDrawable(fractionOpen<.20f?trendingBarBg:buttonBg);
     }
     @Override
     protected void onDetachedFromWindow() {

@@ -200,6 +200,7 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         //Log.d("ll","width " + newWidth);
         lp.width=newWidth;
         leftView.setLayoutParams(lp);
+        ((MojiInputLayout)getParent().getParent()).onLeftAnimationProgress(((float) (newWidth-minSize)/(maxSize-minSize)));
         if (rnUpdateListener!=null){
             invalidate();
             requestLayout();
@@ -247,18 +248,19 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
 
 
     }
-    private void animateSnap(int currentWidth, int goalWidth){
+    private void animateSnap(final int currentWidth, final int goalWidth){
         animator = ValueAnimator.ofInt(currentWidth,goalWidth);
         animator.setDuration(SNAP_DURATION);
         animator.setInterpolator(new DecelerateInterpolator());
-        if (goalWidth==minSize)
+        if (goalWidth==minSize) {
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
-                    ((MojiInputLayout)getParent().getParent()).onLeftClosed();
+                    ((MojiInputLayout) getParent().getParent()).onLeftClosed();
                 }
             });
+        }
         else {
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override

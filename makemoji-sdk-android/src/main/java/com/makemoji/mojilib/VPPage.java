@@ -23,8 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * page that contains one long grid of emojis
- * Created by Scott Baar on 1/19/2016.
+ * page that contains multiple pages of swipeable emojis
  */
 public class VPPage extends MakeMojiPage implements PagerPopulator.PopulatorObserver {
 

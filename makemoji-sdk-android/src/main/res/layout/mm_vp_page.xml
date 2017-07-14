@@ -47,6 +47,7 @@
             android:layout_gravity="center_horizontal|bottom"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
+            app:piv_count="0"
             app:piv_animationType="slide"
             app:piv_selectedColor="#555555"
             app:piv_unselectedColor="#AAAAAA"/>
