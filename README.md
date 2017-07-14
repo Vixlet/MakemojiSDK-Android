@@ -30,7 +30,7 @@ Library Setup
 ```
 dependencies {
 
-	compile 'com.makemoji:makemoji-sdk-android:0.9.804'
+	compile 'com.makemoji:makemoji-sdk-android:0.9.805'
 
 }
 repositories {
@@ -158,7 +158,7 @@ To handle the display of a webpage when tapping on a Hypermoji ( an emoji with a
 There are two key methods to use when displaying messages that are necessary for animation and Hypermoji click behavior.
 
 Moji.setText(String html,TextView tv, boolean simple) parses the HTML and places it into a TextView, beginning any Hypermoji/gif animation of the new text and ending animation of any existing text. The "simple" argument ignores any other attributes like size or font. It should usually be set to true.
-
+See the plain text section below for instructions if not using HTML.
 
 Set a global HyperMojiClickListener using Moji.setDefaultHyperMojiListener(...), or one on each TextView you use, like so
 ```java
@@ -244,7 +244,7 @@ To theme the activity, pass the activity theme as an extra when starting the act
 You can package the Makemoji keyboard in your app so users can select it as a soft keyboard no matter what app they're in. Selecting an emoji here will cause the keyboard to launch a picture share intent to the current app, or copy the image url to the clipboard if there is no matching intent filter in the current app's manifest.
 Add the third party keyboard to your dependencies.
 ```
-compile 'com.makemoji:makemoji-3pk-android:0.9.804'
+compile 'com.makemoji:makemoji-3pk-android:0.9.805'
 ```
 In strings.xml, set the provider authority for the keyboards' content provider based on your unique package name, add the keyboard name as it will appear to the user and the class name of the keyboard's settings activity. Make sure to prompt the user to activate the keyboard after installation using code similar to ActivateActivity, or the keyboard won't show up as an option.
 **If you are publishing multiple apps, each provider authority must be unique**  or there will be installation problems!
