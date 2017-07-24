@@ -290,7 +290,7 @@ If you choose to lock some of your categories, you can control which are unlocke
 If using the 3pk, you can either set a global listener for when a keybaord category is selected, or listen to the default intent fired when a locked category is clicked.
 Add an intent filter to activity to be launched for the action "com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED".
 
-```
+```java
         MMKB.setCategoryListener(new MMKB.ICategorySelected() {
             View v;
             @Override
