@@ -287,6 +287,26 @@ If you choose to lock some of your categories, you can control which are unlocke
         });
 ```
 
+If using the 3pk, you can either set a global listener for when a keybaord category is selected, or listen to the default intent fired when a locked category is clicked.
+Add an intent filter to activity to be launched for the action "com.makemoji.mojilib.action.LOCKED_CATEGORY_CLICKED".
+
+```
+        MMKB.setCategoryListener(new MMKB.ICategorySelected() {
+            View v;
+            @Override
+            public void categorySelected(String category,boolean locked, final FrameLayout parent) {
+            ...
+            }});
+            //OR in an activity
+            
+            public void onNewIntent(Intent i){
+                super.onNewIntent(i);
+                if (Moji.ACTION_LOCKED_CATEGORY_CLICK.equals(i.getAction())){
+                    lockedCategoryClick(i.getStringExtra(Moji.EXTRA_CATEGORY_NAME));
+                }
+            }
+```
+
 To customize the image overlaid onto a locked category icon, add mm_locked_foreground.xml to your drawable folder. It can look something like this
 ```xml
     <?xml version="1.0" encoding="utf-8"?>

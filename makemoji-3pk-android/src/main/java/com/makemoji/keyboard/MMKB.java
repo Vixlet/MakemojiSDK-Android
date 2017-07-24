@@ -1024,6 +1024,10 @@ public class MMKB extends InputMethodService
             return;
         }
         String categoryName = tab.getContentDescription().toString();
+        if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null && tab.getCustomView().getTag(R.id._makemoji_category_tag_id) instanceof Category ){
+            Category c = ((Category) tab.getCustomView().getTag(R.id._makemoji_category_tag_id));
+            categorySelected.categorySelected(c.name,c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name),inputView);
+        }
         if ("keyboard".equals(tab.getContentDescription())){
             category = "keyboard";
             categorySelected.categorySelected("keyboard",false,inputView);
@@ -1059,15 +1063,6 @@ public class MMKB extends InputMethodService
             horizRv.setAdapter(null);
         }
 
-        categorySelected.categorySelected(tab.getContentDescription().toString(),
-                (Boolean.TRUE.equals(tab.getCustomView().getTag(R.id._makemoji_locked_tag_id))),inputView);
-
-       /* else{
-            Category c =(Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
-           if (c!=null && c.models!=null) populator = new LocalPopulator(c, c.models);
-            else populator = new CategoryPopulator(new Category(tab.getContentDescription().toString(),null));//should not happen
-
-        }*/
 
         currentTab = tab.getPosition();
         MojiModel m;
@@ -1364,6 +1359,10 @@ public class MMKB extends InputMethodService
     Target t;
     @Override
     public void mojiSelected(MojiModel model, BitmapDrawable d) {
+        if (model.locked && !MojiUnlock.getUnlockedGroups().contains(model.categoryName)){
+            categorySelected.categorySelected(model.categoryName,true,inputView);
+            return;
+        }
         RecentPopulator.addRecent(model);
         if (model.character!=null && !model.character.isEmpty()){
             getCurrentInputConnection().finishComposingText();
@@ -1438,7 +1437,10 @@ public class MMKB extends InputMethodService
             if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null ){
                 Category category = (Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
                 if (category.models!=null && !category.models.isEmpty()){
-                    for (MojiModel m : category.models) m.categoryName = category.name;
+                    for (MojiModel m : category.models) {
+                        m.locked = category.isLocked();
+                        m.categoryName = category.name;
+                    }
                     allModels.addAll(category.models);
                     allModels.add(new SpaceMojiModel(category.name));
                 }

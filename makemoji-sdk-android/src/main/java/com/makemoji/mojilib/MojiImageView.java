@@ -80,7 +80,7 @@ public class MojiImageView extends ImageView  implements Spanimatable{
     public void setModel(final MojiModel m){
         if (m.equals(model))return;
         if (model!=null){
-            Moji.picasso.cancelRequest(this);
+            Moji.picasso.cancelTag(model);
         }
         model = m;
         Moji.picasso.cancelRequest(this);
@@ -91,11 +91,11 @@ public class MojiImageView extends ImageView  implements Spanimatable{
                 if (sizeImagesToSpanSize)//resize if re using bitmap loaded for moji spans.
                     Moji.picasso.load(Moji.uriImage(m.image_url))
                             .resize(size, size)
-                            .placeholder(d).into(this);
+                            .placeholder(d).tag(m).into(this);
                 else
                     Moji.picasso.load(Moji.uriImage(m.image_url))
-                            .resize(Math.max(forceDimen,1),Math.max(forceDimen,1))//fix rare crash
-                            .placeholder(d).into(this);
+                            .resize(Math.max(forceDimen,size),Math.max(forceDimen,size))//fix rare crash
+                            .placeholder(d).tag(m).into(this);
 
             } else if (m.character!=null){
                 setImageDrawable(new BitmapDrawable(makeBMFromString(forceDimen, m.character)));
