@@ -150,7 +150,7 @@ public class KBCategory {
 
             }
             tab.getCustomView().setTag(R.id._makemoji_category_tag_id,c);
-            if ("Animals".equals(c.name))c.locked=1;
+            //if ("Animals".equals(c.name))c.locked=1;
             if (tab!=null && c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name)){
                 tab.getCustomView().setTag(R.id._makemoji_locked_tag_id,true);
                 if (tab.getCustomView().findViewWithTag("iv") instanceof MMForegroundImageView)
