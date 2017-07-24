@@ -234,6 +234,23 @@ public class ResizeableLL  extends LinearLayout implements View.OnTouchListener{
         animator.start();
     }
 
+    public void snapClose(){
+        if (!enableScroll |!showLeft) return;
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) leftView.getLayoutParams();
+        int currentWidth = lp.width;
+        if (currentWidth==maxSize)return;
+        animator = ValueAnimator.ofInt(currentWidth,maxSize);
+        animator.setDuration(SNAP_DURATION);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                setPrimaryContentWidth((int)animation.getAnimatedValue());
+            }
+        });
+        animator.start();
+    }
+
     public void snapOpenOrClose() {
         animateSnap(leftView.getMeasuredWidth(),lastStateOpened ? minSize : maxSize);
     }

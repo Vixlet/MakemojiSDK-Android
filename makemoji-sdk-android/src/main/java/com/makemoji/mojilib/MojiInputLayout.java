@@ -947,4 +947,13 @@ public class MojiInputLayout extends LinearLayout implements
     public void setInputConnectionCreator(IInputConnectionCreator creator){
         if (editText instanceof MojiEditText) ((MojiEditText) editText).connectionCreator = creator;
     }
+
+
+    public void openCategoriesPage(){
+        if (pages.contains(categoriesPage))return;
+        hasJiggled = true;
+        setTopScrollerVisiblity(View.VISIBLE);
+        topScroller.snapClose();
+        toggleCategoryPage();
+    }
 }

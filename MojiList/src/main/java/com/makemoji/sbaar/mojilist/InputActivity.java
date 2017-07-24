@@ -137,6 +137,7 @@ public class InputActivity extends AppCompatActivity{
         }
         else if (id == R.id.action_plain_conversion){
             plainTextConversion=!plainTextConversion;
+            //mojiInputLayout.openCategoriesPage();
         }
         else if (id == R.id.action_kb_activate){
             startActivity(new Intent(this,ActivateActivity.class));
