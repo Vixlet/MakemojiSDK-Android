@@ -61,7 +61,7 @@ import java.lang.ref.WeakReference;
     //proportion to size the moji on next frame when being animated;
     private float currentAnimationScale = 1f;
 
-    private float sizeMultiplier = 1f;
+    protected float sizeMultiplier = 1f;
 
 
     protected SoftReference<Drawable> mDrawableRef;

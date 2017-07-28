@@ -33,7 +33,7 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     BitmapFactory.Options options;
     Bitmap bitmap;
     BitmapDrawable bitmapDrawable= new BitmapDrawable();
-    public static boolean USE_SMALL_GIFS = true;
+    public static boolean USE_SMALL_GIFS = false;
     public boolean isSmallGif = USE_SMALL_GIFS;
     /**
      * @param d           The placeholder drawable.
@@ -71,8 +71,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
         producer = GifProducer.getProducerAndSub(this, null, mSource);
         if (producer != null) {
             if (!USE_SMALL_GIFS && !isSmallGif) {
-                mWidth = Math.max(mWidth, producer.getWidth());
-                mHeight = Math.max(mHeight, producer.getHeight());
+                mWidth = Math.min(mWidth, producer.getWidth());
+                mHeight = Math.min(mHeight, producer.getHeight());
             }
             return;
         }
@@ -178,8 +178,8 @@ public class GifSpan extends MojiSpan implements GifConsumer {
                        Paint.FontMetricsInt fm) {
         Drawable d = bitmapDrawable;
         Rect rect = d.getBounds();
-        rect.bottom = mHeight;
-        rect.right = mWidth;
+        rect.bottom = (int)(mHeight *sizeMultiplier);
+        rect.right = (int)(mWidth *sizeMultiplier);
 
 
         if (fm != null) {
@@ -199,6 +199,7 @@ public class GifSpan extends MojiSpan implements GifConsumer {
                      int start, int end, float x,
                      int top, int y, int bottom, Paint paint) {
         Drawable d = bitmapDrawable;
+        d.setBounds(0,0,(int)(mWidth * sizeMultiplier),(int)(mHeight * sizeMultiplier));
         canvas.save();
         //save bounds before applying animation scale. for a size pulse only
         //int oldRight = d.getBounds().right;
