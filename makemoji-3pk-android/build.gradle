@@ -41,7 +41,7 @@ ext {
     siteUrl = 'https://github.com/makemoji/MakemojiSDK-KeyboardExtension'
     gitUrl = 'https://github.com/makemoji/MakemojiSDK-KeyboardExtension.git'
 
-    libraryVersion = '0.9.807'
+    libraryVersion = '0.9.808'
 
     developerId = 'scottmoji'
     developerName = 'Scott Baar'

@@ -180,6 +180,12 @@ public class MMKB extends InputMethodService
 
     static int forceDimen;
     public static WeakReference<MMKB> instance;
+    static boolean showLockedEmojis = true;
+
+    //show emojis
+    public static void showLockedEmojis(boolean show){
+        showLockedEmojis = show;
+    }
     public static void forceSizeDp(@Dimension(unit = Dimension.DP) int dimen){
         forceDimen = dimen;
     }
@@ -1436,13 +1442,18 @@ public class MMKB extends InputMethodService
         for (TabLayout.Tab tab: tabs) {
             if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null ){
                 Category category = (Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
+
                 if (category.models!=null && !category.models.isEmpty()){
                     for (MojiModel m : category.models) {
                         m.locked = category.isLocked();
                         m.categoryName = category.name;
                     }
-                    allModels.addAll(category.models);
-                    allModels.add(new SpaceMojiModel(category.name));
+                    if (showLockedEmojis ||
+                            (!category.isLocked() || MojiUnlock.getUnlockedGroups().contains(category.name))){
+                        allModels.addAll(category.models);
+                        allModels.add(new SpaceMojiModel(category.name));
+                    }
+
                 }
             }
 
