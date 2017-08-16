@@ -39,6 +39,9 @@ public class SearchPopulator extends PagerPopulator<MojiModel> {
                         public void run() {
                             List<MojiModel> accumulated = new ArrayList<MojiModel>();
                             for (Map.Entry<String,List<MojiModel>> entry:response.body().entrySet()) {
+                                for (MojiModel m : entry.getValue())
+                                    m.categoryName = entry.getKey();
+
                                 if (!"osemoji".equalsIgnoreCase(entry.getKey()))accumulated.addAll(entry.getValue());
                                 MojiModel.saveList(entry.getValue(),entry.getKey());
                             }

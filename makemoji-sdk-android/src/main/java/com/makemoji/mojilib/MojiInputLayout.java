@@ -407,10 +407,17 @@ public class MojiInputLayout extends LinearLayout implements
             trendingPopulator.onNewDataAvailable();
             if (!usingTrendingAdapter){
                 //adapter.showNames(true);
+                List<MojiModel> filteredList = new ArrayList<>();
                 LinkedHashSet<MojiModel> set = new LinkedHashSet<>(searchPopulator.populatePage(50,0));
-                for (MojiModel m : set) m.fromSearch = true;
-                set.addAll(trendingPopulator.populatePage(100,0));
-                adapter.setMojiModels(new ArrayList<>(set));
+                for (MojiModel m : set){
+                    m.fromSearch = true;
+                    if (m.categoryName!=null && MojiUnlock.getLockedGroups().contains(m.categoryName) && !MojiUnlock.getUnlockedGroups().contains(m.categoryName))
+                        continue;
+                    else
+                        filteredList.add(m);
+                }
+                filteredList.addAll(trendingPopulator.populatePage(100,0));
+                adapter.setMojiModels(new ArrayList<>(filteredList));
                 if (rnUpdateListener!=null)rnUpdateListener.needsUpdate();
             }
         }

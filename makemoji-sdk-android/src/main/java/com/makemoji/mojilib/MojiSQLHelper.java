@@ -22,7 +22,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
 
     public static MojiSQLHelper mInstance;
     public static MojiSQLHelper m3pkInstance;
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "makemoji.db";
 
     private static final String FTS_VIRTUAL_TABLE = "FTS";
@@ -43,6 +43,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
     public static final  String COL_VIDEO = "VIDEO";
     public static final  String COL_VIDEO_URL = "VIDEO_URL";
     public static final  String COL_TAGS = "TAGS";
+    public static final  String COL_CATEGORY = "CATEGORY";
 
 
     private static String getCreateString(String tableName){
@@ -58,7 +59,8 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
                 + COL_GIF_40 + " TEXT, "
                 + COL_VIDEO + " INT, "
                + COL_VIDEO_URL + " TEXT, "
-               + COL_TAGS + " TEXT "
+               + COL_TAGS + " TEXT, "
+               + COL_CATEGORY + " TEXT "
                 +", UNIQUE( "+COL_ID_INT+ ","+COL_IMG_URL+ ","+ COL_NAME+") ON CONFLICT REPLACE"
                 + ");";
     }
@@ -102,6 +104,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
         values.put(COL_VIDEO, model.video);
         values.put(COL_VIDEO_URL, model.video_url);
         values.put(COL_TAGS, model.tags);
+        values.put(COL_CATEGORY, model.categoryName);
         return values;
     }
     public synchronized void insert(List<MojiModel> models){
@@ -137,6 +140,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
             mm.video = c.getInt(9);
             mm.video_url = c.getString(10);
             mm.tags = c.getString(11);
+            mm.categoryName = c.getString(12);
         }
         catch (Exception e){
             mm = null;
@@ -167,6 +171,7 @@ public class MojiSQLHelper extends SQLiteOpenHelper {
                 mm.video = c.getInt(9);
                 mm.video_url = c.getString(10);
                 mm.tags = c.getString(11);
+                mm.categoryName = c.getString(12);
                 models.add(mm);
             }
 

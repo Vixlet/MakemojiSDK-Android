@@ -4,6 +4,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IntegerRes;
 
 import com.makemoji.mojilib.Moji;
+import com.makemoji.mojilib.MojiUnlock;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public class Category {
         JSONArray ja =new JSONArray();
         try {
             for (Category category : categoryList) {
+                if (category.isLocked()) MojiUnlock.getLockedGroups().add(category.name);
                 JSONObject jo = new JSONObject();
                 jo.putOpt("name", category.name);
                 jo.putOpt("locked", category.locked);
@@ -53,6 +55,7 @@ public class Category {
                 Category c = new Category(jo.optString("name"),jo.optString("image_url"));
                 c.locked = jo.optInt("locked");
                 c.gif = jo.optInt("gif");
+                if (c.isLocked()) MojiUnlock.getLockedGroups().add(c.name);
                 categories.add(c);
             }
         }

@@ -177,6 +177,7 @@ public class MMKB extends InputMethodService
     boolean useTrending = true;
     View kbBottomNav;
     String category;
+    Set<String> lockedCategories = new HashSet<>();
 
     static int forceDimen;
     public static WeakReference<MMKB> instance;
@@ -573,17 +574,24 @@ public class MMKB extends InputMethodService
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
             //deleted some candidate code here
-        CharSequence cs = getCurrentInputConnection().getTextBeforeCursor(15,0);
-        String before = cs==null?null:cs.toString();
-        if (before==null || before.isEmpty() || before.endsWith(" ")){
-            useTrending = true;
-           if (trendingPopulator!=null) trendingPopulator.onNewDataAvailable();
-            return;
-        }
-        int idx = Math.max(before.lastIndexOf(' '),0);
-        String query = before.substring(idx, before.length());
-        useTrending = false;
-       if (searchPopulator!=null) searchPopulator.search(query.trim());
+        //runnablle so getTextBeforeCursor is not null
+        Moji.handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CharSequence cs = getCurrentInputConnection().getTextBeforeCursor(15,0);
+                String before = cs==null?null:cs.toString();
+                if (before==null || before.isEmpty() || before.endsWith(" ")){
+                    useTrending = true;
+                    if (trendingPopulator!=null) trendingPopulator.onNewDataAvailable();
+                    return;
+                }
+                int idx = Math.max(before.lastIndexOf(' '),0);
+                String query = before.substring(idx, before.length());
+                useTrending = false;
+                if (searchPopulator!=null) searchPopulator.search(query.trim());
+            }
+        }, 10);
+
     }
     /**
      * This tells us about completions that the editor has determined based
@@ -893,10 +901,12 @@ public class MMKB extends InputMethodService
             updateCandidates();
         } else {
             CharSequence text = getCurrentInputConnection().getTextBeforeCursor(2, InputConnection.GET_TEXT_WITH_STYLES);
-            int deleteLength =1;
-            if (text.length()>1 && (Character.isSurrogatePair(text.charAt(0),text.charAt(1))|| MojiInputLayout.isVariation(text.charAt(1))))
-                deleteLength =2;
-            getCurrentInputConnection().deleteSurroundingText(deleteLength,0);
+            if (text!=null) {
+                int deleteLength = 1;
+                if (text.length() > 1 && (Character.isSurrogatePair(text.charAt(0), text.charAt(1)) || MojiInputLayout.isVariation(text.charAt(1))))
+                    deleteLength = 2;
+                getCurrentInputConnection().deleteSurroundingText(deleteLength, 0);
+            }
             //keyDownUp(KeyEvent.KEYCODE_DEL);
         }
         updateShiftKeyState(getCurrentInputEditorInfo());
@@ -1029,7 +1039,7 @@ public class MMKB extends InputMethodService
             ignoreNextTabSelect = false;
             return;
         }
-        String categoryName = tab.getContentDescription().toString();
+        final String categoryName = tab.getContentDescription().toString();
         if (tab.getCustomView().getTag(R.id._makemoji_category_tag_id)!=null && tab.getCustomView().getTag(R.id._makemoji_category_tag_id) instanceof Category ){
             Category c = ((Category) tab.getCustomView().getTag(R.id._makemoji_category_tag_id));
             categorySelected.categorySelected(c.name,c.isLocked() && !MojiUnlock.getUnlockedGroups().contains(c.name),inputView);
@@ -1049,15 +1059,34 @@ public class MMKB extends InputMethodService
             trendingPopulator.setup(new PagerPopulator.PopulatorObserver() {
                 @Override
                 public void onNewDataAvailable() {
-                    if (useTrending)
-                    adapter.setMojiModels(trendingPopulator.populatePage(trendingPopulator.getTotalCount(),0));
+                    if (useTrending) {
+                        List<MojiModel> list = trendingPopulator.populatePage(trendingPopulator.getTotalCount(),0);
+                        List<MojiModel> filterdList = new ArrayList<MojiModel>();
+                        for (MojiModel m : list){
+                            if (m.categoryName!=null && lockedCategories.contains(m.categoryName) && !MojiUnlock.getUnlockedGroups().contains(m.categoryName))
+                                continue;
+                            else
+                                filterdList.add(m);
+                        }
+                        adapter.setMojiModels(filterdList);
+                    }
                 }
             });
             searchPopulator.setup(new PagerPopulator.PopulatorObserver() {
                 @Override
                 public void onNewDataAvailable() {
-                    if (searchPopulator.getTotalCount()>0 && !useTrending)
-                    adapter.setMojiModels(searchPopulator.populatePage(searchPopulator.getTotalCount(),0));
+                    if (searchPopulator.getTotalCount()>0 && !useTrending) {
+                        List<MojiModel> list = searchPopulator.populatePage(searchPopulator.getTotalCount(),0);
+                        List<MojiModel> filterdList = new ArrayList<MojiModel>();
+                        for (MojiModel m : list){
+                            if (m.categoryName!=null && lockedCategories.contains(m.categoryName) && !MojiUnlock.getUnlockedGroups().contains(m.categoryName))
+                                continue;
+                            else
+                                filterdList.add(m);
+                        }
+
+                        adapter.setMojiModels(filterdList);
+                    }
                 }
             });
             return;
@@ -1444,6 +1473,7 @@ public class MMKB extends InputMethodService
                 Category category = (Category)tab.getCustomView().getTag(R.id._makemoji_category_tag_id);
 
                 if (category.models!=null && !category.models.isEmpty()){
+                    if (category.isLocked()) lockedCategories.add(category.name);
                     for (MojiModel m : category.models) {
                         m.locked = category.isLocked();
                         m.categoryName = category.name;

@@ -20,6 +20,7 @@ import retrofit2.Response;
  */
 public class MojiUnlock {
     private static Set<String> unlocked;
+    private static Set<String> locked = new HashSet<>();
     public interface ICategoryUnlock{
         void unlockChange();
     }
@@ -71,5 +72,9 @@ public class MojiUnlock {
         listeners.remove(unlock);
 
     }
+    public static Set<String> getLockedGroups(){
+        return locked;
+    }
+
 
 }
