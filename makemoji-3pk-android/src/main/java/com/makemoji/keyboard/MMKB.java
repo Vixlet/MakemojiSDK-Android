@@ -1095,6 +1095,8 @@ public class MMKB extends InputMethodService
         {
             mInputView.setVisibility(View.GONE);
             pageFrame.setVisibility(View.VISIBLE);
+            kbBottomNav.setVisibility(View.VISIBLE);
+            horizRv.setVisibility(View.GONE);
             horizRv.setAdapter(null);
         }
 
