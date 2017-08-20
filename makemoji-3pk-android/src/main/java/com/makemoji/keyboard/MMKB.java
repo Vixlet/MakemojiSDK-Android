@@ -573,8 +573,20 @@ public class MMKB extends InputMethodService
                                             int candidatesStart, int candidatesEnd) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
-            //deleted some candidate code here
+
+        if (mComposing.length() > 0 && (newSelStart != candidatesEnd
+                || newSelEnd != candidatesEnd)) {
+            mComposing.setLength(0);
+            updateCandidates();
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null) {
+                ic.finishComposingText();
+            }
+        }
+
         //runnablle so getTextBeforeCursor is not null
+
+
         Moji.handler.postDelayed(new Runnable() {
             @Override
             public void run() {
