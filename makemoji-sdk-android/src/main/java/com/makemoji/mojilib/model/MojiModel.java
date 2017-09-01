@@ -44,6 +44,8 @@ public class MojiModel {
     public String tags;
     public boolean fromSearch;
 
+    public int shares;
+
 
     @SerializedName("native")
     public int _native;

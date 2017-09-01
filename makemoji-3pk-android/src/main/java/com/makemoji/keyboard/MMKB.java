@@ -953,6 +953,7 @@ public class MMKB extends InputMethodService
         if (isAlphabet(primaryCode) && mPredictionOn) {
             mComposing.append((char) primaryCode);
             getCurrentInputConnection().setComposingText(mComposing, 1);
+            getCurrentInputConnection().finishComposingText();
             updateShiftKeyState(getCurrentInputEditorInfo());
             updateCandidates();
         } else {
