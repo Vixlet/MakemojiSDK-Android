@@ -50,7 +50,7 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
             public void onClick(View v) {
                 RVHolder rvHolder = ((RVHolder)v.getTag());
                 MojiModel model = list.get(rvHolder.pos);
-                if (mil instanceof MojiInputLayout)((MojiInputLayout) mil).removeSuggestion();
+                if (mil instanceof MojiInputLayout && model.fromSearch)((MojiInputLayout) mil).removeSuggestion();
                 mil.mojiSelected(model, null);
             }
         });
@@ -77,8 +77,10 @@ public class HorizRVAdapter extends Adapter<HorizRVAdapter.RVHolder>{
 
 
     public void setMojiModels(List<MojiModel> newList){
-        list = newList;
-        notifyDataSetChanged();
+        if (!list.equals(newList)) {
+            list = newList;
+            notifyDataSetChanged();
+        }
     }
     @Override
     public int getItemCount() {

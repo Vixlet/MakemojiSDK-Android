@@ -406,7 +406,7 @@ public class MojiInputLayout extends LinearLayout implements
         public void onNewDataAvailable() {
             MakeMojiPage page = pages.empty()?null:pages.peek();
             if (page!=null)page.onNewDataAvailable();
-            trendingPopulator.onNewDataAvailable();
+            //trendingPopulator.onNewDataAvailable();
             if (!usingTrendingAdapter){
                 //adapter.showNames(true);
                 List<MojiModel> filteredList = new ArrayList<>();
@@ -676,11 +676,10 @@ public class MojiInputLayout extends LinearLayout implements
         if (!replaceSuggestions) return null;
         if (editText.getSelectionStart()==-1)return null;
         int selectionStart = editText.getSelectionStart();
-        int lastSpace = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(' ')+1;
-        if (lastSpace ==-1)lastSpace = 0;//start of string when no space
-        if (selectionStart == lastSpace) return null;
+        int selectionEnd = editText.getSelectionEnd();
+        if (selectionEnd ==-1)return null;
 
-        return new Pair<>(lastSpace,selectionStart);
+        return new Pair<>(selectionStart,selectionEnd);
     }
     @Override
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){

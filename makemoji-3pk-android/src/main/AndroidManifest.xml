@@ -23,7 +23,7 @@
 
         <provider
             android:name=".MMFileProvider"
-            android:authorities="@string/_mm_provider_authority"
+            android:authorities="com.makemoji.keyboard.authority.${applicationId}"
             android:exported="false"
             android:enabled="@bool/mmEnableDefaultKeyboardProvider"
             android:grantUriPermissions="true">
