@@ -401,12 +401,16 @@ public class MojiInputLayout extends LinearLayout implements
             if (usingTrendingAdapter)adapter.setMojiModels(trendingPopulator.populatePage(200,0));
         }
     };
+    int searchUpdated = 0;
     PagerPopulator.PopulatorObserver searchObserver = new PagerPopulator.PopulatorObserver() {
         @Override
         public void onNewDataAvailable() {
             MakeMojiPage page = pages.empty()?null:pages.peek();
             if (page!=null)page.onNewDataAvailable();
-            //trendingPopulator.onNewDataAvailable();
+            if (searchUpdated <2){
+                trendingPopulator.onNewDataAvailable();
+                searchUpdated++;
+            }
             if (!usingTrendingAdapter){
                 //adapter.showNames(true);
                 List<MojiModel> filteredList = new ArrayList<>();
