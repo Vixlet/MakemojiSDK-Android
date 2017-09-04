@@ -85,6 +85,8 @@ public class MojiInputLayout extends LinearLayout implements
 
     String currentSearchQuery;
 
+    boolean replaceSuggestions = true;
+
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
     @DrawableRes int backSpaceDrawableRes;
@@ -658,6 +660,7 @@ public class MojiInputLayout extends LinearLayout implements
 
     //remove last search term
     void removeSuggestion(){
+        if (!replaceSuggestions) return;
         if (usingTrendingAdapter|| editText.getSelectionStart()==-1)return;
         int selectionStart = editText.getSelectionStart();
         int lastBang = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(" ")+1;
@@ -670,6 +673,7 @@ public class MojiInputLayout extends LinearLayout implements
     //the range of text to replace when inserting a moji
     @Nullable
     Pair<Integer,Integer> getReplaceRange(){
+        if (!replaceSuggestions) return null;
         if (editText.getSelectionStart()==-1)return null;
         int selectionStart = editText.getSelectionStart();
         int lastSpace = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(' ')+1;
@@ -945,6 +949,10 @@ public class MojiInputLayout extends LinearLayout implements
         topScroller.setEnableScroll(visible);
         topScroller.setShowLeft(visible);
         showLeft = visible;
+    }
+    //replace the word after clicking a suggestion
+    public void setReplaceSuggestions(boolean enabled){
+        replaceSuggestions = enabled;
     }
 
     protected MojiEditText.IDrawableClick drawableClick;
