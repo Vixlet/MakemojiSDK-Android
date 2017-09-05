@@ -55,6 +55,7 @@ public class InputActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mojiInputLayout = (MojiInputLayout)findViewById(R.id.mojiInput);
+        //mojiInputLayout.setReplaceSuggestions(false);
      /*   //mojiInputLayout.grabFocusShowKb(); //show keyboard on demand; launch behavior defined in mojiInputLayout style xml
        // mojiInputLayout.setVisibility(View.GONE);
         Moji.handler.postDelayed(new Runnable() {

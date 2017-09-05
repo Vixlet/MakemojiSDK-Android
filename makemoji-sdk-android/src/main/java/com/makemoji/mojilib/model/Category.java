@@ -32,6 +32,7 @@ public class Category {
     }
 
     public static void saveCategories(List<Category> categoryList){
+        if (categoryList==null) return;
         JSONArray ja =new JSONArray();
         try {
             for (Category category : categoryList) {

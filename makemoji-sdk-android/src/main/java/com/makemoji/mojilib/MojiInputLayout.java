@@ -85,6 +85,8 @@ public class MojiInputLayout extends LinearLayout implements
 
     String currentSearchQuery;
 
+    boolean replaceSuggestions = true;
+
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
     @DrawableRes int backSpaceDrawableRes;
@@ -399,12 +401,16 @@ public class MojiInputLayout extends LinearLayout implements
             if (usingTrendingAdapter)adapter.setMojiModels(trendingPopulator.populatePage(200,0));
         }
     };
+    int searchUpdated = 0;
     PagerPopulator.PopulatorObserver searchObserver = new PagerPopulator.PopulatorObserver() {
         @Override
         public void onNewDataAvailable() {
             MakeMojiPage page = pages.empty()?null:pages.peek();
             if (page!=null)page.onNewDataAvailable();
-            trendingPopulator.onNewDataAvailable();
+            if (searchUpdated <2){
+                trendingPopulator.onNewDataAvailable();
+                searchUpdated++;
+            }
             if (!usingTrendingAdapter){
                 //adapter.showNames(true);
                 List<MojiModel> filteredList = new ArrayList<>();
@@ -658,6 +664,7 @@ public class MojiInputLayout extends LinearLayout implements
 
     //remove last search term
     void removeSuggestion(){
+        if (!replaceSuggestions) return;
         if (usingTrendingAdapter|| editText.getSelectionStart()==-1)return;
         int selectionStart = editText.getSelectionStart();
         int lastBang = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(" ")+1;
@@ -670,13 +677,13 @@ public class MojiInputLayout extends LinearLayout implements
     //the range of text to replace when inserting a moji
     @Nullable
     Pair<Integer,Integer> getReplaceRange(){
+        if (!replaceSuggestions) return null;
         if (editText.getSelectionStart()==-1)return null;
         int selectionStart = editText.getSelectionStart();
-        int lastSpace = editText.getText().toString().substring(0,editText.getSelectionStart()).lastIndexOf(' ')+1;
-        if (lastSpace ==-1)lastSpace = 0;//start of string when no space
-        if (selectionStart == lastSpace) return null;
+        int selectionEnd = editText.getSelectionEnd();
+        if (selectionEnd ==-1)return null;
 
-        return new Pair<>(lastSpace,selectionStart);
+        return new Pair<>(selectionStart,selectionEnd);
     }
     @Override
     public void mojiSelected(MojiModel model, @Nullable BitmapDrawable bitmapDrawable){
@@ -945,6 +952,10 @@ public class MojiInputLayout extends LinearLayout implements
         topScroller.setEnableScroll(visible);
         topScroller.setShowLeft(visible);
         showLeft = visible;
+    }
+    //replace the word after clicking a suggestion
+    public void setReplaceSuggestions(boolean enabled){
+        replaceSuggestions = enabled;
     }
 
     protected MojiEditText.IDrawableClick drawableClick;
