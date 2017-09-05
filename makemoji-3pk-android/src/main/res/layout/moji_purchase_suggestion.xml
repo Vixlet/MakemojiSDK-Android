@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/moji_purchase_suggestion"
+             xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+
+             android:background="@color/purchase_background"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:text="This is a premium emoji pack, click the button below to learn more."
+            android:textColor="@color/purchase_text"
+            android:textSize="15sp"/>
+
+        <FrameLayout
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@+id/label"
+            android:layout_margin="16dp"
+
+            android:background="@drawable/button_drawable">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Learn More"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/purchase_text"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/close_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@+id/button"
+            android:gravity="center"
+            android:text="Cancel"
+            android:textColor="@color/purchase_text"
+
+            android:textSize="15sp"/>
+
+    </LinearLayout>
+
+</FrameLayout>
