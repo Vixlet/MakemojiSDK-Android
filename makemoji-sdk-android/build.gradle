@@ -1,35 +1,5 @@
 apply plugin: 'com.android.library'
-/* How to upload to bintray
-Update library version number below
-Add to local.properties your jcenter name/pw
-bintray.user=arcshod
-bintray.apikey=151985234y208
 
-Click terminal in android studio or navigate to project root
-> gradlew bintrayUpload
- */
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'com.makemoji:makemoji-sdk-android'
-
-    publishedGroupId = 'com.makemoji'
-    libraryName = 'MakemojiSDK Android'
-    artifact = 'makemoji-sdk-android'
-
-    libraryDescription = 'MakeMoji Android SDK'
-
-    siteUrl = 'https://github.com/makemoji/MakemojiSDK-Android'
-    gitUrl = 'https://github.com/makemoji/MakemojiSDK-Android.git'
-
-    libraryVersion = '0.9.814'
-    developerId = 'scottmoji'
-    developerName = 'Scott Baar'
-    developerEmail = 'scott@makemoji.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
 
 android {
     compileSdkVersion 25
@@ -70,10 +40,8 @@ dependencies {
     compile 'com.romandanylyk:pageindicatorview:0.2.0@aar'
 
     compile 'com.squareup.okhttp:okhttp:2.7.0'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-   // compile  'com.squareup.okhttp3:logging-interceptor:3.3.1'
-    //compile 'com.githang:viewpagerindicator:2.4.2@aar'//not needed unless we want viewpagerpage back
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
     androidTestCompile 'com.android.support:support-annotations:25.4.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
@@ -83,51 +51,3 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 }
 
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
-//removed source tasks from above script
-apply plugin: 'com.jfrog.bintray'
-
-version = libraryVersion
-
-if (project.hasProperty("android")) { // Android libraries
-
-    task javadoc(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    //archives javadocJar
-}
-
-// Bintray
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = bintrayRepo
-        name = bintrayName
-        desc = libraryDescription
-        userOrg ='mm'
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = allLicenses
-        publish = true
-        publicDownloadNumbers = false
-        version {
-            desc = libraryDescription
-        }
-    }
-}

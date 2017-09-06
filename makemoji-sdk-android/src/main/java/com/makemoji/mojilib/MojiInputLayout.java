@@ -732,7 +732,6 @@ public class MojiInputLayout extends LinearLayout implements
     }
 
     void onLeftClosed(){
-        showKeyboard();
         deactiveButtons();
         layoutRunnable = new Runnable() {
             @Override
