@@ -135,6 +135,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
+                long t = System.currentTimeMillis();
                 String string = s.toString();
                 SpannableStringBuilder ssb = new SpannableStringBuilder(s);
                 SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -169,7 +170,7 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
                         }
                     }
 
-                if (beforeLength!=builder.length() || newEmoji){
+                if (/*beforeLength!=builder.length() ||*/ newEmoji){
                     int selection = getSelectionStart()-(ssb.length()-builder.length());
                     Moji.setText(builder,MojiEditText.this);
                     setSelection(Math.max(0,Math.min(selection,getText().length())));

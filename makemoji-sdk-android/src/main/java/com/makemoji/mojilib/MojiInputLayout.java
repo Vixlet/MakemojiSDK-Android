@@ -406,8 +406,8 @@ public class MojiInputLayout extends LinearLayout implements
         @Override
         public void onNewDataAvailable() {
             MakeMojiPage page = pages.empty()?null:pages.peek();
-            if (page!=null)page.onNewDataAvailable();
             if (searchUpdated <2){
+                if (page!=null)page.onNewDataAvailable();
                 trendingPopulator.onNewDataAvailable();
                 searchUpdated++;
             }
