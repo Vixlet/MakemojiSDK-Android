@@ -11,12 +11,14 @@ import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.contrib.RecyclerViewActions.*;
+import android.support.test.espresso.core.deps.guava.base.CharMatcher;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.espresso.matcher.*;
 
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import android.support.test.filters.SmallTest;
 import android.support.test.rule.ActivityTestRule;
@@ -154,7 +156,7 @@ public class InputTest {
         onView(withText("Send")).check(ViewAssertions.matches(isEnabled()));
         onView(withText("Send")).perform(ViewActions.click());
         onView(withText("Send")).check(ViewAssertions.matches(Matchers.not(isEnabled())));
-        onView(withId(R.id._mm_page_grid)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
+        onView(withTagValue(CoreMatchers.is((Object)"page0"))).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
         onView(withText("Send")).check(ViewAssertions.matches(isEnabled()));
 
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("abc"));

@@ -86,6 +86,7 @@ public class MojiInputLayout extends LinearLayout implements
     String currentSearchQuery;
 
     boolean replaceSuggestions = true;
+    boolean searchAsYouType = true;
 
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
@@ -358,6 +359,7 @@ public class MojiInputLayout extends LinearLayout implements
         final String t = editText.getText().toString();
         sendLayout.setEnabled(t.length()>=minimumSendLength);
 
+        if (!searchAsYouType)return;
         if (!showLeft) return;
 
         int selectionEnd = editText.getSelectionEnd();
@@ -957,6 +959,10 @@ public class MojiInputLayout extends LinearLayout implements
     //replace the word after clicking a suggestion
     public void setReplaceSuggestions(boolean enabled){
         replaceSuggestions = enabled;
+    }
+    public void setSearchAsYouType(boolean enabled){
+        searchAsYouType = enabled;
+        if (!searchAsYouType) useTrendingAdapter(true);
     }
 
     protected MojiEditText.IDrawableClick drawableClick;

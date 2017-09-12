@@ -163,6 +163,7 @@ public class VPPage extends MakeMojiPage implements PagerPopulator.PopulatorObse
             pageSize = getArguments().getInt("size");
             View view = inflater.inflate(R.layout.mm_grid_frag, container,false);
             RecyclerView rv = (RecyclerView) view.findViewById(R.id._mm_page_grid);
+            rv.setTag("page"+offset);
             int rows = OneGridPage.DEFAULT_ROWS;
             int cols = OneGridPage.DEFAULT_COLS;
 
