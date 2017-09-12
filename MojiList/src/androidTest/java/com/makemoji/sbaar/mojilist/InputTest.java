@@ -101,7 +101,7 @@ public class InputTest {
     @Test public void testAttatchDetatch(){
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("a"));
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
-        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText(SPAN_STRING)));
+        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("a"+SPAN_STRING)));
         openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getTargetContext());
         onView(withText("Attatch EditText")).perform(ViewActions.click());
 
@@ -116,7 +116,7 @@ public class InputTest {
 
         onView(withId(R.id._mm_edit_text)).perform(ViewActions.click(),ViewActions.typeTextIntoFocusedView("b "));
         onView(withId(R.id._mm_recylcer_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,ViewActions.click()));
-        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText(SPAN_STRING+"b "+ SPAN_STRING)));
+        onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withText("a"+SPAN_STRING+"b "+ SPAN_STRING)));
         onView(withId(R.id.outside_met)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
         onView(withId(R.id._mm_edit_text)).check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
 
@@ -172,7 +172,7 @@ public class InputTest {
         openLeft();
         onView(withId(R.id._mm_trending_button)).perform(ViewActions.click());
         MojiModel trendingModel = MojiModel.getList("Trending").get(3);
-        onView(withId(R.id._mm_page_grid)).perform(RecyclerViewActions.actionOnItemAtPosition(3,ViewActions.click()));
+        onView(withTagValue(CoreMatchers.is((Object)"page0"))).perform(RecyclerViewActions.actionOnItemAtPosition(3,ViewActions.click()));
         onView(withText("Send")).perform(ViewActions.click());
         MojiModel recent = RecentPopulator.getRecents().get(0);
         assert recent.equals(trendingModel);
