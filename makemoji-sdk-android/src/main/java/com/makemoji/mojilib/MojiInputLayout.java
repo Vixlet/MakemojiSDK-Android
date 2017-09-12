@@ -181,6 +181,7 @@ public class MojiInputLayout extends LinearLayout implements
         findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topScrollerBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL) findViewById(R.id._mm_horizontal_top_scroller);
+        topScroller.setBackgroundDrawable(topScrollerBg);
         if (alwaysShowBar) setTopScrollerVisiblity(View.VISIBLE);
 
         sendLayout = ((LinearLayout) inflate(getContext(), sendLayoutRes, horizontalLayout)).getChildAt(2);
