@@ -189,6 +189,7 @@ public class MojiInputLayout extends LinearLayout implements
 
         leftButtons = findViewById(R.id._mm_left_buttons);
         leftButtons.setBackgroundDrawable(leftContainerDrawable);
+        setBackgroundDrawable(topScrollerBg);
 
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
@@ -754,6 +755,8 @@ public class MojiInputLayout extends LinearLayout implements
     void onLeftAnimationProgress(float fractionOpen){
         toggleButton.setRotation(180f*(1f-fractionOpen));
         toggleButton.setBackgroundDrawable(fractionOpen<.20f?trendingBarBg:buttonBg);
+        horizontalLayout.setBackgroundDrawable(topScrollerBg);
+
     }
     @Override
     protected void onDetachedFromWindow() {
