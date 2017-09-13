@@ -86,6 +86,7 @@ public class MojiInputLayout extends LinearLayout implements
     String currentSearchQuery;
 
     boolean replaceSuggestions = true;
+    boolean searchAsYouType = true;
 
     @ColorInt int headerTextColor;
     @ColorInt int phraseBgColor;
@@ -181,12 +182,14 @@ public class MojiInputLayout extends LinearLayout implements
         findViewById(R.id._mm_horizontal_ll).setBackgroundDrawable(topScrollerBg);
         horizontalLayout = (LinearLayout) findViewById(R.id._mm_horizontal_ll);
         topScroller = (ResizeableLL) findViewById(R.id._mm_horizontal_top_scroller);
+        topScroller.setBackgroundDrawable(topScrollerBg);
         if (alwaysShowBar) setTopScrollerVisiblity(View.VISIBLE);
 
         sendLayout = ((LinearLayout) inflate(getContext(), sendLayoutRes, horizontalLayout)).getChildAt(2);
 
         leftButtons = findViewById(R.id._mm_left_buttons);
         leftButtons.setBackgroundDrawable(leftContainerDrawable);
+        setBackgroundDrawable(topScrollerBg);
 
         cameraImageButton = (ImageButton) findViewById(R.id._mm_camera_ib);
         cameraImageButton.setImageResource(cameraDrawableRes);
@@ -357,6 +360,7 @@ public class MojiInputLayout extends LinearLayout implements
         final String t = editText.getText().toString();
         sendLayout.setEnabled(t.length()>=minimumSendLength);
 
+        if (!searchAsYouType)return;
         if (!showLeft) return;
 
         int selectionEnd = editText.getSelectionEnd();
@@ -750,6 +754,8 @@ public class MojiInputLayout extends LinearLayout implements
     void onLeftAnimationProgress(float fractionOpen){
         toggleButton.setRotation(180f*(1f-fractionOpen));
         toggleButton.setBackgroundDrawable(fractionOpen<.20f?trendingBarBg:buttonBg);
+        horizontalLayout.setBackgroundDrawable(topScrollerBg);
+
     }
     @Override
     protected void onDetachedFromWindow() {
@@ -955,6 +961,10 @@ public class MojiInputLayout extends LinearLayout implements
     //replace the word after clicking a suggestion
     public void setReplaceSuggestions(boolean enabled){
         replaceSuggestions = enabled;
+    }
+    public void setSearchAsYouType(boolean enabled){
+        searchAsYouType = enabled;
+        if (!searchAsYouType) useTrendingAdapter(true);
     }
 
     protected MojiEditText.IDrawableClick drawableClick;
