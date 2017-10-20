@@ -122,7 +122,7 @@ public class GifSpan extends MojiSpan implements GifConsumer {
     }
 
     @Override
-    public void onFrameAvailable(final Bitmap b) {
+    public void onFrameAvailable(final Bitmap b,String bitmapUrl) {
         final TextView v = mViewRef.get();
         if (v==null){
             if (producer!=null)

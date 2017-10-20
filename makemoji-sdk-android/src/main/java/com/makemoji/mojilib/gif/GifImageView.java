@@ -6,6 +6,7 @@ package com.makemoji.mojilib.gif;
         import android.graphics.BitmapFactory;
         import android.os.Handler;
         import android.os.Looper;
+        import android.support.v7.widget.AppCompatImageView;
         import android.util.AttributeSet;
         import android.util.Log;
         import android.view.View;
@@ -24,7 +25,7 @@ package com.makemoji.mojilib.gif;
         import okhttp3.Request;
         import okhttp3.Response;
 
-public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
+public class GifImageView extends AppCompatImageView implements GifConsumer,Spanimatable{
 
     private static final String TAG = "GifDecoderView";
     private GifDecoder gifDecoder;
@@ -48,7 +49,11 @@ public class GifImageView extends ImageView implements GifConsumer,Spanimatable{
     }
 
     @Override
-    public void onFrameAvailable(final Bitmap b) {
+    public void onFrameAvailable(final Bitmap b,String bitmapUrl) {
+        if (bitmapUrl==null || !bitmapUrl.equals(url)){
+           // Log.d("gif ","tossing bogus gif bitmap");
+            return;
+        }
         Runnable r = new Runnable() {
             @Override
             public void run() {

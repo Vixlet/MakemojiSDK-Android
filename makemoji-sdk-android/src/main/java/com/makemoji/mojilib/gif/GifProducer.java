@@ -125,7 +125,7 @@ public class GifProducer implements Runnable{
                     synchronized (consumers) {
                         for (WeakReference<GifConsumer> sr : consumers) {
                             GifConsumer c = sr.get();
-                            if (c!=null)c.onFrameAvailable(tmpBitmap);
+                            if (c!=null)c.onFrameAvailable(tmpBitmap,url);
                         }
                     }
 
@@ -190,7 +190,7 @@ public class GifProducer implements Runnable{
         }
         start();
         if (tmpBitmap!=null)
-            consumer.onFrameAvailable(tmpBitmap);
+            consumer.onFrameAvailable(tmpBitmap,url);
     }
     public void unsubscribe(GifConsumer consumer){
         synchronized (consumers) {

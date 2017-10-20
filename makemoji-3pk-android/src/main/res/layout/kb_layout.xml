@@ -14,6 +14,8 @@
     <include layout="@layout/kb_page"
         />
         <android.support.v7.widget.RecyclerView
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="match_parent"
             android:visibility="gone"
             android:id="@+id/_mm_recylcer_view"
