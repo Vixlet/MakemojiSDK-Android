@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MojiList/MojiList.iml" filepath="$PROJECT_DIR$/MojiList/MojiList.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MojiList.iml" filepath="$PROJECT_DIR$/MojiList.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" filepath="$PROJECT_DIR$/MojiList/MojiList-MojiList.iml" />
+      <module fileurl="file://C:\Users\s_baa\Documents\Github\moji-sdk-2\MojiList.iml" filepath="C:\Users\s_baa\Documents\Github\moji-sdk-2\MojiList.iml" />
+      <module fileurl="file://C:\Users\s_baa\Documents\Github\moji-sdk-2\MojiList\MojiList-MojiList.iml" filepath="C:\Users\s_baa\Documents\Github\moji-sdk-2\MojiList\MojiList-MojiList.iml" />
       <module fileurl="file://$PROJECT_DIR$/makemoji-3pk-android/makemoji-3pk-android.iml" filepath="$PROJECT_DIR$/makemoji-3pk-android/makemoji-3pk-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/makemoji-sdk-android/makemoji-sdk-android.iml" filepath="$PROJECT_DIR$/makemoji-sdk-android/makemoji-sdk-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/moji-sdk-2.iml" filepath="$PROJECT_DIR$/moji-sdk-2.iml" />
