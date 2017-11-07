@@ -25,6 +25,7 @@ import java.util.Map;
  * Created by Scott Baar on 4/19/2016.
  */
 public class GifProducer implements Runnable{
+    private static final float FREE_FACTOR = 2;// must have this factor of free memory to decode the next bitmap
     private static String TAG = "GifProducer";
     static Map<String,GifProducer> producerMap = Collections.synchronizedMap(new HashMap<String,GifProducer>());
     public static synchronized GifProducer getProducerAndSub(GifConsumer consumer, @Nullable byte[] bytes, String url){
@@ -51,6 +52,7 @@ public class GifProducer implements Runnable{
     String url;
     final static Object syncObject = new Object();//wait while activity is paused
 
+    Runtime runtime;
     private GifProducer(GifConsumer consumer,byte[] bytes,String url) {
         this.url = url;
         consumers.add(new WeakReference<>(consumer));
@@ -65,6 +67,14 @@ public class GifProducer implements Runnable{
         }
 
         start();
+        runtime = Runtime.getRuntime();
+    }
+    public long getFreeMemory(){
+
+        final long usedMem=(runtime.totalMemory() - runtime.freeMemory());
+        final long maxHeapSize=runtime.maxMemory();
+        final long availHeapSize = maxHeapSize - usedMem;
+        return availHeapSize;
     }
     public int getHeight(){
         return gifDecoder==null?0:gifDecoder.getHeight();
@@ -120,15 +130,19 @@ public class GifProducer implements Runnable{
                 long frameDecodeTime = 0;
                 try {
                     long before = System.nanoTime();
-                    tmpBitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
-                    frameDecodeTime = (System.nanoTime() - before) / 1000000;
-                    synchronized (consumers) {
-                        for (WeakReference<GifConsumer> sr : consumers) {
-                            GifConsumer c = sr.get();
-                            if (c!=null)c.onFrameAvailable(tmpBitmap);
+                    long bmSize = gifDecoder.getWidth() *gifDecoder.getHeight()*4;
+                    long free = getFreeMemory();
+                    if ((bmSize*FREE_FACTOR)<free) {
+                        tmpBitmap = Bitmap.createBitmap(gifDecoder.getNextFrame());
+                        frameDecodeTime = (System.nanoTime() - before) / 1000000;
+                        synchronized (consumers) {
+                            for (WeakReference<GifConsumer> sr : consumers) {
+                                GifConsumer c = sr.get();
+                                if (c != null) c.onFrameAvailable(tmpBitmap, url);
+                            }
                         }
-                    }
 
+                    }
                     if (!animating()) {
                         break;
                     }
@@ -190,7 +204,7 @@ public class GifProducer implements Runnable{
         }
         start();
         if (tmpBitmap!=null)
-            consumer.onFrameAvailable(tmpBitmap);
+            consumer.onFrameAvailable(tmpBitmap,url);
     }
     public void unsubscribe(GifConsumer consumer){
         synchronized (consumers) {

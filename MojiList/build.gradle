@@ -8,12 +8,12 @@ android {
             storePassword 'password'
         }
     }
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.makemoji.sbaar.mojilist"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -28,11 +28,11 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        prog {
-            minifyEnabled true
-            signingConfig signingConfigs.config
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+//        prog {
+//            minifyEnabled true
+//            signingConfig signingConfigs.config
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
     }
 }
 
@@ -41,8 +41,8 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
     //releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //this will compile from source, creating an aar at mojilib/build/outputs/aar
-    compile project(':makemoji-sdk-android')
-    compile project(':makemoji-3pk-android')
+    api project(':makemoji-sdk-android')
+    api project(':makemoji-3pk-android')
     //compile 'com.makemoji:makemoji-sdk-android:0.9.5'
 
     androidTestCompile 'com.android.support.test:runner:0.5'

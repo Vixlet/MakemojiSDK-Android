@@ -1,9 +1,11 @@
 package com.makemoji.mojilib;
 
+import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -292,6 +294,12 @@ public class MojiEditText extends AppCompatEditText implements ISpecialInvalidat
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putString("html",Moji.toHtml(getText()));
         return bundle;
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public int getAutofillType() {
+        return AUTOFILL_TYPE_NONE;
     }
 
     @Override

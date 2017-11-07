@@ -546,7 +546,8 @@ public class MMKB extends InputMethodService
             inputView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    tabLayout.getTabAt(currentTab).select();
+                    TabLayout.Tab tab = tabLayout.getTabAt(currentTab);
+                    if (tab!=null) tab.select();
                 }
             },20);
         firstStart=false;
